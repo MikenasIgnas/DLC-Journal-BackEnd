@@ -49,13 +49,15 @@ const {
     getCompaniesSites,
     getCompaniesPremises,
     getCompaniesColocation,
-    getCompaniesEmployees,
     singleCompanyPage,
     getSingleCompaniesEmployees,
     getSingleCompaniesSites,
     postVisitDetails,
     getVisits,
     getSingleVisit,
+    getCollocations,
+    addCompany,
+    addEmployee,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -99,12 +101,16 @@ router.get('/getCompanies',                     verifyToken, getCompanies)
 router.get('/getCompaniesSites',                verifyToken, getCompaniesSites)
 router.get('/getCompaniesPremises',             verifyToken, getCompaniesPremises)
 router.get('/getCompaniesColocation',           verifyToken, getCompaniesColocation)
-router.get('/getCompaniesEmployees',            verifyToken, getCompaniesEmployees)
+
 router.get('/SingleCompanyPage/:id',            verifyToken, singleCompanyPage)
 router.get('/getSingleCompaniesEmployees/:id',  verifyToken, getSingleCompaniesEmployees)
 router.get('/getSingleCompaniesSites/:id',      verifyToken, getSingleCompaniesSites)
 router.get('/getVisits',                        verifyToken, getVisits)
 router.get('/getSingleVisit/:id',               verifyToken, getSingleVisit)
+router.get('/getCollocations',                  verifyToken, getCollocations)
+
+router.post('/addCompany',                       verifyToken, addCompany)
+router.post('/addEmployee',                      verifyToken, addEmployee)
 
 router.get('/checklistHistoryData',             verifyToken, paginatedResults(FilledChecklistData), (req,res) => {
   res.json(res.paginatedResults)

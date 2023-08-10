@@ -442,7 +442,7 @@ module.exports = {
     },
 
     getCompanies: async (req, res) => {
-        const companiesCollection = client.db('ChecklistDB').collection('companiesTable');
+        const companiesCollection = client.db('ChecklistDB').collection('companies');
         const companies = await companiesCollection.find().toArray()
         sendRes(res, false, 'Companies', companies)
     },
@@ -461,21 +461,18 @@ module.exports = {
         const companiesCollocation = await companyColocationCollection.find().toArray()
         sendRes(res, false, 'coclocation', companiesCollocation)
     },
-    getCompaniesEmployees: async (req, res) => {
-        const companyEmployeesCollection = client.db('ChecklistDB').collection('EmployeesTable');
-        const companiesEmployees = await companyEmployeesCollection.find().toArray()
-        sendRes(res, false, 'CompaniesEmployees', companiesEmployees)
-    },
     singleCompanyPage: async (req, res) => {
         const {id}= req.params
-        const companiesCollection = client.db('ChecklistDB').collection('companiesTable');
+        const companiesCollection = client.db('ChecklistDB').collection('companies');
         const singleCompany = await companiesCollection.findOne({id})
         sendRes(res, false, 'singleCompany', singleCompany)
     },
     getSingleCompaniesEmployees: async (req, res) => {
         const {id} = req.params
-        const companyEmployeesCollection = client.db('ChecklistDB').collection('EmployeesTable');
-        const companiesEmployees = await companyEmployeesCollection.find({CompanyId: id}).toArray()
+        console.log(id)
+        const companyEmployeesCollection = client.db('ChecklistDB').collection('companyEmployees');
+        const companiesEmployees = await companyEmployeesCollection.find({companyId: id}).toArray()
+        console.log(companiesEmployees)
         sendRes(res, false, 'companiesEmployees', companiesEmployees)
     },
     getSingleCompaniesSites: async (req, res) => {
@@ -521,5 +518,55 @@ module.exports = {
         const {id} = req.params
         const visits = await visistsCollection.find({id}).toArray()
         sendRes(res, false, 'visits', visits)
+    },
+    getCollocations: async (req, res) => {
+        const collocationsCollection = client.db('ChecklistDB').collection('Collocations');
+        const collocations = await collocationsCollection.find().toArray()
+        sendRes(res, false, 'collocations', collocations)
+    },
+    addCompany: async (req, res) => {
+        const companies = client.db('ChecklistDB').collection('companies');
+        const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter')
+        companiesIdCounter.findOneAndUpdate(
+            {id:"companyId"},
+            {"$inc": {"seq":1}},
+            { new: true, upsert: true },
+             async (err, cd) => {
+                let seqId
+                if (!cd || !cd.value.seq) {
+                    seqId = 1;
+                }
+                else {
+                    seqId = cd.value.seq;
+                }
+                const companyData = {
+                    companyInfo: req.body,
+                    id: String(seqId)
+                }
+                 await companies.insertOne(companyData);
+            }
+        );
+        return sendRes(res, false, "all good", null)
+    },
+    addEmployee: async (req, res) => {
+        const companyEmployees = client.db('ChecklistDB').collection('companyEmployees');
+        const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
+        employeeIdCounter.findOneAndUpdate(
+            {id:"employeeId"},
+            {"$inc": {"seq":1}},
+            { new: true, upsert: true },
+             async (err, cd) => {
+                let seqId
+                if (!cd || !cd.value.seq) {
+                    seqId = 1;
+                }
+                else {
+                    seqId = cd.value.seq;
+                }
+                req.body.employeeId = String(seqId)
+                 await companyEmployees.insertOne( req.body);
+            }
+        );
+        return sendRes(res, false, "all good", null)
     }
 }
