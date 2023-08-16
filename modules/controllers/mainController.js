@@ -7,6 +7,10 @@ const config =              process.env;
 const MongoClient =         require('mongodb').MongoClient;
 const client =              new MongoClient('mongodb://10.81.7.29:27017/');
 const { ObjectId } =        require('mongodb');
+const path =                require('path'); // Import the 'path' module
+const fs =                  require('fs');
+const multer = require('multer')
+// const upload = multer({ dest: 'C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-BackEnd/uploads' })
 require('dotenv').config()
 
 module.exports = {
@@ -432,13 +436,28 @@ module.exports = {
     },
 
     uploadPhoto: async (req, res) => {
-        const photos = client.db('ChecklistDB').collection('problemPhotos');
-        const uploadedPhoto = await photos.findOneAndUpdate(
-            { checklistId: req.body.checklistId, photoId: req.body.photoId},
-            { $set: { photo: req.body.photo } },
-            { upsert: true }
-          );
-        sendRes(res, false, 'uploadPhoto', uploadedPhoto)
+        const storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+              console.log(req.body)
+              cb(null, ('C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-BackEnd/uploads') )
+            },
+            filename: function (req, file, cb) {
+              cb(null, 'testFile.jpeg')
+            }
+          })
+  
+      const upload = multer({ storage:storage }).single('file')
+
+      upload(req,res,function(err) {
+          if(err) {
+              return handleError(err, res);
+          }
+          console.log("done upload---")
+          res.json({"status":"completed"});
+      });
+
+          const checklistId = req.query.checklistId
+          const photoId = req.query.photoId
     },
 
     getCompanies: async (req, res) => {
@@ -469,10 +488,8 @@ module.exports = {
     },
     getSingleCompaniesEmployees: async (req, res) => {
         const {id} = req.params
-        console.log(id)
         const companyEmployeesCollection = client.db('ChecklistDB').collection('companyEmployees');
         const companiesEmployees = await companyEmployeesCollection.find({companyId: id}).toArray()
-        console.log(companiesEmployees)
         sendRes(res, false, 'companiesEmployees', companiesEmployees)
     },
     getSingleCompaniesSites: async (req, res) => {
@@ -568,5 +585,18 @@ module.exports = {
             }
         );
         return sendRes(res, false, "all good", null)
+    },
+    getClientsEmployees: async (req, res) => {
+        const companyEmployees = client.db('ChecklistDB').collection('companyEmployees');
+        const companyId = parseInt(req.query.companyId)
+        const employeeId = parseInt(req.query.employeeId)
+        const employee = await companyEmployees.findOne({companyId: String(companyId), employeeId: String(employeeId)})
+        return sendRes(res, false, "all good", employee)
+    },
+    getClientsEmployeesCompanyName: async (req, res) => {
+        const companies = client.db('ChecklistDB').collection('companies');
+        const {id} = req.params
+        const companyName = await companies.findOne({id})
+        return sendRes(res, false, "all good", companyName.companyInfo.companyName)
     }
 }

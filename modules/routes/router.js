@@ -58,6 +58,8 @@ const {
     getCollocations,
     addCompany,
     addEmployee,
+    getClientsEmployees,
+    getClientsEmployeesCompanyName,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -75,7 +77,7 @@ router.post("/updateHistoryItem/:id",           verifyToken, updateHistoryItem)
 router.post("/postPhotos",                      verifyToken, postPhotos)
 router.post("/postLastestAndCurrentPhotos",     verifyToken, postLastestAndCurrentPhotos)
 router.post("/postLatestPhotos",                verifyToken, postLatestPhotos)
-router.post("/uploadPhoto",                     verifyToken, uploadPhoto)
+router.post("/uploadPhoto",                      uploadPhoto)
 router.post("/postVisitDetails",                verifyToken, postVisitDetails)
 
 router.get("/routeData",                        verifyToken, routeData)
@@ -108,9 +110,11 @@ router.get('/getSingleCompaniesSites/:id',      verifyToken, getSingleCompaniesS
 router.get('/getVisits',                        verifyToken, getVisits)
 router.get('/getSingleVisit/:id',               verifyToken, getSingleVisit)
 router.get('/getCollocations',                  verifyToken, getCollocations)
+router.get('/getClientsEmployee',               verifyToken, getClientsEmployees)
+router.get('/getClientsEmployeesCompanyName/:id',   verifyToken, getClientsEmployeesCompanyName)
 
-router.post('/addCompany',                       verifyToken, addCompany)
-router.post('/addEmployee',                      verifyToken, addEmployee)
+router.post('/addCompany',                      verifyToken, addCompany)
+router.post('/addEmployee',                     verifyToken, addEmployee)
 
 router.get('/checklistHistoryData',             verifyToken, paginatedResults(FilledChecklistData), (req,res) => {
   res.json(res.paginatedResults)
