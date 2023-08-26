@@ -436,8 +436,7 @@ module.exports = {
     },
     
     uploadPhoto: async (req, res) => {
-        // const checklistId = req.query.checklistId
-        // const photoId = req.query.photoId
+
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
               cb(null, ('C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-BackEnd/uploads') )
@@ -458,19 +457,24 @@ module.exports = {
     },
     uploadCompanysPhoto: async (req, res) => {
         const companyIdCounter = client.db('ChecklistDB').collection('companiesIdCounter');
+        const companiesCollection =  client.db('ChecklistDB').collection('companies');
         const companyId = await companyIdCounter.findOne({id:"companyId"})
         const companyName = req.query.company
-         const storage = multer.diskStorage({
+        const filePath = 'C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/CompanyLogos'
+        const fileName =  `${companyName}Logo${companyId.seq -1}.jpeg`
+        const storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, ('C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/CompanyLogos') )
+                cb(null, (filePath) )
             },
             filename: function (req, file, cb) {
-                cb(null, `${companyName}Logo${companyId.seq -1}.jpeg`)
+                cb(null, fileName)
             }
-          })
-  
-      const upload = multer({ storage:storage }).single('file')
-
+        })
+        const upload = multer({ storage:storage }).single('file')
+        
+        await companiesCollection.findOneAndUpdate({id: String(companyId.seq - 1)}, { $set: {
+            'companyInfo.companyPhoto': `${fileName}` // New photo URL or filename
+          }} )
       upload(req,res,function(err) {
           if(err) {
               return handleError(err, res);
@@ -649,4 +653,49 @@ module.exports = {
           );
         res.send({success: true})
     },
+    uploadCliesntEmployeesPhoto: async (req, res) => {
+        const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter');
+        const employeeId = await employeeIdCounter.findOne({id:"employeeId"})
+        const companyName = req.query.companyName
+        const companyId = req.query.companyId
+
+        const storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+              cb(null, (`C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos`) )
+            },
+            filename: function (req, file, cb) {
+                cb(null, `${companyName}companyId${companyId}employeeId${employeeId.seq - 1}.jpeg`)
+            }
+        })
+  
+      const upload = multer({ storage:storage }).single('file')
+
+      upload(req,res,function(err) {
+        if(err) {
+            return handleError(err, res);
+        }
+        res.json({"status":"completed"});
+        })
+    },
+    deleteClientsEmployee: async (req, res) => {
+        const clientsEmployees = client.db('ChecklistDB').collection('companyEmployees');
+        const companyId = req.query.companyId
+        const employeeId = req.query.employeeId
+        const companyName = req.query.companyName
+        await clientsEmployees.findOneAndDelete({companyId, employeeId})
+        const filePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err);
+            } else {
+                console.log('File deleted successfully');
+            }
+        });
+        res.send({success: true})
+    },
+    updateClientsEmployee: async (req, res) => {
+        const clientsEmployees = client.db('ChecklistDB').collection('companyEmployees');
+        await clientsEmployees.findOneAndUpdate({companyId: req.body.companyId, employeeId: req.body.employeeId}, { $set: req.body})
+        return sendRes(res, false, "all good", null)
+    }
 }
