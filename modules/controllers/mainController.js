@@ -459,7 +459,7 @@ module.exports = {
         const companyIdCounter = client.db('ChecklistDB').collection('companiesIdCounter');
         const companiesCollection =  client.db('ChecklistDB').collection('companies');
         const companyId = await companyIdCounter.findOne({id:"companyId"})
-        const companyName = req.query.company
+        const companyName = req.query.companyName.replace(/\s+/g, '');  
         const filePath = 'C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/CompanyLogos'
         const fileName =  `${companyName}Logo${companyId.seq -1}.jpeg`
         const storage = multer.diskStorage({
@@ -625,20 +625,48 @@ module.exports = {
         const company = client.db('ChecklistDB').collection('companies');
         const companyEmployees = client.db('ChecklistDB').collection('companyEmployees');
         const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter')
+        const companiesEmployeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
         const {id} = req.params
         const companyData = await company.findOne({id})
-        const companyName = companyData.companyInfo.companyName 
+        const clientsEmployees = await companyEmployees.find().toArray()
+        const companyName = companyData.companyInfo.companyName.replace(/\s+/g, '');  
         await company.findOneAndDelete({id})
-        await companyEmployees.findOneAndDelete({companyId: id})
-        const filePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/CompanyLogos/${companyName}Logo${id}.jpeg`
-        fs.unlink(filePath, (err) => {
+        const deletedEmployees = await companyEmployees.deleteMany({companyId: id})
+        const numDocumentsDeleted = deletedEmployees.deletedCount;
+        const companyLogofilePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/CompanyLogos/${companyName}Logo${id}.jpeg`
+
+        fs.unlink(companyLogofilePath, (err) => {
             if (err) {
                 console.error('Error deleting file:', err);
             } 
         });
+
+        for(let i = 1; i<= numDocumentsDeleted; i++){
+            for(let i = clientsEmployees[0].employeeId; i <= clientsEmployees[clientsEmployees.length - 1].employeeId; i++ ){
+                const companyEmployeePhotoFilePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${id}employeeId${i}.jpeg`
+                fs.unlink(companyEmployeePhotoFilePath, (err) => {
+                    if (err) {
+                        console.error('Error deleting file:', err);
+                    } 
+                });
+            }
+            }
         companiesIdCounter.findOneAndUpdate(
             { id: "companyId" },
-            { $inc: { seq: -1 } }, // Decrementing seq by 1
+            { $inc: { seq: -1 } },
+            { new: true, upsert: true },
+            async (err, cd) => {
+              let seqId;
+              if (!cd || !cd.value.seq) {
+                seqId = 1;
+              } else {
+                seqId = cd.value.seq;
+              }
+            }
+          );
+          companiesEmployeesIdCounter.findOneAndUpdate(
+            { id: "employeeId" },
+            { $inc: { seq: -numDocumentsDeleted } }, 
             { new: true, upsert: true },
             async (err, cd) => {
               let seqId;
@@ -653,21 +681,25 @@ module.exports = {
     },
     uploadCliesntEmployeesPhoto: async (req, res) => {
         const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter');
+        const clientsEmployeesCollection = client.db('ChecklistDB').collection('companyEmployees');
         const employeeId = await employeeIdCounter.findOne({id:"employeeId"})
-        const companyName = req.query.companyName
+        const companyName = req.query.companyName.replace(/\s+/g, '');  
         const companyId = req.query.companyId
-
+        const fileName =  `${companyName}companyId${companyId}employeeId${employeeId.seq - 1}.jpeg`
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
               cb(null, (`C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos`) )
             },
             filename: function (req, file, cb) {
-                cb(null, `${companyName}companyId${companyId}employeeId${employeeId.seq - 1}.jpeg`)
+                cb(null, fileName)
             }
         })
   
       const upload = multer({ storage:storage }).single('file')
-
+      await clientsEmployeesCollection.findOneAndUpdate({employeeId: String(employeeId.seq - 1)}, { $set: {
+        employeePhoto: `${fileName}` 
+      }})
+      
       upload(req,res,function(err) {
         if(err) {
             return handleError(err, res);
@@ -677,6 +709,7 @@ module.exports = {
     },
     deleteClientsEmployee: async (req, res) => {
         const clientsEmployees = client.db('ChecklistDB').collection('companyEmployees');
+        const employeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter');
         const companyId = req.query.companyId
         const employeeId = req.query.employeeId
         const companyName = req.query.companyName
@@ -687,6 +720,19 @@ module.exports = {
                 console.error('Error deleting file:', err);
             } 
         });
+        employeesIdCounter.findOneAndUpdate(
+            { id: "employeeId" },
+            { $inc: { seq: -1 } },
+            { new: true, upsert: true },
+            async (err, cd) => {
+              let seqId;
+              if (!cd || !cd.value.seq) {
+                seqId = 1;
+              } else {
+                seqId = cd.value.seq;
+              }
+            }
+          );
         res.send({success: true})
     },
     updateClientsEmployee: async (req, res) => {
