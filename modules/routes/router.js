@@ -65,6 +65,7 @@ const {
     uploadCliesntEmployeesPhoto,
     deleteClientsEmployee,
     updateClientsEmployee,
+    updateCompaniesData,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -125,6 +126,7 @@ router.get('/deleteClientsEmployee',            verifyToken, deleteClientsEmploy
 router.post('/addCompany',                      verifyToken, addCompany)
 router.post('/addEmployee',                     verifyToken, addEmployee)
 router.post('/updateClientsEmployee',           verifyToken, updateClientsEmployee)
+router.post('/updateCompaniesData',             verifyToken, updateCompaniesData)
 
 router.get('/checklistHistoryData',             verifyToken, paginatedResults(FilledChecklistData), (req,res) => {
   res.json(res.paginatedResults)

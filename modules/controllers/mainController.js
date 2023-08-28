@@ -634,9 +634,7 @@ module.exports = {
         fs.unlink(filePath, (err) => {
             if (err) {
                 console.error('Error deleting file:', err);
-            } else {
-                console.log('File deleted successfully');
-            }
+            } 
         });
         companiesIdCounter.findOneAndUpdate(
             { id: "companyId" },
@@ -687,15 +685,22 @@ module.exports = {
         fs.unlink(filePath, (err) => {
             if (err) {
                 console.error('Error deleting file:', err);
-            } else {
-                console.log('File deleted successfully');
-            }
+            } 
         });
         res.send({success: true})
     },
     updateClientsEmployee: async (req, res) => {
         const clientsEmployees = client.db('ChecklistDB').collection('companyEmployees');
         await clientsEmployees.findOneAndUpdate({companyId: req.body.companyId, employeeId: req.body.employeeId}, { $set: req.body})
+        return sendRes(res, false, "all good", null)
+    },
+    updateCompaniesData: async (req, res) => {
+        const companiesCollenction = client.db('ChecklistDB').collection('companies');
+        await companiesCollenction.findOneAndUpdate({id:req.query.companyId},  { $set: {
+            'companyInfo.J13': req.body.J13, 
+            'companyInfo.T72': req.body.T72, 
+            'companyInfo.companyName': req.body.companyName, 
+        }}) 
         return sendRes(res, false, "all good", null)
     }
 }
