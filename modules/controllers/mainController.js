@@ -748,5 +748,20 @@ module.exports = {
             'companyInfo.companyName': req.body.companyName, 
         }}) 
         return sendRes(res, false, "all good", null)
+    },
+    addSubClient: async (req, res) => {
+        const companiesCollenction = client.db('ChecklistDB').collection('companies');
+        const companyId = req.query.companyId
+        const addedSubClient = await companiesCollenction.findOneAndUpdate({id: companyId}, {$push: {'companyInfo.subClient': req.body}});
+        return sendRes(res, false, "all good", null)
+    },
+    deleteCompaniesSubClient: async (req, res) => {
+        const companiesCollenction = client.db('ChecklistDB').collection('companies');
+        const companyId = req.query.companyId
+        const subClientName = req.query.subClient
+        const company = await companiesCollenction.findOne({id: companyId})
+        const filteredArray = company.companyInfo.subClient.filter(item => item.subClientCompanyName !== subClientName)
+        const updatedSubClient = await companiesCollenction.findOneAndUpdate({id: companyId}, {$set: {'companyInfo.subClient': filteredArray}})
+        return sendRes(res, false, "all good", updatedSubClient)
     }
 }
