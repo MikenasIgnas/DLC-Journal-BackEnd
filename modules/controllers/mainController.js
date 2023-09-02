@@ -749,12 +749,7 @@ module.exports = {
         }}) 
         return sendRes(res, false, "all good", null)
     },
-    addSubClient: async (req, res) => {
-        const companiesCollenction = client.db('ChecklistDB').collection('companies');
-        const companyId = req.query.companyId
-        const addedSubClient = await companiesCollenction.findOneAndUpdate({id: companyId}, {$push: {'companyInfo.subClient': req.body}});
-        return sendRes(res, false, "all good", null)
-    },
+
     deleteCompaniesSubClient: async (req, res) => {
         const companiesCollenction = client.db('ChecklistDB').collection('companies');
         const companyId = req.query.companyId
@@ -762,6 +757,39 @@ module.exports = {
         const company = await companiesCollenction.findOne({id: companyId})
         const filteredArray = company.companyInfo.subClient.filter(item => item.subClientCompanyName !== subClientName)
         const updatedSubClient = await companiesCollenction.findOneAndUpdate({id: companyId}, {$set: {'companyInfo.subClient': filteredArray}})
-        return sendRes(res, false, "all good", updatedSubClient)
+        return sendRes(res, false, "all good", [{value: companyId, label:  subClientName }])
+    },
+
+    addSubClient: async (req, res) => {
+        const companies = client.db('ChecklistDB').collection('companies');
+        const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter')
+        companiesIdCounter.findOneAndUpdate(
+            {id:"companyId"},
+            {"$inc": {"seq":1}},
+            { new: true, upsert: true },
+             async (err, cd) => {
+                let seqId
+                if (!cd || !cd.value.seq) {
+                    seqId = 1;
+                }
+                else {
+                    seqId = cd.value.seq;
+                }
+                const companyData = {
+                    parentCompanyId: req.query.parentCompanyId,
+                    companyInfo: req.body,
+                    id: String(seqId)
+                }
+                 await companies.insertOne(companyData);
+            }
+        );
+        return sendRes(res, false, "all good", null)
+    },
+    getSubClients: async (req, res) => {
+        const companies = client.db('ChecklistDB').collection('companies');
+        const parentCompanyId = req.query.parentCompanyId
+        const subClient = await companies.find({parentCompanyId: parentCompanyId}).toArray()
+        return sendRes(res, false, "all good", subClient)
     }
 }
+
