@@ -69,6 +69,8 @@ const {
     addSubClient,
     deleteCompaniesSubClient,
     getSubClients,
+    addSubClientsEmployee,
+    getSubClientsEmployees,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -127,12 +129,14 @@ router.get('/deleteCompany/:id',                verifyToken, deleteCompany)
 router.get('/deleteClientsEmployee',            verifyToken, deleteClientsEmployee)
 router.get('/deleteCompaniesSubClient',         verifyToken, deleteCompaniesSubClient)
 router.get('/getSubClients',                    verifyToken, getSubClients)
+router.get('/getSubClientsEmployees',           verifyToken, getSubClientsEmployees)
 
 router.post('/addCompany',                      verifyToken, addCompany)
 router.post('/addEmployee',                     verifyToken, addEmployee)
 router.post('/updateClientsEmployee',           verifyToken, updateClientsEmployee)
 router.post('/updateCompaniesData',             verifyToken, updateCompaniesData)
 router.post('/addSubClient',                    verifyToken, addSubClient)
+router.post('/addSubClientsEmployee',                    verifyToken, addSubClientsEmployee)
 
 router.get('/checklistHistoryData',             verifyToken, paginatedResults(FilledChecklistData), (req,res) => {
   res.json(res.paginatedResults)
