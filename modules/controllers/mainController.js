@@ -610,8 +610,8 @@ module.exports = {
     },
     getClientsEmployees: async (req, res) => {
         const companyEmployees = client.db('ChecklistDB').collection('companyEmployees');
-        const companyId = parseInt(req.query.companyId)
-        const employeeId = parseInt(req.query.employeeId)
+        const companyId = req.query.companyId
+        const employeeId = req.query.employeeId
         const employee = await companyEmployees.findOne({companyId: String(companyId), employeeId: String(employeeId)})
         return sendRes(res, false, "all good", employee)
     },
@@ -682,10 +682,10 @@ module.exports = {
     uploadCliesntEmployeesPhoto: async (req, res) => {
         const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter');
         const clientsEmployeesCollection = client.db('ChecklistDB').collection('companyEmployees');
-        const employeeId = await employeeIdCounter.findOne({id:"employeeId"})
         const companyName = req.query.companyName.replace(/\s+/g, '');  
         const companyId = req.query.companyId
-        const fileName =  `${companyName}companyId${companyId}employeeId${employeeId.seq - 1}.jpeg`
+        const employeeId = req.query.employeeId
+        const fileName =  `${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
               cb(null, (`C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos`) )
@@ -694,9 +694,8 @@ module.exports = {
                 cb(null, fileName)
             }
         })
-  
       const upload = multer({ storage:storage }).single('file')
-      await clientsEmployeesCollection.findOneAndUpdate({employeeId: String(employeeId.seq - 1)}, { $set: {
+      await clientsEmployeesCollection.findOneAndUpdate({employeeId: String(employeeId)}, { $set: {
         employeePhoto: `${fileName}` 
       }})
       
@@ -751,13 +750,23 @@ module.exports = {
     },
 
     deleteCompaniesSubClient: async (req, res) => {
+        const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter')
         const companiesCollenction = client.db('ChecklistDB').collection('companies');
-        const companyId = req.query.companyId
-        const subClientName = req.query.subClient
-        const company = await companiesCollenction.findOne({id: companyId})
-        const filteredArray = company.companyInfo.subClient.filter(item => item.subClientCompanyName !== subClientName)
-        const updatedSubClient = await companiesCollenction.findOneAndUpdate({id: companyId}, {$set: {'companyInfo.subClient': filteredArray}})
-        return sendRes(res, false, "all good", [{value: companyId, label:  subClientName }])
+        await companiesCollenction.findOneAndDelete({id: req.query.subClientId, parentCompanyId: req.query.parentCompanyId})
+        companiesIdCounter.findOneAndUpdate(
+            { id: "companyId" },
+            { $inc: { seq: -1 } },
+            { new: true, upsert: true },
+            async (err, cd) => {
+              let seqId;
+              if (!cd || !cd.value.seq) {
+                seqId = 1;
+              } else {
+                seqId = cd.value.seq;
+              }
+            }
+          );
+        return sendRes(res, false, "all good", null)
     },
 
     addSubClient: async (req, res) => {
@@ -790,6 +799,7 @@ module.exports = {
         const parentCompanyId = req.query.parentCompanyId
         const subClient = await companies.find({parentCompanyId: parentCompanyId}).toArray()
         return sendRes(res, false, "all good", subClient)
-    }
+    },
+
 }
 
