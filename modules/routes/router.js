@@ -71,6 +71,7 @@ const {
     getSubClients,
     addSubClientsEmployee,
     getSubClientsEmployees,
+    deleteSubClientsEmployee,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -130,6 +131,7 @@ router.get('/deleteClientsEmployee',            verifyToken, deleteClientsEmploy
 router.get('/deleteCompaniesSubClient',         verifyToken, deleteCompaniesSubClient)
 router.get('/getSubClients',                    verifyToken, getSubClients)
 router.get('/getSubClientsEmployees',           verifyToken, getSubClientsEmployees)
+router.get('/deleteSubClientsEmployee',         verifyToken, deleteSubClientsEmployee)
 
 router.post('/addCompany',                      verifyToken, addCompany)
 router.post('/addEmployee',                     verifyToken, addEmployee)

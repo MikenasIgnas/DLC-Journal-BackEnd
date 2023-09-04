@@ -824,9 +824,35 @@ module.exports = {
     },
     getSubClientsEmployees: async (req, res) => {
         const companyEmployees = client.db('ChecklistDB').collection('companyEmployees');
-        const subClientEmployees = await companyEmployees.find({companyId: req.query.parentCompanyId, subClientId: req.query.subClientId }).toArray()
+        const subClientEmployees = await companyEmployees.find({subClientId: req.query.subClientId }).toArray()
         return sendRes(res, false, "all good", subClientEmployees)
+    },
+    deleteSubClientsEmployee: async (req, res) => {
+        const subClientsEMployees = client.db('ChecklistDB').collection('companyEmployees');
+        const employeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter');
+        const companyId = req.query.companyId
+        const employeeId = req.query.employeeId
+        await subClientsEMployees.findOneAndDelete({companyId, employeeId})
+        // const filePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
+        // fs.unlink(filePath, (err) => {
+        //     if (err) {
+        //         console.error('Error deleting file:', err);
+        //     } 
+        // });
+        employeesIdCounter.findOneAndUpdate(
+            { id: "employeeId" },
+            { $inc: { seq: -1 } },
+            { new: true, upsert: true },
+            async (err, cd) => {
+              let seqId;
+              if (!cd || !cd.value.seq) {
+                seqId = 1;
+              } else {
+                seqId = cd.value.seq;
+              }
+            }
+          );
+        res.send({success: true})
     }
-
 }
 
