@@ -72,6 +72,9 @@ const {
     addSubClientsEmployee,
     getSubClientsEmployees,
     deleteSubClientsEmployee,
+    getAllMainCompanies,
+    addMainCompanyAsSubClient,
+    changeSubClientToMainClient,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -132,13 +135,16 @@ router.get('/deleteCompaniesSubClient',         verifyToken, deleteCompaniesSubC
 router.get('/getSubClients',                    verifyToken, getSubClients)
 router.get('/getSubClientsEmployees',           verifyToken, getSubClientsEmployees)
 router.get('/deleteSubClientsEmployee',         verifyToken, deleteSubClientsEmployee)
+router.get('/getAllMainCompanies',              verifyToken, getAllMainCompanies)
 
 router.post('/addCompany',                      verifyToken, addCompany)
 router.post('/addEmployee',                     verifyToken, addEmployee)
 router.post('/updateClientsEmployee',           verifyToken, updateClientsEmployee)
 router.post('/updateCompaniesData',             verifyToken, updateCompaniesData)
 router.post('/addSubClient',                    verifyToken, addSubClient)
-router.post('/addSubClientsEmployee',                    verifyToken, addSubClientsEmployee)
+router.post('/addSubClientsEmployee',           verifyToken, addSubClientsEmployee)
+router.post('/addMainCompanyAsSubClient',       verifyToken, addMainCompanyAsSubClient)
+router.get('/changeSubClientToMainClient',     verifyToken, changeSubClientToMainClient)
 
 router.get('/checklistHistoryData',             verifyToken, paginatedResults(FilledChecklistData), (req,res) => {
   res.json(res.paginatedResults)

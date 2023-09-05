@@ -833,26 +833,39 @@ module.exports = {
         const companyId = req.query.companyId
         const employeeId = req.query.employeeId
         await subClientsEMployees.findOneAndDelete({companyId, employeeId})
-        // const filePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
-        // fs.unlink(filePath, (err) => {
-        //     if (err) {
-        //         console.error('Error deleting file:', err);
-        //     } 
-        // });
         employeesIdCounter.findOneAndUpdate(
             { id: "employeeId" },
             { $inc: { seq: -1 } },
             { new: true, upsert: true },
             async (err, cd) => {
-              let seqId;
-              if (!cd || !cd.value.seq) {
-                seqId = 1;
-              } else {
-                seqId = cd.value.seq;
-              }
+                let seqId;
+                if (!cd || !cd.value.seq) {
+                    seqId = 1;
+                } else {
+                    seqId = cd.value.seq;
+                }
             }
-          );
-        res.send({success: true})
+            );
+            res.send({success: true})
+        },
+        getAllMainCompanies: async (req, res) => {
+            const companiesCollection = client.db('ChecklistDB').collection('companies');
+            const companies = await companiesCollection.find().toArray()
+            const companyId = req.query.companyId
+            const mainCompanies = companies.filter(item => !item.parentCompanyId).filter((el) => el.id !== companyId);
+            return sendRes(res, false, "all good", mainCompanies)
+        },
+        addMainCompanyAsSubClient: async (req, res) => {
+            const companiesCollection = client.db('ChecklistDB').collection('companies');
+            await companiesCollection.findOneAndUpdate({id: req.query.companyId}, {$set: {parentCompanyId: req.query.parentCompanyId, wasMainClient: true}})
+            return sendRes(res, false, "all good", null)
+        },
+        changeSubClientToMainClient: async (req, res) => {
+            const companiesCollection = client.db('ChecklistDB').collection('companies');
+            await companiesCollection.findOneAndUpdate(
+              { id: req.query.companyId },
+              { $unset: { parentCompanyId: 1 }, $set: { wasMainClient: false } }
+            );
+          }
     }
-}
-
+    
