@@ -863,9 +863,10 @@ module.exports = {
         changeSubClientToMainClient: async (req, res) => {
             const companiesCollection = client.db('ChecklistDB').collection('companies');
             await companiesCollection.findOneAndUpdate(
-              { id: req.query.companyId },
-              { $unset: { parentCompanyId: 1 }, $set: { wasMainClient: false } }
-            );
-          }
+                { id: req.query.companyId },
+                { $unset: { parentCompanyId: 1 }, $set: { wasMainClient: false } }
+                );
+            return sendRes(res, false, "all good", null)
+            }
     }
     
