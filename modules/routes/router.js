@@ -75,6 +75,7 @@ const {
     getAllMainCompanies,
     addMainCompanyAsSubClient,
     changeSubClientToMainClient,
+    getSingleSubClient,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -133,6 +134,7 @@ router.get('/deleteCompany/:id',                verifyToken, deleteCompany)
 router.get('/deleteClientsEmployee',            verifyToken, deleteClientsEmployee)
 router.get('/deleteCompaniesSubClient',         verifyToken, deleteCompaniesSubClient)
 router.get('/getSubClients',                    verifyToken, getSubClients)
+router.get('/getSingleSubClient',               verifyToken, getSingleSubClient)
 router.get('/getSubClientsEmployees',           verifyToken, getSubClientsEmployees)
 router.get('/deleteSubClientsEmployee',         verifyToken, deleteSubClientsEmployee)
 router.get('/getAllMainCompanies',              verifyToken, getAllMainCompanies)

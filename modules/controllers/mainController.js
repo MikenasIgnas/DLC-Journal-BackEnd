@@ -800,6 +800,13 @@ module.exports = {
         const subClient = await companies.find({parentCompanyId: parentCompanyId}).toArray()
         return sendRes(res, false, "all good", subClient)
     },
+    getSingleSubClient: async (req, res) => {
+        const companies = client.db('ChecklistDB').collection('companies');
+        const parentCompanyId = req.query.parentCompanyId
+        const subClientId = req.query.subClientId
+        const subClient = await companies.findOne({parentCompanyId: parentCompanyId, id: subClientId})
+        return sendRes(res, false, "all good", subClient)
+    },
     addSubClientsEmployee: async (req, res) => {
         const companyEmployees = client.db('ChecklistDB').collection('companyEmployees');
         const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
