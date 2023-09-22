@@ -76,6 +76,8 @@ const {
     addMainCompanyAsSubClient,
     changeSubClientToMainClient,
     getSingleSubClient,
+    getAllHistoryData,
+    generateMonthlyPDFReport,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -116,6 +118,8 @@ router.get('/getHistoryData',                   verifyToken, getHistoryData)
 router.get('/getPhotos/:photoId',               verifyToken, getPhotos)
 router.get('/latestPhotos',                     verifyToken, latestPhotos)
 router.get('/deletePhoto/:photoId',             verifyToken, deletePhoto)
+router.get('/getAllHistoryData',                verifyToken, getAllHistoryData)
+router.get('/generateMonthlyPDFReport',         verifyToken,   generateMonthlyPDFReport)
 
 router.get('/getCompanies',                     verifyToken, getCompanies)
 router.get('/getCompaniesSites',                verifyToken, getCompaniesSites)

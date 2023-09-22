@@ -874,6 +874,46 @@ module.exports = {
                 { $unset: { parentCompanyId: 1 }, $set: { wasMainClient: false } }
                 );
             return sendRes(res, false, "all good", null)
+        },
+        getAllHistoryData: async (req, res) => {
+            return sendRes(res, false, "totalHistoryData",totalHistoryData) 
+        },
+        generateMonthlyPDFReport: async (req, res) => {
+
+            const today = new Date()
+            const year = today.getFullYear()
+            const month = today.getMonth() + 1 // Month is 0-based, so add 1
+            const day = today.getDate()
+    
+            const currentDate = `${year}/${month}/${day}`
+            let newYear = year
+            let newMonth = month - 1
+            if (newMonth < 1) {
+              newMonth = 12
+              newYear--
             }
+    
+            const dateInOneMoth = `${newYear}/${newMonth}/${day}`
+
+            const checklistHistoryData = client.db('ChecklistDB').collection('checklistHistoryData');
+            const allHistoryData = await checklistHistoryData.find().toArray()
+              const startDateRangeStart = new Date(dateInOneMoth)
+              const startDateRangeEnd = new Date(currentDate)
+              const filteredData2 = allHistoryData?.filter(user => {
+                const userStartDate = new Date(user.endDate)
+                return userStartDate >= startDateRangeStart && userStartDate <= startDateRangeEnd
+            })
+            const filteredData = filteredData2?.map(user => ({
+                  ...user,
+                filledData: user?.filledData?.filter(page => {
+                  const values = Object?.values(page?.values)
+                  return values?.some(pageValues =>
+                    Object?.values(pageValues)?.some(value =>
+                      typeof value === 'object' ? Object?.values(value)?.some(innerValue => innerValue === true) : value === true
+                    ))
+                }),
+            }))
+            return sendRes(res, false, "totalHistoryData",filteredData) 
+        }
     }
     
