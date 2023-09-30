@@ -78,6 +78,7 @@ const {
     getSingleSubClient,
     getAllHistoryData,
     generateMonthlyPDFReport,
+    getAllClientsEmployees,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -134,6 +135,7 @@ router.get('/getSingleVisit/:id',               verifyToken, getSingleVisit)
 router.get('/getCollocations',                  verifyToken, getCollocations)
 router.get('/getClientsEmployee',               verifyToken, getClientsEmployees)
 router.get('/getClientsEmployeesCompanyName/:id', verifyToken, getClientsEmployeesCompanyName)
+router.get('/getAllClientsEmployees',           verifyToken, getAllClientsEmployees)
 router.get('/deleteCompany/:id',                verifyToken, deleteCompany)
 router.get('/deleteClientsEmployee',            verifyToken, deleteClientsEmployee)
 router.get('/deleteCompaniesSubClient',         verifyToken, deleteCompaniesSubClient)

@@ -914,6 +914,12 @@ module.exports = {
                 }),
             }))
             return sendRes(res, false, "totalHistoryData",filteredData) 
+        },
+        getAllClientsEmployees: async (req, res) => {
+            const companies = client.db('ChecklistDB').collection('companyEmployees');
+            const companyId = req.query.companyId
+            const employees = await companies.find({companyId: companyId}).toArray()
+            return sendRes(res, false, "all good", employees)
         }
     }
     
