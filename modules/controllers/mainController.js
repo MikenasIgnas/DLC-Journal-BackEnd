@@ -52,6 +52,7 @@ module.exports = {
                         dateDeleted: '',
                         defaultTheme,
                         key: seqId,
+                        id: seqId,
                         secret: secret
                     };
         
@@ -75,7 +76,7 @@ module.exports = {
               res.status(400).send("All input is required");
             }
             if (user && (await bcrypt.compare(password, user.password)) ) {
-              const payload = { email, userId: user._id, userRole: user.userRole, secret: user.secret};
+              const payload = { email, userId: user._id, userRole: user.userRole, secret: user.secret, id: user.id};
               const options = { expiresIn: '30m', algorithm: 'HS256' };
               const token = jwt.sign(payload, config.TOKEN_KEY, options);
               user.token = token;
@@ -92,12 +93,6 @@ module.exports = {
         const collection = client.db('ChecklistDB').collection('registeredusers');
         const allUsers = await collection.find().toArray()
         return sendRes(res, false, "all good", allUsers)
-    },
-
-    getArchivedUsers:async (req,res) => {
-        const collection = client.db('ChecklistDB').collection('archivedusers');
-        const archivedUsers = await collection.find().toArray()
-        return sendRes(res, false, "all good",archivedUsers)
     },
 
     routeData: async (req, res) => {
@@ -149,7 +144,7 @@ module.exports = {
                     problemCount: req.body.problemCount,
                     secret: req.body.secret,
                     userRole:req.body.userRole,
-                    id: String(seqId)
+                    id: seqId
                 }
                  await checklistHistoryData.insertOne(filledData);
             }
@@ -170,12 +165,31 @@ module.exports = {
         res.send({success: true})
     },
 
-    totalHistoryEntries: async (req, res) => {
+    checklistHistoryCount: async (req, res) => {
         const checklistHistoryData = client.db('ChecklistDB').collection('checklistHistoryData');
         const totalHistoryData = await checklistHistoryData.countDocuments()
         return sendRes(res, false, "totalHistoryData",totalHistoryData)
     },
-
+    allUsersCount: async (req, res) => {
+        const registeredUsers = client.db('ChecklistDB').collection('registeredusers');
+        const registeredUsersCount = await registeredUsers.countDocuments()
+        return sendRes(res, false, "totalHistoryData",registeredUsersCount)
+    },
+    visitsCount: async (req, res) => {
+        const visits = client.db('ChecklistDB').collection('Visits');
+        const visitsCount = await visits.countDocuments()
+        return sendRes(res, false, "totalHistoryData",visitsCount)
+    },
+    archivedUsersCount: async (req, res) => {
+        const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
+        const archivedUsersCount = await archivedUsers.countDocuments()
+        return sendRes(res, false, "totalHistoryData",archivedUsersCount)
+    },
+    totalVisitsEntries: async (req, res) => {
+        const visitsData = client.db('ChecklistDB').collection('Visits');
+        const visitsCount = await visitsData.countDocuments()
+        return sendRes(res, false, "visitsCount",visitsCount)
+    },
     getTotalAreasCount: async (req, res) => {
         const collection = client.db('ChecklistDB').collection('areasTable');
         const totalAreasCount = await collection.countDocuments()
@@ -184,15 +198,15 @@ module.exports = {
 
     FindUser: async(req, res) => {
         const users = client.db('ChecklistDB').collection('registeredusers');
-        const {secret} = req.params
-        const user = await users.findOne({secret})
+        const {id} = req.params
+        const user = await users.findOne({id:Number(id)})
         return sendRes(res, false, 'User', user)
     },
 
     deleteUser: async (req, res) => {
         const users = client.db('ChecklistDB').collection('registeredusers');
-        const {secret} = req.params
-        await users.findOneAndDelete({secret})
+        const {id} = req.params
+        await users.findOneAndDelete({id: Number(id)})
         res.send({success: true})
     },
 
@@ -212,10 +226,10 @@ module.exports = {
 
     changeUsersRole:async(req, res) => {
         const users = client.db('ChecklistDB').collection('registeredusers');
-        const {secret} = req.params
+        const {id} = req.params
         const userRole = req.body.userRole
         const newRole = await users.findOneAndUpdate(
-            {secret: secret},
+            {id: Number(id)},
             {$set: {userRole:userRole}},
         )
         return sendRes(res, false, 'newRole', newRole)
@@ -224,19 +238,18 @@ module.exports = {
     editUserProfile:async(req,res)=> {
         const users = client.db('ChecklistDB').collection('registeredusers');
         const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
-        const {secret} = req.params
+        const {id} = req.params
         const username = req.body.username
         const email = req.body.email
         const userRole = req.body.userRole
         const passwordOne = req.body.passwordOne
         if(!passwordOne){
-            
             const editedProfileData = await users.findOneAndUpdate(
-                {secret: secret},
+                {id: Number(id)},
                 {$set: {username, email,userRole}},
             )
              await archivedUsers.findOneAndUpdate(
-                {secret: secret},
+                {id: Number(id)},
                 {$set: {username, email,userRole}},
             )
             return sendRes(res, false, 'editedProfileData', editedProfileData)   
@@ -244,7 +257,7 @@ module.exports = {
             const password = await bcrypt.hash(passwordOne, 10)
             const repeatPassword = password
             const editedProfileData = await users.findOneAndUpdate(
-                {secret: secret},
+                {id: Number(id)},
                 {$set: {username, email,userRole, password, repeatPassword}},
             )
             return sendRes(res, false, 'editedProfileData', editedProfileData)
@@ -254,9 +267,9 @@ module.exports = {
     changedUsername: async (req,res) => {
         const checklistHistoryData = client.db('ChecklistDB').collection('checklistHistoryData');
         const username = req.body.username
-        const {secret} = req.params
+        const {id} = req.params
         const changeUsernameInHistoryElements = await checklistHistoryData.updateMany(
-            {secret: secret},
+            {id: Number(id)},
             {$set: {userName:username}},
         )
         return sendRes(res, false, 'changeUsernameInHistoryElements', changeUsernameInHistoryElements)
@@ -264,17 +277,17 @@ module.exports = {
 
     FindSingleUser: async (req, res)=> {
         const users = client.db('ChecklistDB').collection('registeredusers');
-        const {secret} = req.params
-        const singleUser = await users.findOne({secret: secret})
+        const {id} = req.params
+        const singleUser = await users.findOne({id: Number(id)})
         return sendRes(res, false, 'User', singleUser)
     },
 
     updateUsersTheme:async (req, res) => {
         const users = client.db('ChecklistDB').collection('registeredusers');
-        const {secret}= req.params
+        const {id}= req.params
         const defaultTheme = req.body.defaultPageTheme
         const updateTheme = await users.findOneAndUpdate(
-            {secret: secret},
+            {id: Number(id)},
             {$set: {defaultTheme}},
         )
         return sendRes(res, false, 'changeUsernameInHistoryElements', updateTheme)
@@ -282,10 +295,10 @@ module.exports = {
 
     changeUsersStatus: async (req,res)=> {
         const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
-        const {secret}= req.params
+        const {id}= req.params
         const status = req.body.status
         const updateUsersStatus = await archivedUsers.findOneAndUpdate(
-            {secret: secret},
+            {id: Number(id)},
             {$set: {status}},
         )
         return sendRes(res, false, 'updateUsersStatus', updateUsersStatus)
@@ -293,10 +306,10 @@ module.exports = {
 
     addDeletionData: async (req, res) => {
         const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
-        const {secret}= req.params
+        const {id}= req.params
         const dateDeleted = req.body.dateDeleted
         const updateUsersStatus = await archivedUsers.findOneAndUpdate(
-            {secret: secret},
+            {id: Number(id)},
             {$set: {dateDeleted}},
         )
         return sendRes(res, false, 'updateUsersStatus', updateUsersStatus)
@@ -537,9 +550,10 @@ module.exports = {
                     seqId = cd.value.seq;
                 }
                 const visitRegistrationData = {
-                    visitInfo:  req.body.visitInfo,
-                    visitGoal:  req.body.visitGoal,
-                    visitorsId: req.body.visitorsId,
+                    visitStatus: req.body.visitStatus,
+                    visitInfo:   req.body.visitInfo,
+                    visitGoal:   req.body.visitGoal,
+                    visitorsId:  req.body.visitorsIdentification,
                     id: String(seqId)
                 }
                  await visistsCollection.insertOne(visitRegistrationData);
@@ -561,6 +575,13 @@ module.exports = {
     getCollocations: async (req, res) => {
         const collocationsCollection = client.db('ChecklistDB').collection('Collocations');
         const collocations = await collocationsCollection.find().toArray()
+        sendRes(res, false, 'collocations', collocations)
+    },
+    getSingleClientsCollocations: async (req, res) => {
+        const collocationsCollection = client.db('ChecklistDB').collection('Collocations');
+        const companyId = req.query.companyId
+        const addressId = req.query.addressId
+        const collocations = await collocationsCollection.find({companyId:companyId, PremiseId: addressId}).toArray()
         sendRes(res, false, 'collocations', collocations)
     },
     addCompany: async (req, res) => {
@@ -649,8 +670,7 @@ module.exports = {
                         console.error('Error deleting file:', err);
                     } 
                 });
-            }
-            }
+            }}
         companiesIdCounter.findOneAndUpdate(
             { id: "companyId" },
             { $inc: { seq: -1 } },
@@ -879,13 +899,12 @@ module.exports = {
             return sendRes(res, false, "totalHistoryData",totalHistoryData) 
         },
         generateMonthlyPDFReport: async (req, res) => {
-
             const today = new Date()
             const year = today.getFullYear()
             const month = today.getMonth() + 1 // Month is 0-based, so add 1
             const day = today.getDate()
-    
             const currentDate = `${year}/${month}/${day}`
+
             let newYear = year
             let newMonth = month - 1
             if (newMonth < 1) {
@@ -893,16 +912,16 @@ module.exports = {
               newYear--
             }
     
-            const dateInOneMoth = `${newYear}/${newMonth}/${day}`
-
+            const dateMonthAgo = `${newYear}/${newMonth}/${day}`
             const checklistHistoryData = client.db('ChecklistDB').collection('checklistHistoryData');
             const allHistoryData = await checklistHistoryData.find().toArray()
-              const startDateRangeStart = new Date(dateInOneMoth)
-              const startDateRangeEnd = new Date(currentDate)
-              const filteredData2 = allHistoryData?.filter(user => {
+            const startDateRangeStart = new Date(dateMonthAgo)
+            const endDateRange = new Date(currentDate)
+            const filteredData2 = allHistoryData?.filter(user => {
                 const userStartDate = new Date(user.endDate)
-                return userStartDate >= startDateRangeStart && userStartDate <= startDateRangeEnd
+                return userStartDate >= startDateRangeStart && userStartDate <= endDateRange
             })
+
             const filteredData = filteredData2?.map(user => ({
                   ...user,
                 filledData: user?.filledData?.filter(page => {
@@ -913,13 +932,76 @@ module.exports = {
                     ))
                 }),
             }))
+
             return sendRes(res, false, "totalHistoryData",filteredData) 
+        },
+        getSpecificDateReport: async (req, res) => {
+            const checklistHistoryData = client.db('ChecklistDB').collection('checklistHistoryData');
+            const allHistoryData = await checklistHistoryData.find().toArray()
+            const startDate = req.query.startDate
+            const endDate = req.query.endDate
+            const startDateRangeStart = new Date(startDate)
+            const endDateRange = new Date(endDate)
+            const filteredData2 = allHistoryData?.filter(user => {
+                const userStartDate = new Date(user.endDate)
+                return userStartDate >= startDateRangeStart && userStartDate <= endDateRange
+            })
+
+            const filteredData = filteredData2?.map(user => ({
+                ...user,
+              filledData: user?.filledData?.filter(page => {
+                const values = Object?.values(page?.values)
+                return values?.some(pageValues =>
+                  Object?.values(pageValues)?.some(value =>
+                    typeof value === 'object' ? Object?.values(value)?.some(innerValue => innerValue === true) : value === true
+                  ))
+              }),
+          }))
+          const filterEmptyFilledData = filteredData.filter((el) => el.filledData.length > 0)
+          return sendRes(res, false, "totalHistoryData",filterEmptyFilledData) 
         },
         getAllClientsEmployees: async (req, res) => {
             const companies = client.db('ChecklistDB').collection('companyEmployees');
             const companyId = req.query.companyId
             const employees = await companies.find({companyId: companyId}).toArray()
             return sendRes(res, false, "all good", employees)
+        },
+        endVisit: async (req, res) => {
+            const visistsCollection = client.db('ChecklistDB').collection('Visits');
+            const updateVisitStatus = await visistsCollection.findOneAndUpdate(
+                { id: req.query.visitId },
+                { $set: { visitStatus: 'error' } }
+            );
+            return sendRes(res, false, "all good", [updateVisitStatus.value])  
+        },
+        startVisit: async (req, res) => {
+            const visistsCollection = client.db('ChecklistDB').collection('Visits');
+            const updateVisitStatus = await visistsCollection.findOneAndUpdate(
+                { id: req.query.visitId },
+                { $set: { visitStatus: 'success' } }
+            );
+            return sendRes(res, false, "all good", [updateVisitStatus.value])  
+        },
+        prepareVisit: async (req, res) => {
+            const visistsCollection = client.db('ChecklistDB').collection('Visits');
+            const updateVisitStatus = await visistsCollection.findOneAndUpdate(
+                { id: req.query.visitId },
+                { $set: { visitStatus: 'processing' } }
+            );
+            return sendRes(res, false, "all good", [updateVisitStatus.value])  
+        },
+        filterByStatus: async (req, res) => {
+            const visistsCollection = client.db('ChecklistDB').collection('Visits');
+            const filterOption = req.query.filterOption
+            let sortCriteria = {};
+            if (filterOption === 'processing') {
+                sortCriteria = { visitStatus: 1 };
+            } else if (filterOption === 'success') {
+                sortCriteria = { visitStatus: -1 }; // Example: Sorting in descending order
+            }
+            const filteredVisits = await visistsCollection.find().sort(sortCriteria).toArray();
+
+            return sendRes(res, false, "all good",filteredVisits)  
         }
     }
     

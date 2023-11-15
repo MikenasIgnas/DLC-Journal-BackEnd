@@ -1,6 +1,8 @@
 const express =             require("express")
 const router =              express.Router()
 const FilledChecklistData = require("../../shemas/FilledChecklistData");
+const VisitsData =          require('../../shemas/VisitsSchema')
+const AllUsersData =        require('../../shemas/AllUsersSchema')
 const MongoClient =         require('mongodb').MongoClient;
 const client =              new MongoClient('mongodb://10.81.7.29:27017/');
 
@@ -20,7 +22,10 @@ const {
     postFilledChecklistData,
     getSingleHistoryELementData,
     updateFilledChecklistData,
-    totalHistoryEntries,
+    checklistHistoryCount,
+    allUsersCount,
+    visitsCount,
+    archivedUsersCount,
     getTotalAreasCount,
     FindUser,
     getAllUsers,
@@ -31,7 +36,6 @@ const {
     changedUsername,
     FindSingleUser,
     updateUsersTheme,
-    getArchivedUsers,
     changeUsersStatus,
     addDeletionData,
     deleteHistoryItem,
@@ -79,6 +83,13 @@ const {
     getAllHistoryData,
     generateMonthlyPDFReport,
     getAllClientsEmployees,
+    getSingleClientsCollocations,
+    getSpecificDateReport,
+    totalVisitsEntries,
+    endVisit,
+    startVisit,
+    prepareVisit,
+    filterByStatus,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                       login)
@@ -86,12 +97,12 @@ router.post("/createUser",                      verifyToken, registerValidation,
 router.post('/postChecklistData',               verifyToken, postFilledChecklistData)
 router.post('/updateFilledChecklistData',       verifyToken, updateFilledChecklistData)
 router.post('/changePassword',                  verifyToken, passwordChangeValidation,changePassword)
-router.post("/changeUsersRole/:secret",         verifyToken, changeUsersRole)
-router.post("/editUserProfile/:secret",         verifyToken, editUserProfile)
-router.post("/changedUsername/:secret",         verifyToken, changedUsername)
-router.post("/updateUsersTheme/:secret",        verifyToken, updateUsersTheme)
-router.post("/changeUsersStatus/:secret",       verifyToken, changeUsersStatus)
-router.post("/addDeletionDate/:secret",         verifyToken, addDeletionData)
+router.post("/changeUsersRole/:id",         verifyToken, changeUsersRole)
+router.post("/editUserProfile/:id",         verifyToken, editUserProfile)
+router.post("/changedUsername/:id",         verifyToken, changedUsername)
+router.post("/updateUsersTheme/:id",        verifyToken, updateUsersTheme)
+router.post("/changeUsersStatus/:id",       verifyToken, changeUsersStatus)
+router.post("/addDeletionDate/:id",         verifyToken, addDeletionData)
 router.post("/updateHistoryItem/:id",           verifyToken, updateHistoryItem)
 router.post("/postPhotos",                      verifyToken, postPhotos)
 router.post("/postLastestAndCurrentPhotos",     verifyToken, postLastestAndCurrentPhotos)
@@ -101,18 +112,25 @@ router.post("/uploadCompanysPhoto",             uploadCompanysPhoto)
 router.post("/uploadCliesntEmployeesPhoto",     uploadCliesntEmployeesPhoto)
 router.post("/postVisitDetails",                verifyToken, postVisitDetails)
 
+router.get("/startVisit",                       verifyToken, startVisit)
+router.get("/endVisit",                         verifyToken, endVisit)
+router.get("/prepareVisit",                     verifyToken, prepareVisit)
 router.get("/routeData",                        verifyToken, routeData)
 router.get("/areasData",                        verifyToken, areasData)
 router.get("/todoData",                         verifyToken, todoData)
 router.get("/problemsData",                     verifyToken, problemsData)
 router.get("/getSingleHistoryELementData/:id",  verifyToken, getSingleHistoryELementData)
-router.get('/FindUser/:secret',                 verifyToken, FindUser)
-router.get('/FindSingleUser/:secret',           verifyToken, FindSingleUser)
+router.get('/FindUser/:id',                     verifyToken, FindUser)
+router.get('/FindSingleUser/:id',               verifyToken, FindSingleUser)
 router.get('/getAllUsers',                      verifyToken, getAllUsers)
-router.get('/getArchivedUsers',                 verifyToken, getArchivedUsers)
-router.get("/totalHistoryEntries",              verifyToken, totalHistoryEntries)
+
+router.get("/checklistHistoryCount",            verifyToken, checklistHistoryCount)
+router.get("/allUsersCount",                    verifyToken, allUsersCount)
+router.get("/visitsCount",                      verifyToken, visitsCount)
+router.get("/archivedUsersCount",               verifyToken, archivedUsersCount)
+
 router.get("/getTotalAreasCount",               verifyToken, getTotalAreasCount)
-router.get("/deleteUser/:secret",               verifyToken, deleteUser)
+router.get("/deleteUser/:id",                   verifyToken, deleteUser)
 router.get("/deleteHistoryItem/:_id",           verifyToken, deleteHistoryItem)
 router.get("/latestHistoryItem",                verifyToken, latestHistoryItem)
 router.get('/getHistoryData',                   verifyToken, getHistoryData)
@@ -133,6 +151,7 @@ router.get('/getSingleCompaniesSites/:id',      verifyToken, getSingleCompaniesS
 router.get('/getVisits',                        verifyToken, getVisits)
 router.get('/getSingleVisit/:id',               verifyToken, getSingleVisit)
 router.get('/getCollocations',                  verifyToken, getCollocations)
+router.get('/getSingleClientsCollocations',     verifyToken, getSingleClientsCollocations)
 router.get('/getClientsEmployee',               verifyToken, getClientsEmployees)
 router.get('/getClientsEmployeesCompanyName/:id', verifyToken, getClientsEmployeesCompanyName)
 router.get('/getAllClientsEmployees',           verifyToken, getAllClientsEmployees)
@@ -152,41 +171,62 @@ router.post('/updateCompaniesData',             verifyToken, updateCompaniesData
 router.post('/addSubClient',                    verifyToken, addSubClient)
 router.post('/addSubClientsEmployee',           verifyToken, addSubClientsEmployee)
 router.post('/addMainCompanyAsSubClient',       verifyToken, addMainCompanyAsSubClient)
-router.get('/changeSubClientToMainClient',     verifyToken, changeSubClientToMainClient)
+router.get('/changeSubClientToMainClient',      verifyToken, changeSubClientToMainClient)
+router.get('/getSpecificDateReport',            verifyToken, getSpecificDateReport)
+router.get('/totalVisitsEntries',               verifyToken, totalVisitsEntries)
 
-router.get('/checklistHistoryData',             verifyToken, paginatedResults(FilledChecklistData), (req,res) => {
+router.get('/filterByStatus',                   verifyToken, filterByStatus)
+
+router.get('/checklistHistoryData',             verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults)
 })
 
-  function paginatedResults(model) {
-    const checklistHistoryData = client.db('ChecklistDB').collection('checklistHistoryData');
-    return async (req, res, next) => {
-      const page = parseInt(req.query.page)
-      const limit = parseInt(req.query.limit)
-      const startIndex = (page - 1) * limit
-      const endIndex = page * limit
-      const results = {}
+router.get('/visitsData',                       verifyToken, paginatedResults(VisitsData, 'Visits'), async(req,res) => {
+  res.json(res.paginatedResults.results)
+})
+router.get('/allUsers',                         verifyToken, paginatedResults(AllUsersData, 'registeredusers'), async(req,res) => {
+  res.json(res.paginatedResults.results)
+})
+router.get('/getArchivedUsers',                         verifyToken, paginatedResults(AllUsersData, 'archivedusers'), async(req,res) => {
+  res.json(res.paginatedResults.results)
+})
+function paginatedResults(model, collection) {
+  return async (req, res, next) => {
+    const dbCollection = client.db('ChecklistDB').collection(collection);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const filterOption = req.query.filter;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const results = {};
+
+    try {
       if (endIndex < await model.countDocuments().exec()) {
-        results.next = {
-          page: page + 1,
-          limit: limit
-        }
+        results.next = { page: page + 1, limit: limit };
       }
       if (startIndex > 0) {
-        results.previous = {
-          page: page - 1,
-          limit: limit
-        }
+        results.previous = { page: page - 1, limit: limit };
       }
-      try {
-        results.results = await checklistHistoryData.find().skip(startIndex).sort({ _id: -1 }).limit(limit).toArray();
-        res.paginatedResults = results
-        next()
-      } catch (e) {
-        res.status(500).json({ message: e.message })
-      }
+      const sortCriteriaMap = {
+        default: { id: -1 },
+        success: { visitStatus: -1 },
+        processing: { visitStatus: 1 },
+        '1': { 'visitInfo.visitAddress': 1 },
+        '2': { 'visitInfo.visitAddress': -1 },
+        admin: { userRole: 1 },
+        user: { userRole: -1 },
+        active: { status: 1},
+        inactive: { status: -1}
+      };
+      const sortCriteria = sortCriteriaMap[filterOption] || sortCriteriaMap.default;
+      const query = dbCollection.find().sort(sortCriteria);
+      results.results = await query.skip(startIndex).limit(limit).toArray();
+      res.paginatedResults = results;
+      next();
+    } catch (e) {
+      res.status(500).json({ message: e.message });
     }
-  }
+  };
+}
 
 module.exports = router
-
