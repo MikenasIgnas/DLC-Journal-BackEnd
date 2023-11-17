@@ -30,6 +30,7 @@ const {
     FindUser,
     getAllUsers,
     deleteUser,
+    deleteVisit,
     changePassword,
     changeUsersRole,
     editUserProfile,
@@ -131,7 +132,8 @@ router.get("/archivedUsersCount",               verifyToken, archivedUsersCount)
 
 router.get("/getTotalAreasCount",               verifyToken, getTotalAreasCount)
 router.get("/deleteUser/:id",                   verifyToken, deleteUser)
-router.get("/deleteHistoryItem/:_id",           verifyToken, deleteHistoryItem)
+router.get("/deleteVisit/:id",                  verifyToken, deleteVisit)
+router.get("/deleteHistoryItem/:id",           verifyToken, deleteHistoryItem)
 router.get("/latestHistoryItem",                verifyToken, latestHistoryItem)
 router.get('/getHistoryData',                   verifyToken, getHistoryData)
 router.get('/getPhotos/:photoId',               verifyToken, getPhotos)
@@ -190,6 +192,7 @@ router.get('/allUsers',                         verifyToken, paginatedResults(Al
 router.get('/getArchivedUsers',                         verifyToken, paginatedResults(AllUsersData, 'archivedusers'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
+
 function paginatedResults(model, collection) {
   return async (req, res, next) => {
     const dbCollection = client.db('ChecklistDB').collection(collection);
@@ -199,6 +202,7 @@ function paginatedResults(model, collection) {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
     const results = {};
+    const selectFilter = req.query.selectFilter;
 
     try {
       if (endIndex < await model.countDocuments().exec()) {
@@ -207,6 +211,7 @@ function paginatedResults(model, collection) {
       if (startIndex > 0) {
         results.previous = { page: page - 1, limit: limit };
       }
+
       const sortCriteriaMap = {
         default: { id: -1 },
         success: { visitStatus: -1 },
@@ -215,11 +220,39 @@ function paginatedResults(model, collection) {
         '2': { 'visitInfo.visitAddress': -1 },
         admin: { userRole: 1 },
         user: { userRole: -1 },
-        active: { status: 1},
-        inactive: { status: -1}
+        active: { status: 1 },
+        inactive: { status: -1 },
+        username: { username: -1 }
       };
-      const sortCriteria = sortCriteriaMap[filterOption] || sortCriteriaMap.default;
-      const query = dbCollection.find().sort(sortCriteria);
+
+      let query;
+
+      if (filterOption !== 'null') {
+        const filterFunction = item => {
+          for (const key in item) {
+            if (typeof item[key] === 'string' && item[key].toLowerCase().includes(filterOption)) {
+              return true;
+            }
+          }
+          return false;
+        };
+
+        const allDocuments = await dbCollection.find().toArray();
+        const filteredDocuments = allDocuments.filter(filterFunction);
+        query = dbCollection.find({ _id: { $in: filteredDocuments.map(doc => doc._id) } });
+      } else if (selectFilter !== undefined && selectFilter !== 'undefined') {
+        const sortCriteria = sortCriteriaMap[selectFilter];
+        query = dbCollection.find().sort(sortCriteria);
+      }else {
+        const sortCriteria = sortCriteriaMap.default;
+        query = dbCollection.find().sort(sortCriteria);
+      }
+      
+      if((filterOption === 'null') && ( selectFilter === undefined || selectFilter === 'undefined' || selectFilter === 'null')){
+        const sortCriteria = sortCriteriaMap.default;
+        query = dbCollection.find().sort(sortCriteria);
+      }
+
       results.results = await query.skip(startIndex).limit(limit).toArray();
       res.paginatedResults = results;
       next();
@@ -228,5 +261,7 @@ function paginatedResults(model, collection) {
     }
   };
 }
+  
+  module.exports = router
 
-module.exports = router
+                                  

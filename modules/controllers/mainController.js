@@ -209,7 +209,12 @@ module.exports = {
         await users.findOneAndDelete({id: Number(id)})
         res.send({success: true})
     },
-
+    deleteVisit: async (req, res) => {
+        const visits = client.db('ChecklistDB').collection('Visits');
+        const {id} = req.params
+        await visits.findOneAndDelete({id: id})
+        res.send({success: true})
+    },
     changePassword:async(req, res) => {
         const users = client.db('ChecklistDB').collection('registeredusers');
         const passwordOne = req.body.passwordOne
@@ -317,8 +322,8 @@ module.exports = {
 
     deleteHistoryItem: async (req, res) => {
         const historyItem = client.db('ChecklistDB').collection('checklistHistoryData');
-        const {_id} = req.params
-        const result = await historyItem.findOneAndDelete({ _id: ObjectId(_id) });
+        const {id} = req.params
+        const result = await historyItem.findOneAndDelete({ id: Number(id) });
         if (result.value === null) {
           return res.status(404).json({ error: 'Document not found' });
         }  
