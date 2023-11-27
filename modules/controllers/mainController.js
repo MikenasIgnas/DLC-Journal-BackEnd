@@ -1,16 +1,18 @@
-const {uid} =               require("uid");
-const bcrypt =              require("bcrypt");
-const sendRes =             require("../modules/UniversalRes");
-const FilledChecklistData = require("../../shemas/FilledChecklistData");
-const jwt =                 require('jsonwebtoken')
-const config =              process.env;
-const MongoClient =         require('mongodb').MongoClient;
-const client =              new MongoClient('mongodb://10.81.7.29:27017/');
-const { ObjectId } =        require('mongodb');
-const path =                require('path'); // Import the 'path' module
-const fs =                  require('fs');
-const multer = require('multer')
-// const upload = multer({ dest: 'C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-BackEnd/uploads' })
+const {uid} =                               require("uid");
+const bcrypt =                              require("bcrypt");
+const sendRes =                             require("../modules/UniversalRes");
+const FilledChecklistData =                 require("../../shemas/FilledChecklistData");
+const jwt =                                 require('jsonwebtoken')
+const config =                              process.env;
+const MongoClient =                         require('mongodb').MongoClient;
+const client =                              new MongoClient('mongodb://10.81.7.29:27017/');
+const fs =                                  require('fs');
+const multer =                              require('multer');
+const { getCurrentDate, getCurrentTime } =  require("../../helpers");
+const nodemailer =                          require("nodemailer");
+const imageToBase64 = require('image-to-base64');
+const path = require('path');
+
 require('dotenv').config()
 
 module.exports = {
@@ -212,7 +214,7 @@ module.exports = {
     deleteVisit: async (req, res) => {
         const visits = client.db('ChecklistDB').collection('Visits');
         const {id} = req.params
-        await visits.findOneAndDelete({id: id})
+        await visits.findOneAndDelete({id: Number(id)})
         res.send({success: true})
     },
     changePassword:async(req, res) => {
@@ -350,7 +352,7 @@ module.exports = {
         const historyItem = client.db('ChecklistDB').collection('checklistHistoryData');
         const items = await historyItem
           .aggregate([
-            { $sort: { id: -1 } },
+            { $sort: { id: 1 } },
             { $addFields: { numericId: { $toInt: '$id' } } },
             { $sort: { numericId: -1 } },
             { $unset: 'numericId' }
@@ -532,16 +534,9 @@ module.exports = {
         const companiesEmployees = await companyEmployeesCollection.find({companyId: id}).toArray()
         sendRes(res, false, 'companiesEmployees', companiesEmployees)
     },
-    getSingleCompaniesSites: async (req, res) => {
-        const {id} = req.params
-        const companySitesCollection = client.db('ChecklistDB').collection('CompanySitesTable');
-        const companiesSites = await companySitesCollection.find({CompanyId: id}).toArray()
-        sendRes(res, false, 'companiesSites', companiesSites)
-    },
     postVisitDetails: async (req, res) => {
         const visistsCollection = client.db('ChecklistDB').collection('Visits');
         const visitsIdCounter = client.db('ChecklistDB').collection('VisitsIdCounter')
-
         visitsIdCounter.findOneAndUpdate(
             {id:"visitId"},
             {"$inc": {"seq":1}},
@@ -555,16 +550,81 @@ module.exports = {
                     seqId = cd.value.seq;
                 }
                 const visitRegistrationData = {
-                    visitStatus: req.body.visitStatus,
-                    visitInfo:   req.body.visitInfo,
-                    visitGoal:   req.body.visitGoal,
-                    visitorsId:  req.body.visitorsIdentification,
-                    id: String(seqId)
+                    visitStatus:      req.body.visitStatus,
+                    visitingClient:   req.body.visitingClient,
+                    clientsEmployees: req.body.clientsEmployees,
+                    visitAddress:     req.body.visitAddress,
+                    dlcEmployees:     req.body.dlcEmployees,
+                    visitPurpose:     req.body.visitPurpose,
+                    visitorsIdType:   req.body.visitorsIdType,
+                    visitCollocation: req.body.visitCollocation,
+                    signature:        req.body.signature,
+                    creationDate:     req.body.creationDate,
+                    creationTime:     req.body.creationTime,
+                    escortNames:      req.body.escortNames,
+                    id:               seqId,
                 }
-                 await visistsCollection.insertOne(visitRegistrationData);
-            }
-        );
-        return sendRes(res, false, "all good", null)
+                    await visistsCollection.insertOne(visitRegistrationData);
+                    return sendRes(res, false, "all good", visitRegistrationData.id)
+                }
+                );
+        if(req.body.visitAddress === 'T72'){
+            const sendEmail = () => {
+
+
+              
+                return new Promise((resolve, reject) => {
+                  const transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                      user: 'mikenasignas@gmail.com',
+                      pass: 'czwj jdyw xdyn qphs'
+                    }
+                  });
+              
+                  const mail_configs = {
+                    from: 'mikenasignas@gmail.com',
+                    to: 'ignas.mikenas@datalogistics.lt',
+                    subject: `${req.body.visitingClient}  ${req.body.creationDate} ${req.body.creationTime}`,
+                    html: `<!DOCTYPE html>
+                          <html lang="en" >
+                              <head>
+                                  <meta charset="UTF-8">
+                              </head>
+                              <body>
+                                  <div style="font-family: Helvetica,Arial,sans-serif;overflow:auto;line-height:2">
+                                      <div style="margin:50px auto;width:70%;padding:20px 0">
+                                          <p style="font-size:1.1em">Sveiki, </p>
+                                          <span>Vizitas į DATAINN</span>
+                                          <p>Klientas: ${req.body.visitingClient}</p>
+                                          <p>Data/Laikas: ${req.body.creationDate} ${req.body.creationTime}</p>
+                                          <p>Įmonės atstovai: ${req.body.clientsEmployees}</p>
+                                          ${req.body.escortNames ? `<p>Palyda: ${req.body.escortNames}</p>` : ''}
+                                      </div>
+                                      <div style="margin:50px auto;width:70%;padding:20px 0">
+                                          <p style="font-size: 10px">Pagarbiai,</p>
+                                          <p style="font-size: 10px">Monitoringo centras</p>
+                                          <p style="font-size: 10px">UAB Duomenų logistikos centras  |  A. Juozapavičiaus g. 13  |  LT-09311 Vilnius</p>
+                                          <p style="font-size: 10px">Mob. +370 618 44 445;  +370 674 44 455 |</p>
+                                          <p style="font-size: 10px">El.paštas noc@datalogistics.lt</p>
+                                          <p style="font-size: 10px">www.datalogistics.lt</p>
+                                      </div>
+                                  </div>
+                              </body>
+                          </html>`,
+                  };
+              
+                  transporter.sendMail(mail_configs, function (error, info) {
+                    if (error) {
+                      console.log(error);
+                      return reject({ message: `An error has occurred` });
+                    }
+                    return resolve({ message: 'Email sent successfully' });
+                  });
+                });
+              };
+              sendEmail()
+        }
     },
     getVisits: async (req, res) => {
         const visistsCollection = client.db('ChecklistDB').collection('Visits');
@@ -574,7 +634,7 @@ module.exports = {
     getSingleVisit: async (req, res) => {
         const visistsCollection = client.db('ChecklistDB').collection('Visits');
         const {id} = req.params
-        const visits = await visistsCollection.find({id}).toArray()
+        const visits = await visistsCollection.find({id: Number(id)}).toArray()
         sendRes(res, false, 'visits', visits)
     },
     getCollocations: async (req, res) => {
@@ -675,7 +735,8 @@ module.exports = {
                         console.error('Error deleting file:', err);
                     } 
                 });
-            }}
+        }}
+
         companiesIdCounter.findOneAndUpdate(
             { id: "companyId" },
             { $inc: { seq: -1 } },
@@ -689,6 +750,7 @@ module.exports = {
               }
             }
           );
+
           companiesEmployeesIdCounter.findOneAndUpdate(
             { id: "employeeId" },
             { $inc: { seq: -numDocumentsDeleted } }, 
@@ -702,6 +764,7 @@ module.exports = {
               }
             }
           );
+
         res.send({success: true})
     },
     uploadCliesntEmployeesPhoto: async (req, res) => {
@@ -974,24 +1037,24 @@ module.exports = {
         endVisit: async (req, res) => {
             const visistsCollection = client.db('ChecklistDB').collection('Visits');
             const updateVisitStatus = await visistsCollection.findOneAndUpdate(
-                { id: req.query.visitId },
-                { $set: { visitStatus: 'error' } }
+                { id: Number(req.query.visitId) },
+                { $set: { visitStatus: 'error', endDate: getCurrentDate(), endTime: getCurrentTime()}}
             );
             return sendRes(res, false, "all good", [updateVisitStatus.value])  
         },
         startVisit: async (req, res) => {
             const visistsCollection = client.db('ChecklistDB').collection('Visits');
             const updateVisitStatus = await visistsCollection.findOneAndUpdate(
-                { id: req.query.visitId },
-                { $set: { visitStatus: 'success' } }
+                { id: Number(req.query.visitId) },
+                { $set: { visitStatus: 'success', startDate: getCurrentDate(), startTime: getCurrentTime(), endDate: '', endTime: ''}}
             );
-            return sendRes(res, false, "all good", [updateVisitStatus.value])  
+            return sendRes(res, false, "all good",  [updateVisitStatus.value])  
         },
         prepareVisit: async (req, res) => {
             const visistsCollection = client.db('ChecklistDB').collection('Visits');
             const updateVisitStatus = await visistsCollection.findOneAndUpdate(
-                { id: req.query.visitId },
-                { $set: { visitStatus: 'processing' } }
+                { id: Number(req.query.visitId) },
+                { $set: { visitStatus: 'processing', startDate: '', startTime: '', endDate: '', endTime:'' } }
             );
             return sendRes(res, false, "all good", [updateVisitStatus.value])  
         },
