@@ -549,10 +549,11 @@ module.exports = {
                 else {
                     seqId = cd.value.seq;
                 }
+                console.log(req.body)
                 const visitRegistrationData = {
                     visitStatus:      req.body.visitStatus,
                     visitingClient:   req.body.visitingClient,
-                    clientsEmployees: req.body.clientsEmployees,
+                    visitors:         req.body.visitors,
                     visitAddress:     req.body.visitAddress,
                     dlcEmployees:     req.body.dlcEmployees,
                     visitPurpose:     req.body.visitPurpose,
@@ -561,7 +562,8 @@ module.exports = {
                     signature:        req.body.signature,
                     creationDate:     req.body.creationDate,
                     creationTime:     req.body.creationTime,
-                    escortNames:      req.body.escortNames,
+                    clientsGuests:    req.body.clientsGuests,
+                    carPlates:        req.body.carPlates,
                     id:               seqId,
                 }
                     await visistsCollection.insertOne(visitRegistrationData);
@@ -570,9 +572,6 @@ module.exports = {
                 );
         if(req.body.visitAddress === 'T72'){
             const sendEmail = () => {
-
-
-              
                 return new Promise((resolve, reject) => {
                   const transporter = nodemailer.createTransport({
                     service: 'gmail',
@@ -602,6 +601,7 @@ module.exports = {
                                           ${req.body.escortNames ? `<p>Palyda: ${req.body.escortNames}</p>` : ''}
                                       </div>
                                       <div style="margin:50px auto;width:70%;padding:20px 0">
+                                            <img/>
                                           <p style="font-size: 10px">Pagarbiai,</p>
                                           <p style="font-size: 10px">Monitoringo centras</p>
                                           <p style="font-size: 10px">UAB Duomenų logistikos centras  |  A. Juozapavičiaus g. 13  |  LT-09311 Vilnius</p>
