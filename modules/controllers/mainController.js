@@ -549,7 +549,6 @@ module.exports = {
                 else {
                     seqId = cd.value.seq;
                 }
-                console.log(req.body)
                 const visitRegistrationData = {
                     visitStatus:      req.body.visitStatus,
                     visitingClient:   req.body.visitingClient,
@@ -564,6 +563,7 @@ module.exports = {
                     creationTime:     req.body.creationTime,
                     clientsGuests:    req.body.clientsGuests,
                     carPlates:        req.body.carPlates,
+                    companyId:        req.body.companyId,
                     id:               seqId,
                 }
                     await visistsCollection.insertOne(visitRegistrationData);
@@ -1070,6 +1070,67 @@ module.exports = {
             const filteredVisits = await visistsCollection.find().sort(sortCriteria).toArray();
 
             return sendRes(res, false, "all good",filteredVisits)  
+        },
+        deleteVisitor: async (req, res) => {
+            const visitId = req.query.visitId
+            const employeeId = req.query.employeeId
+            const visistsCollection = client.db('ChecklistDB').collection('Visits')
+            const result = visistsCollection.findOneAndUpdate(
+                { id: Number(visitId) },
+                { $pull: { 'visitors': { 'selectedVisitor.employeeId': employeeId } } },
+                { returnDocument: 'after' }
+            );
+                
+                return sendRes(res, false, "all good", result.value)  
+        },
+         updateVisitorList: async (req, res) => {
+            const visitId = req.query.visitId;
+            const visitsCollection = client.db('ChecklistDB').collection('Visits');
+            const result =  visitsCollection.findOneAndUpdate(
+                { id: Number(visitId) },
+                { $push: { 'visitors':  {idType: '', selectedVisitor: req.body}  } },
+                { returnDocument: 'after' }
+            );
+        
+            return sendRes(res, false, "all good", result.value);
+        },
+        updateClientsGests: async (req, res) => {
+            const visitId = req.query.visitId;
+            const visitsCollection = client.db('ChecklistDB').collection('Visits');
+            console.log(req.body )
+            const result =  visitsCollection.findOneAndUpdate(
+                { id: Number(visitId) },
+                { $push: { 'clientsGuests':  req.body.value  } }, 
+                { returnDocument: 'after' }
+            );
+            return sendRes(res, false, "all good", result.value);
+        },
+        updateCarPlates: async (req, res) => {
+            const visitId = req.query.visitId;
+            const visitsCollection = client.db('ChecklistDB').collection('Visits');
+            const result =  visitsCollection.findOneAndUpdate(
+                { id: Number(visitId) },
+                { $push: { 'carPlates':  req.body.value  } }, 
+                { returnDocument: 'after' }
+            );
+            return sendRes(res, false, "all good", result.value);
+        },
+
+        removeClientsGuest: async (req, res) => {
+            const visitId = req.query.visitId
+            const index = req.query.index
+            const visitsCollection = client.db('ChecklistDB').collection('Visits');
+            const visit = await visitsCollection.findOne({id: Number(visitId)})
+            visit.clientsGuests.splice(Number(index), 1);
+            await visitsCollection.updateOne({ id: Number(visitId) }, { $set: { clientsGuests: visit.clientsGuests } });
+        },
+        removeCarPlates: async (req, res) => {
+            const visitId = req.query.visitId
+            const index = req.query.index
+            const visitsCollection = client.db('ChecklistDB').collection('Visits');
+            const visit = await visitsCollection.findOne({id: Number(visitId)})
+            visit.carPlates.splice(Number(index), 1);
+            await visitsCollection.updateOne({ id: Number(visitId) }, { $set: { carPlates: visit.carPlates } });
         }
     }
     

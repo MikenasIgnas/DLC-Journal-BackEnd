@@ -90,6 +90,12 @@ const {
     startVisit,
     prepareVisit,
     filterByStatus,
+    deleteVisitor,
+    updateVisitorList,
+    updateClientsGests,
+    updateCarPlates,
+    removeClientsGuest,
+    removeCarPlates,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                         login)
@@ -174,8 +180,15 @@ router.post('/addMainCompanyAsSubClient',         verifyToken, addMainCompanyAsS
 router.get('/changeSubClientToMainClient',        verifyToken, changeSubClientToMainClient)
 router.get('/getSpecificDateReport',              verifyToken, getSpecificDateReport)
 router.get('/totalVisitsEntries',                 verifyToken, totalVisitsEntries)
+router.get('/deleteVisitor',                      verifyToken, deleteVisitor)
+router.post('/updateVisitorList',                 verifyToken, updateVisitorList)
+
+router.post('/updateClientsGests',                verifyToken, updateClientsGests)
+router.post('/updateCarPlates',                   verifyToken, updateCarPlates)
 
 router.get('/filterByStatus',                     verifyToken, filterByStatus)
+router.get('/removeClientsGuest',                 verifyToken, removeClientsGuest)
+router.get('/removeCarPlates',                    verifyToken, removeCarPlates)
 
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)
