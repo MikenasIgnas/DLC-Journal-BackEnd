@@ -10,8 +10,6 @@ const fs =                                  require('fs');
 const multer =                              require('multer');
 const { getCurrentDate, getCurrentTime } =  require("../../helpers");
 const nodemailer =                          require("nodemailer");
-const imageToBase64 = require('image-to-base64');
-const path = require('path');
 
 require('dotenv').config()
 
