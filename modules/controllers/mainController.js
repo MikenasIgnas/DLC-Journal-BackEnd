@@ -1065,7 +1065,7 @@ module.exports = {
             if (filterOption === 'processing') {
                 sortCriteria = { visitStatus: 1 };
             } else if (filterOption === 'success') {
-                sortCriteria = { visitStatus: -1 }; // Example: Sorting in descending order
+                sortCriteria = { visitStatus: -1 };
             }
             const filteredVisits = await visistsCollection.find().sort(sortCriteria).toArray();
 
@@ -1086,13 +1086,13 @@ module.exports = {
          updateVisitorList: async (req, res) => {
             const visitId = req.query.visitId;
             const visitsCollection = client.db('ChecklistDB').collection('Visits');
-            const result =  visitsCollection.findOneAndUpdate(
+            const result =  await visitsCollection.findOneAndUpdate(
                 { id: Number(visitId) },
                 { $push: { 'visitors':  {idType: '', selectedVisitor: req.body}  } },
                 { returnDocument: 'after' }
             );
         
-            return sendRes(res, false, "all good", result.value);
+            return sendRes(res, false, "all good", [result.value]);
         },
         updateClientsGests: async (req, res) => {
             const visitId = req.query.visitId;
@@ -1115,7 +1115,7 @@ module.exports = {
             );
             return sendRes(res, false, "all good", result.value);
         },
-
+        
         removeClientsGuest: async (req, res) => {
             const visitId = req.query.visitId
             const index = req.query.index
@@ -1131,6 +1131,32 @@ module.exports = {
             const visit = await visitsCollection.findOne({id: Number(visitId)})
             visit.carPlates.splice(Number(index), 1);
             await visitsCollection.updateOne({ id: Number(visitId) }, { $set: { carPlates: visit.carPlates } });
-        }
+        },
+        updateVisitInformation: async (req, res) => {
+            const visitId =           req.query.visitId
+            const visitsCollection =  client.db('ChecklistDB').collection('Visits');
+            const updateVisit =       await visitsCollection.findOneAndUpdate({id: Number(visitId)}, {$set: {
+                visitCollocation:     req.body.visitCollocation,
+                startDate:            req.body.startDate,
+                startTime:            req.body.startTime,
+                dlcEmployees:         req.body.dlcEmployees,
+                visitAddress:         req.body.visitAddress,
+                visitPurpose:         req.body.visitPurpose,
+                visitors:             req.body.visitors,
+            }})
+
+            return sendRes(res, false, "all good", updateVisit);
+        },
+        addSignature: async (req, res) => {
+            const visitId =           req.query.visitId
+            const employeeId =           req.query.employeeId
+            const signature = req.body.signature
+            const visitsCollection =  client.db('ChecklistDB').collection('Visits');
+            const updateResult = await visitsCollection.updateOne(
+                { "id": Number(visitId), "visitors.selectedVisitor.employeeId": employeeId },
+                { $set: { "visitors.$.signature": signature } }
+              );
+            return sendRes(res, false, "all good", null);
+        },
     }
     
