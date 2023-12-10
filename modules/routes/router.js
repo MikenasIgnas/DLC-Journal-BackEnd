@@ -98,6 +98,7 @@ const {
     removeCarPlates,
     updateVisitInformation,
     addSignature,
+    deleteSignature,
 } = require("../controllers/mainController")
 
 router.post("/logInUser",                         login)
@@ -193,6 +194,7 @@ router.get('/filterByStatus',                     verifyToken, filterByStatus)
 router.get('/removeClientsGuest',                 verifyToken, removeClientsGuest)
 router.get('/removeCarPlates',                    verifyToken, removeCarPlates)
 router.post('/addSignature',                      verifyToken, addSignature)
+router.get('/deleteSignature',                    verifyToken, deleteSignature)
 
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)

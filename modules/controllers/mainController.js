@@ -1135,6 +1135,7 @@ module.exports = {
         updateVisitInformation: async (req, res) => {
             const visitId =           req.query.visitId
             const visitsCollection =  client.db('ChecklistDB').collection('Visits');
+            const existingVisit = await visitsCollection.findOne({ id: Number(visitId) });
             const updateVisit =       await visitsCollection.findOneAndUpdate({id: Number(visitId)}, {$set: {
                 visitCollocation:     req.body.visitCollocation,
                 startDate:            req.body.startDate,
@@ -1142,9 +1143,12 @@ module.exports = {
                 dlcEmployees:         req.body.dlcEmployees,
                 visitAddress:         req.body.visitAddress,
                 visitPurpose:         req.body.visitPurpose,
-                visitors:             req.body.visitors,
+                visitors:             req.body.visitors.map((el, i) => ({   
+                ...existingVisit.visitors[i],
+                selectedVisitor: req.body.visitors[i].selectedVisitor,
+                idType: req.body.visitors[i].idType, 
+            })),
             }})
-
             return sendRes(res, false, "all good", updateVisit);
         },
         addSignature: async (req, res) => {
@@ -1152,11 +1156,21 @@ module.exports = {
             const employeeId =           req.query.employeeId
             const signature = req.body.signature
             const visitsCollection =  client.db('ChecklistDB').collection('Visits');
-            const updateResult = await visitsCollection.updateOne(
+            await visitsCollection.updateOne(
                 { "id": Number(visitId), "visitors.selectedVisitor.employeeId": employeeId },
                 { $set: { "visitors.$.signature": signature } }
-              );
-            return sendRes(res, false, "all good", null);
+                );
+                return sendRes(res, false, "all good", null);
+            },
+            deleteSignature: async (req, res) => {
+            const visitId = req.query.visitId
+            const employeeId =  req.query.employeeId
+            const visitsCollection = client.db('ChecklistDB').collection('Visits');
+            await visitsCollection.updateOne(
+                { "id": Number(visitId), "visitors.selectedVisitor.employeeId": employeeId },
+                { $set: { "visitors.$.signature": null } }
+                );
+                return sendRes(res, false, "all good", null);
         },
     }
     
