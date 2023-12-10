@@ -1,0 +1,6 @@
+
+{
+  "watch": ["src"],
+  "ext": "ts, json, js",
+  "exec": "tsc && node ./build/app.js"
+}
