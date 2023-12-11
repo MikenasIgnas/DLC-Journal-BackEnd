@@ -5,7 +5,6 @@ const jwt =                 require("jsonwebtoken");
 const MongoClient =         require('mongodb').MongoClient;
 const client =              new MongoClient(process.env.MONGO_PATH);
 require('dotenv').config()
-const config =              process.env;
 
 module.exports  = {
     registerValidation:async (req, res, next) => {
@@ -44,7 +43,7 @@ module.exports  = {
             return sendRes(res, true, 'token not provided')
         }
         try {
-        const decoded = jwt.decode(token, config.TOKEN_KEY);
+        const decoded = jwt.decode(token, process.env.TOKEN_KEY);
         if (decoded.exp < Date.now() / 1000) {
             return sendRes(res, true, 'token has expired')
         }
