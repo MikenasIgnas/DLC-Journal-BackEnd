@@ -1,14 +1,14 @@
 const {uid} =                               require("uid");
 const bcrypt =                              require("bcrypt");
 const sendRes =                             require("../modules/UniversalRes");
-const FilledChecklistData =                 require("../../shemas/FilledChecklistData");
+const FilledChecklistData =                 require("../shemas/FilledChecklistData");
 const jwt =                                 require('jsonwebtoken')
 const config =                              process.env;
 const MongoClient =                         require('mongodb').MongoClient;
 const client =                              new MongoClient('mongodb://10.81.7.29:27017/');
 const fs =                                  require('fs');
 const multer =                              require('multer');
-const { getCurrentDate, getCurrentTime } =  require("../../helpers");
+const { getCurrentDate, getCurrentTime } =  require("../helpers");
 const nodemailer =                          require("nodemailer");
 
 require('dotenv').config()

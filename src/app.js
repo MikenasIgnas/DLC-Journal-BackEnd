@@ -2,7 +2,7 @@ const express = require("express")
 const app = express()
 const cors = require("cors")
 const mongoose = require("mongoose")
-const mainRouter = require("./modules/routes/router")
+const mainRouter = require("./routes/router")
 
 const bodyparser = require('body-parser')
 mongoose.connect('mongodb://10.81.7.29:27017/')

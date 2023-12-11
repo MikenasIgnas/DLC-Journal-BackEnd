@@ -1,8 +1,8 @@
 const express =             require("express")
 const router =              express.Router()
-const FilledChecklistData = require("../../shemas/FilledChecklistData");
-const VisitsData =          require('../../shemas/VisitsSchema')
-const AllUsersData =        require('../../shemas/AllUsersSchema')
+const FilledChecklistData = require("../shemas/FilledChecklistData");
+const VisitsData =          require('../shemas/VisitsSchema')
+const AllUsersData =        require('../shemas/AllUsersSchema')
 const MongoClient =         require('mongodb').MongoClient;
 const client =              new MongoClient('mongodb://10.81.7.29:27017/');
 
