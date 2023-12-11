@@ -1,7 +1,6 @@
 import { Router }       from 'express'
 
 import {
-  registerValidation,
   verifyToken,
 }                       from '../middleware/middle'
 import createUser       from '../controllers/usersControllers/createUser'
@@ -20,7 +19,7 @@ router.get("/getAll", verifyToken, getAllUsers)
 router.get("/getAll/count", verifyToken, getAllUsersCount)
 router.get("/getbyid", verifyToken, getUserById)
 router.post("/changeStatus", verifyToken, changeUserStatus)
-router.post("/create", verifyToken, registerValidation, createUser)
+router.post("/create", verifyToken, createUser)
 router.post("/edit", verifyToken, editUser)
 
 export default router
