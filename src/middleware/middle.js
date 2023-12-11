@@ -3,7 +3,7 @@ const sendRes =             require("../modules/UniversalRes")
 const UserRegisterSchema =  require("../shemas/UserRegisterSchema")
 const jwt =                 require("jsonwebtoken");
 const MongoClient =         require('mongodb').MongoClient;
-const client =              new MongoClient('mongodb://10.81.7.29:27017/');
+const client =              new MongoClient(process.env.MONGO_PATH);
 require('dotenv').config()
 const config =              process.env;
 

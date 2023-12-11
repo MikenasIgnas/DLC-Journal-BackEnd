@@ -1,16 +1,20 @@
-const express = require("express")
-const app = express()
-const cors = require("cors")
-const mongoose = require("mongoose")
-const mainRouter = require("./routes/router")
+import { app }     from 'express'
+import bodyparser  from 'body-parser'
+import cors        from 'cors'
+import mongoose    from 'mongoose'
 
-const bodyparser = require('body-parser')
-mongoose.connect('mongodb://10.81.7.29:27017/')
-    .then(() => {
-        console.log('CONNECTED OK')
-    }).catch(e => {
-        console.log(e,'CONNECTION ERROR')
-    })
+import authRouter  from './routes/authRoutes'
+import mainRouter  from './routes/router'
+import rolesRouter from './routes/roleRoutes'
+import usersRouter from './routes/userRoutes'
+
+
+mongoose.connect(process.env.MONGO_PATH)
+  .then(() => {
+    console.log('CONNECTED OK')
+  }).catch(e => {
+    console.log(e,'CONNECTION ERROR')
+  })
 
 app.use(cors({origin: 'http://localhost:3000', credentials: true, methods: "GET,HEAD,PUT,PATCH,POST,DELETE"}))
 app.use(express.json())
@@ -18,3 +22,6 @@ app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({extended: true, keepExtensions: true}));
 app.listen(4000)
 app.use("/", mainRouter)
+app.use("/auth", authRouter)
+app.use("/role", rolesRouter)
+app.use("/user", usersRouter)
