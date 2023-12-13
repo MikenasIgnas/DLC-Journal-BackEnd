@@ -99,7 +99,8 @@ const {
     updateVisitInformation,
     addSignature,
     deleteSignature,
-} = require("../controllers/mainController")
+} = require("../controllers/mainController");
+const { default: pdfController } = require("../controllers/pdfController");
 
 router.post("/logInUser",                         login)
 router.post("/createUser",                        verifyToken, registerValidation, createUser)
@@ -195,6 +196,8 @@ router.get('/removeClientsGuest',                 verifyToken, removeClientsGues
 router.get('/removeCarPlates',                    verifyToken, removeCarPlates)
 router.post('/addSignature',                      verifyToken, addSignature)
 router.get('/deleteSignature',                    verifyToken, deleteSignature)
+
+router.get('/generatePdf',                    pdfController)
 
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)
