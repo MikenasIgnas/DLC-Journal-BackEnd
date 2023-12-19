@@ -52,9 +52,7 @@ const {
     uploadPhoto,
     getCompanies,
     getCompaniesSites,
-    getCompaniesPremises,
-    getCompaniesColocation,
-    singleCompanyPage,
+    getSingleCompany,
     getSingleCompaniesEmployees,
     postVisitDetails,
     getVisits,
@@ -101,6 +99,7 @@ const {
     deleteSignature,
 } = require("../controllers/mainController");
 const { default: pdfController } = require("../controllers/pdfController");
+const { default: customPdfController } = require("../controllers/customPdfController");
 
 router.post("/logInUser",                         login)
 router.post("/createUser",                        verifyToken, registerValidation, createUser)
@@ -153,13 +152,11 @@ router.get('/generateMonthlyPDFReport',           verifyToken,   generateMonthly
 
 router.get('/getCompanies',                       verifyToken, getCompanies)
 router.get('/getCompaniesSites',                  verifyToken, getCompaniesSites)
-router.get('/getCompaniesPremises',               verifyToken, getCompaniesPremises)
-router.get('/getCompaniesColocation',             verifyToken, getCompaniesColocation)
 
-router.get('/SingleCompanyPage/:id',              verifyToken, singleCompanyPage)
-router.get('/getSingleCompaniesEmployees/:id',    verifyToken, getSingleCompaniesEmployees)
+router.get('/getSingleCompany',                   verifyToken, getSingleCompany)
+router.get('/getSingleCompaniesEmployees',        verifyToken, getSingleCompaniesEmployees)
 router.get('/getVisits',                          verifyToken, getVisits)
-router.get('/getSingleVisit/:id',                 verifyToken, getSingleVisit)
+router.get('/getSingleVisit',                     verifyToken, getSingleVisit)
 router.get('/getCollocations',                    verifyToken, getCollocations)
 router.get('/getSingleClientsCollocations',       verifyToken, getSingleClientsCollocations)
 router.get('/getClientsEmployee',                 verifyToken, getClientsEmployees)
@@ -197,13 +194,14 @@ router.get('/removeCarPlates',                    verifyToken, removeCarPlates)
 router.post('/addSignature',                      verifyToken, addSignature)
 router.get('/deleteSignature',                    verifyToken, deleteSignature)
 
-router.get('/generatePdf',                    pdfController)
+router.get('/generatePdf',                        verifyToken, pdfController)
+router.get('/generateCustomPdf',                  verifyToken, customPdfController)
 
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)
 })
 
-router.get('/visitsData',                         verifyToken, paginatedResults(VisitsData, 'Visits'), async(req,res) => {
+router.get('/visitsData',                         verifyToken, paginatedResults(VisitsData, 'visits'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
 router.get('/allUsers',                           verifyToken, paginatedResults(AllUsersData, 'registeredusers'), async(req,res) => {

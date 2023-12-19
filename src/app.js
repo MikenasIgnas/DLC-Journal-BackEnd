@@ -5,7 +5,7 @@ const mongoose = require("mongoose")
 const mainRouter = require("./routes/router")
 
 const bodyparser = require('body-parser')
-mongoose.connect('mongodb+srv://murauskasnorbertas:slaptas@cluster0.0pdeqi5.mongodb.net/ChecklistDB')
+mongoose.connect('mongodb://10.81.7.29:27017/')
     .then(() => {
         console.log('CONNECTED OK')
     }).catch(e => {

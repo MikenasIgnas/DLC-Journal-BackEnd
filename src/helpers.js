@@ -1,7 +1,7 @@
 const getCurrentDate = () =>  {
     const currentdate = new Date()
-    const datetime = currentdate.getFullYear() + '/'
-                    + (currentdate.getMonth()+1) + '/'
+    const datetime = currentdate.getFullYear() + '-'
+                    + (currentdate.getMonth()+1) + '-'
                     + currentdate.getDate()
     return datetime
 }
