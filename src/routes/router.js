@@ -98,8 +98,8 @@ const {
     addSignature,
     deleteSignature,
 } = require("../controllers/mainController");
-const { default: pdfController } = require("../controllers/pdfController");
-const { default: customPdfController } = require("../controllers/customPdfController");
+const { default: pdfController } = require("../controllers/pdfControllerWorking");
+const { default: customPdfController } = require("../controllers/multipleVisitPdfController");
 
 router.post("/logInUser",                         login)
 router.post("/createUser",                        verifyToken, registerValidation, createUser)
