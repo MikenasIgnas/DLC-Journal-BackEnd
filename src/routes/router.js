@@ -98,8 +98,7 @@ const {
     addSignature,
     deleteSignature,
 } = require("../controllers/mainController");
-const { default: pdfController } = require("../controllers/pdfControllerWorking");
-const { default: customPdfController } = require("../controllers/multipleVisitPdfController");
+const { default: singleVisitPdfController} = require("../controllers/singleVisitPdfController");
 
 router.post("/logInUser",                         login)
 router.post("/createUser",                        verifyToken, registerValidation, createUser)
@@ -194,8 +193,7 @@ router.get('/removeCarPlates',                    verifyToken, removeCarPlates)
 router.post('/addSignature',                      verifyToken, addSignature)
 router.get('/deleteSignature',                    verifyToken, deleteSignature)
 
-router.get('/generatePdf',                        verifyToken, pdfController)
-router.get('/generateCustomPdf',                  verifyToken, customPdfController)
+router.get('/generatePdf',                        verifyToken, singleVisitPdfController)
 
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)
