@@ -1,3 +1,4 @@
+import {paginatedResults, paginatedVisitsResults}     from "./paginatedResultsFunctions";
 const express =             require("express")
 const router =              express.Router()
 const FilledChecklistData = require("../shemas/FilledChecklistData");
@@ -5,7 +6,6 @@ const VisitsData =          require('../shemas/VisitsSchema')
 const AllUsersData =        require('../shemas/AllUsersSchema')
 const MongoClient =         require('mongodb').MongoClient;
 const client =              new MongoClient('mongodb://10.81.7.29:27017/');
-
 const {
     registerValidation,
     passwordChangeValidation,
@@ -199,7 +199,7 @@ router.get('/checklistHistoryData',               verifyToken, paginatedResults(
   res.json(res.paginatedResults.results)
 })
 
-router.get('/visitsData',                         verifyToken, paginatedResults(VisitsData, 'visits'), async(req,res) => {
+router.get('/visitsData',                         verifyToken, paginatedVisitsResults(VisitsData, 'visits'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
 router.get('/allUsers',                           verifyToken, paginatedResults(AllUsersData, 'registeredusers'), async(req,res) => {
@@ -209,69 +209,7 @@ router.get('/getArchivedUsers',                   verifyToken, paginatedResults(
   res.json(res.paginatedResults.results)
 })
 
-function paginatedResults(model, collection) {
-  return async (req, res, next) => {
-    const dbCollection =  client.db('ChecklistDB').collection(collection);
-    const page =          parseInt(req.query.page);
-    const limit =         parseInt(req.query.limit);
-    const filterOption =  req.query.filter;
-    const startIndex =    (page - 1) * limit;
-    const endIndex =      page * limit;
-    const results =       {};
-    const selectFilter =  req.query.selectFilter;
-    try {
-      if (endIndex < await model.countDocuments().exec()) {
-        results.next = { page: page + 1, limit: limit };
-      }
-      if (startIndex > 0) {
-        results.previous = { page: page - 1, limit: limit };
-      }
 
-      let query;
-      if (filterOption !== undefined) {
-        const filterFunction = item => {
-          for (const key in item) {
-            if (key === 'signature') {
-              continue
-            }
-            if (typeof item[key] === 'string' && item[key].toLowerCase().includes(filterOption)) {
-              return true;
-            }
-          }
-          return false;
-        };
-        const allDocuments = await dbCollection.find().toArray();
-        const filteredDocuments = allDocuments.filter(filterFunction);
-        query = dbCollection.find({ _id: { $in: filteredDocuments.map(doc => doc._id) } });
-      } else if (selectFilter !== undefined) {
-        const filterFunction = item => {
-            for (const key in item) {
-                if (key === 'signature') {
-                    continue;
-                }
-                if (typeof item[key] === 'string' && item[key].toLowerCase() === selectFilter.toLowerCase()) {
-                    return true;
-                }
-            }
-            return false;
-        };
-    
-        const allDocuments = await dbCollection.find().toArray();
-        const filteredDocuments = allDocuments.filter(filterFunction);
-        query = dbCollection.find({ _id: { $in: filteredDocuments.map(doc => doc._id) } });
-    }else {
-        query = dbCollection.find().sort({id: -1});
-      }
-
-      results.results = await query.skip(startIndex).limit(limit).toArray();
-      res.paginatedResults = results;
-      next();
-    } catch (e) {
-      res.status(500).json({ message: e.message });
-    }
-  };
-}
-  
   module.exports = router
 
                                   

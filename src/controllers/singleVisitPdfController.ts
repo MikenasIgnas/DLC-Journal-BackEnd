@@ -1,5 +1,5 @@
 import { Response }         from 'express';
-import { TypedRequestBody } from '../types';
+import { TypedRequestBody, VisitsType } from '../types';
 import { jsPDF }            from 'jspdf';
 import autoTable            from 'jspdf-autotable';
 
@@ -16,7 +16,7 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
   try {
     const visits = client.db('ChecklistDB').collection('visits');
     const visitId = req.query.visitId;
-    const visit = await visits.findOne({ id: Number(visitId) });
+    const visit: VisitsType = await visits.findOne({ id: Number(visitId) })
 
     if (!visit) {
       res.status(500).json({ message: 'Could not find visit by that id' });
@@ -29,13 +29,13 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
           head: [
             ['Vardas', 'Pavardė', 'Gimimo data', 'Pareigos', 'Telefono Nr.', 'El.Paštas', 'Parašas'],
           ],
-          body: visit.visitors.map((el: any) => [
-            el.selectedVisitor.name,
-            el.selectedVisitor.lastName,
-            el.selectedVisitor.birthday,
-            el.selectedVisitor.occupation,
-            el.selectedVisitor.phoneNr,
-            el.selectedVisitor.email,
+          body: visit?.visitors?.map((el: any) => [
+            el?.selectedVisitor?.name,
+            el?.selectedVisitor?.lastName,
+            el?.selectedVisitor?.birthday,
+            el?.selectedVisitor?.occupation,
+            el?.selectedVisitor?.phoneNr,
+            el?.selectedVisitor?.email,
           ]), 
           columns: [
             { header: 'Vardas', dataKey: 'name' },
@@ -49,9 +49,11 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
           didDrawCell: (data) => {
             if (data.column.dataKey === 'signature') {
               const { x, y } = data.cell;
-               visit.visitors.map((el: any) => (
-                doc.addImage(el.signature, 'PNG', x + 2, y + 2, 15, 15)
-              ))
+               visit.visitors.map((el) =>{
+                if(el.signature){
+                  doc.addImage(el.signature, 'PNG', x + 2, y + 2, 15, 15)
+                }
+              })
             }
           },
           styles: {font: 'Arial'}

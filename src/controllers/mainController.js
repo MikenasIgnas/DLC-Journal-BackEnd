@@ -715,7 +715,12 @@ module.exports = {
         const companyData = await company.findOne({id: Number(id)})
         const clientsEmployees = await companyEmployees.find().toArray()
         const companyName = companyData.companyInfo.companyName.replace(/\s+/g, '');  
-        await company.findOneAndDelete({id: Number(id)})
+        await company.findOneAndDelete({id: Number(id)}, )
+        company.findOneAndUpdate(  
+        { parentCompanyId: Number(id), "wasMainClient": true },
+        { $unset: { "wasMainClient": "", "parentCompanyId": "" } },
+        { multi: true }
+        )
         const deletedEmployees = await companyEmployees.deleteMany({companyId: Number(id)})
         const numDocumentsDeleted = deletedEmployees.deletedCount;
         const companyLogofilePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/CompanyLogos/${companyName}Logo${id}.jpeg`
