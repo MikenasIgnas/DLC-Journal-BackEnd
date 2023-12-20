@@ -99,6 +99,8 @@ const {
     deleteSignature,
 } = require("../controllers/mainController");
 const { default: singleVisitPdfController} = require("../controllers/singleVisitPdfController");
+const { default: allCollocationsCsvController} = require("../controllers/allCollocationsCsvController");
+const { default: singleCollocationCsvController} = require("../controllers/singleCollocationCsvController");
 
 router.post("/logInUser",                         login)
 router.post("/createUser",                        verifyToken, registerValidation, createUser)
@@ -194,11 +196,12 @@ router.post('/addSignature',                      verifyToken, addSignature)
 router.get('/deleteSignature',                    verifyToken, deleteSignature)
 
 router.get('/generatePdf',                        verifyToken, singleVisitPdfController)
+router.post('/generateAllCollocationsCSV',        verifyToken, allCollocationsCsvController)
+router.post('/generateSingleCollocationCSV',      verifyToken, singleCollocationCsvController)
 
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)
 })
-
 router.get('/visitsData',                         verifyToken, paginatedVisitsResults(VisitsData, 'visits'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
@@ -209,7 +212,6 @@ router.get('/getArchivedUsers',                   verifyToken, paginatedResults(
   res.json(res.paginatedResults.results)
 })
 
-
-  module.exports = router
+module.exports = router
 
                                   
