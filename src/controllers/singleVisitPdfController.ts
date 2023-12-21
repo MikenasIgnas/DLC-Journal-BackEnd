@@ -29,9 +29,8 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
       doc.setFont("Arial", "bold"); 
       doc.setFontSize(20);
       doc.addImage(backgroundBuffer, 'PNG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
-      
-      const originalFontSize = doc.getFontSize();
 
+      const originalFontSize = doc.getFontSize();
       doc.setFontSize(14);
       doc.text("Vizito ataskaita", doc.internal.pageSize.width / 2, 30, { align: 'center' });
       doc.setFontSize(10);
@@ -40,10 +39,10 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
       doc.text(`Duomenų centras: ${visit.visitAddress}`, doc.internal.pageSize.width / 2, 40, { align: 'center' });
       doc.setFontSize(10);
       doc.text(`Įmonė: ${visit.visitingClient}`, doc.internal.pageSize.width / 2, 45, { align: 'center' });
-      
+
       doc.setFontSize(originalFontSize);
 
-      autoTable(doc,{
+     autoTable(doc,{
         head: [
           ['Vardas', 'Pavardė', 'Gimimo data', 'Pareigos', 'Telefono Nr.', 'El.Paštas', 'Dokumentas' ,'Leidimai', 'Parašas'],
         ],
@@ -58,7 +57,7 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
             el?.selectedVisitor?.phoneNr,
             el?.selectedVisitor?.email,
             el.idType,
-            el.selectedVisitor.permissions.map((el: string) => `${el}\n`),
+            el.selectedVisitor.permissions.map((el: string) => `${el}\n`).join(''),
             el.signature,
           ]), 
           columns: [
@@ -90,10 +89,34 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
           styles: {font: 'Arial'},
           startY: 50,
         });
-        
+        if(Object.keys(visit?.visitCollocation).length !== 0){
+         const firstTableEnd = (doc as any).lastAutoTable.finalY;
+         doc.setFontSize(10)
+         doc.text('Kolokacijos', 15, firstTableEnd + 10);
+         doc.setFontSize(originalFontSize);
+         autoTable(doc, {
+           head: [
+             ['Patalpa', 'Spinta'],
+            ],
+            body: Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
+            startY: firstTableEnd + 15,
+          });
+        }
+        if(visit.clientsGuests.length > 0){
+          const secondTableEnd = (doc as any).lastAutoTable.finalY;
+          doc.setFontSize(10)
+          doc.text('Palyda', 15, secondTableEnd + 10);
+          doc.setFontSize(originalFontSize);
+          autoTable(doc, {
+            head: [
+              ['Palyda'],
+             ],
+             body: visit.clientsGuests.map((el) => [`${el}`]),
+             startY: secondTableEnd + 15,
+           });
+        }
         const docOutput = doc.output('arraybuffer');
         const docBuffer = Buffer.from(docOutput as any, 'ascii');
-        
         res.setHeader('Content-Disposition', 'attachment; filename="two-by-four.pdf"');
         res.setHeader('Content-Type', 'application/pdf');
         res.send(docBuffer);
