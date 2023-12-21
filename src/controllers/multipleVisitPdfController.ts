@@ -1,84 +1,118 @@
-import { Response } from 'express';
-import fs       from 'fs/promises';
+import { Response }                     from 'express';
+import { TypedRequestBody, VisitsType } from '../types';
+import { jsPDF }                        from 'jspdf';
+import autoTable                        from 'jspdf-autotable';
 
 const MongoClient = require('mongodb').MongoClient;
-const client = new MongoClient('mongodb://10.81.7.29:27017/');
+const client      = new MongoClient('mongodb://10.81.7.29:27017/');
+const fs          = require('fs');
+interface ChangePasswordBody {
+  id:             string;
+  oldPassword:    string;
+  password:       string;
+  repeatPassword: string;
+}
 
-export default async (req: any, res: Response) => {
+export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) => {
   try {
-    const PDFDocument     = require("pdfkit-table");
-    const dateFrom        = req.query.dateFrom;
-    const dateTo          = req.query.dateTo;
-    const visitCollection = client.db('ChecklistDB').collection('visits');
-    const visits          = await visitCollection.find().toArray();
-    const startDate       = new Date(dateFrom);
-    const endDate         = new Date(dateTo);
-    
-    const visitsByDate = visits
+    const visits                  = client.db('ChecklistDB').collection('visits');
+    const allVisits: VisitsType[] = await visits.find().toArray()
+    const backgroundPath          = 'src/Images/PDFbackround.png';
+    const backgroundBuffer        = fs.readFileSync(backgroundPath);
+    const dateFrom                = req.query.dateFrom
+    const dateTo                  = req.query.dateTo
+    const startDate       = new Date(dateFrom as string);
+    const endDate         = new Date(dateTo as string);
+
+    const visitsByDate = allVisits
       .filter((item: any) => {
         const visitDate = new Date(item.startDate);
         return visitDate >= startDate && visitDate <= endDate;
       })
       .sort((a: any, b: any) => b.id - a.id);
-      
-    if (!visitsByDate || visitsByDate.length === 0) {
-      res.status(500).json({ message: 'No visits found within the specified date range' });
-      return;
+    if (!visitsByDate) {
+      res.status(500).json({ message: 'Could not find visit by that id' });
     } else {
-      res.setHeader('Content-Type', 'application/pdf; charset=utf-8');
-      const logoPath = 'src/Images/signatureLogo.png';
-      const fontPath = 'src/Fonts/arial.ttf';
-      const fontData = await fs.readFile(fontPath);
+      const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' });
+      visitsByDate.map((visit: any, index: number) => {
+        if (index > 0) {
+          doc.addPage();
+        }
+    
+      doc.addFont("src/Fonts/arial.ttf", "Arial", "bold");
+      doc.setFont("Arial", "bold"); 
+      doc.setFontSize(20);
+      doc.addImage(backgroundBuffer, 'PNG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
+      
+      const originalFontSize = doc.getFontSize();
 
-      let doc = new PDFDocument({ margin: 20, size: 'A4', layout: 'landscape' });
-        visitsByDate?.map((visit: any, index: number) => {
-          if (index > 0) {
-            doc.addPage();
-          }
+      doc.setFontSize(14);
+      doc.text("Vizito ataskaita", doc.internal.pageSize.width / 2, 30, { align: 'center' });
+      doc.setFontSize(10);
+      doc.text(`Data: ${visit.creationDate}`, doc.internal.pageSize.width / 2, 35, { align: 'center' });
+      doc.setFontSize(10);
+      doc.text(`Duomenų centras: ${visit.visitAddress}`, doc.internal.pageSize.width / 2, 40, { align: 'center' });
+      doc.setFontSize(10);
+      doc.text(`Įmonė: ${visit.visitingClient}`, doc.internal.pageSize.width / 2, 45, { align: 'center' });
+      
+      doc.setFontSize(originalFontSize);
 
-          doc.image(logoPath, { width: 70, height: 50 });
-
-          const table = {
-            title: 'Duomenų Logistikos Centras',
-            subtitle: `Vizito ataskaita ${visit.startDate}`,
-            headers: [
-              { label: 'Vardas', property: 'name', width: 60 },
-              { label: 'Pavardė', property: 'lastName', width: 80 },
-              { label: 'Pareigos', property: 'occupation', width: 70 },
-              { label: 'Tel. Nr.', property: 'phoneNr', width: 70 },
-              { label: 'El. paštas', property: 'email', width: 80 },
-              { label: 'Gimimo data', property: 'birthday', width: 80 },
-              { label: 'Dokumentas', property: 'idType', width: 80 },
-              { label: 'Leidimai', property: 'permissions', width: 43 },
-            ],
-            rows: visit.visitors.map((el: any) => [
-              el.selectedVisitor.name,
-              el.selectedVisitor.lastName,
-              el.selectedVisitor.occupation,
-              el.selectedVisitor.phoneNr,
-              el.selectedVisitor.email,
-              el.selectedVisitor.birthday,
-              el.idType,
-              el.selectedVisitor.permissions,
-            ]),
-            options: {
-              minRowHeight: 50,
-            },
-          };
-
-          doc.table(table, {
-            prepareHeader: () => doc.font(fontData).fontSize(8),
-            prepareRow: (row: any, indexColumn: any, indexRow: any, rectRow: any) => {
-              doc.font(fontData).fontSize(8);
-              indexColumn === 0 && doc.addBackground(rectRow, 'white', 0.15);
-            },
-          });
-        })
-
-      doc.pipe(res);
-      doc.end();
-    }
-  } catch (error) {
+      autoTable(doc,{
+        head: [
+          ['Vardas', 'Pavardė', 'Gimimo data', 'Pareigos', 'Telefono Nr.', 'El.Paštas', 'Dokumentas' ,'Leidimai', 'Parašas'],
+        ],
+        bodyStyles: {
+          minCellHeight: 20,
+        },
+        body: visit?.visitors?.map((el: any) => [
+          el?.selectedVisitor?.name,
+            el?.selectedVisitor?.lastName,
+            el?.selectedVisitor?.birthday,
+            el?.selectedVisitor?.occupation,
+            el?.selectedVisitor?.phoneNr,
+            el?.selectedVisitor?.email,
+            el.idType,
+            el.selectedVisitor.permissions.map((el: string) => `${el}\n`),
+            el.signature,
+          ]), 
+          columns: [
+            { header: 'Vardas', dataKey: 'name' },
+            { header: 'Pavardė', dataKey: 'lastName' },
+            { header: 'Gimimo data', dataKey: 'birthday' },
+            { header: 'Pareigos', dataKey: 'occupation' },
+            { header: 'Telefono Nr.', dataKey: 'phoneNr' },
+            { header: 'El.Paštas', dataKey: 'email' },
+            { header: 'Dokumentas', dataKey: 'idType' },
+            { header: 'Leidimai', dataKey: 'permissions' },
+            { header: 'Parašas', dataKey: 'signature' },
+          ],
+          didParseCell: (data) => {
+            if (data.row.section === 'body' && data.column.dataKey === 'signature') {
+              data.cell.text = ['']
+              data.cell.minWidth = 200
+            }
+          },
+          didDrawCell: (data) => {
+            if (data.row.section === 'body' && data.column.dataKey === 'signature') {
+              const { raw, x, y } = data.cell;
+              if (typeof raw === 'string') {
+                doc.addImage(raw, 'PNG', x , y, 15, 15)
+              }
+            }
+          },
+          styles: {font: 'Arial'},
+          startY: 50,
+        });
+        
+      })
+      const docOutput = doc.output('arraybuffer');
+      const docBuffer = Buffer.from(docOutput as any, 'ascii');
+      
+      res.setHeader('Content-Disposition', 'attachment; filename="two-by-four.pdf"');
+      res.setHeader('Content-Type', 'application/pdf');
+      res.send(docBuffer);
+      }
+    } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Unexpected error' });
   }

@@ -80,7 +80,6 @@ const {
     changeSubClientToMainClient,
     getSingleSubClient,
     getAllHistoryData,
-    generateMonthlyPDFReport,
     getAllClientsEmployees,
     getSingleClientsCollocations,
     getSpecificDateReport,
@@ -100,6 +99,7 @@ const {
     deleteSignature,
 } = require("../controllers/mainController");
 const { default: singleVisitPdfController} = require("../controllers/singleVisitPdfController");
+const { default: multipleVisitPdfController} = require("../controllers/multipleVisitPdfController");
 const { default: allCollocationsCsvController} = require("../controllers/allCollocationsCsvController");
 const { default: singleCollocationCsvController} = require("../controllers/singleCollocationCsvController");
 
@@ -151,7 +151,6 @@ router.get('/getPhotos/:photoId',                 verifyToken, getPhotos)
 router.get('/latestPhotos',                       verifyToken, latestPhotos)
 router.get('/deletePhoto/:photoId',               verifyToken, deletePhoto)
 router.get('/getAllHistoryData',                  verifyToken, getAllHistoryData)
-router.get('/generateMonthlyPDFReport',           verifyToken,   generateMonthlyPDFReport)
 
 router.get('/getCompanies',                       verifyToken, getCompanies)
 router.get('/getCompaniesSites',                  verifyToken, getCompaniesSites)
@@ -198,6 +197,7 @@ router.post('/addSignature',                      verifyToken, addSignature)
 router.get('/deleteSignature',                    verifyToken, deleteSignature)
 
 router.get('/generatePdf',                        verifyToken, singleVisitPdfController)
+router.get('/generateMultipleVisitPdf',           verifyToken, multipleVisitPdfController)
 router.post('/generateAllCollocationsCSV',        verifyToken, allCollocationsCsvController)
 router.post('/generateSingleCollocationCSV',      verifyToken, singleCollocationCsvController)
 
