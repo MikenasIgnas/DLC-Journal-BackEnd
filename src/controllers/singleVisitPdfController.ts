@@ -25,10 +25,14 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
       doc.addFont("src/Fonts/arial.ttf", "Arial", "bold");
       doc.setFont("Arial", "bold"); 
       doc.setFontSize(20);
+
       autoTable(doc,{
           head: [
             ['Vardas', 'Pavardė', 'Gimimo data', 'Pareigos', 'Telefono Nr.', 'El.Paštas', 'Parašas'],
           ],
+          bodyStyles: {
+            minCellHeight: 20,
+          },
           body: visit?.visitors?.map((el: any) => [
             el?.selectedVisitor?.name,
             el?.selectedVisitor?.lastName,
@@ -36,6 +40,7 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
             el?.selectedVisitor?.occupation,
             el?.selectedVisitor?.phoneNr,
             el?.selectedVisitor?.email,
+            el.signature,
           ]), 
           columns: [
             { header: 'Vardas', dataKey: 'name' },
@@ -46,22 +51,30 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
             { header: 'El.Paštas', dataKey: 'email' },
             { header: 'Parašas', dataKey: 'signature' },
           ],
+          didParseCell: (data) => {
+            if (data.row.section === 'body' && data.column.dataKey === 'signature') {
+              data.cell.text = ['']
+              data.cell.minWidth = 200
+            }
+          },
           didDrawCell: (data) => {
-            if (data.column.dataKey === 'signature') {
-              const { x, y } = data.cell;
-               visit.visitors.map((el) =>{
-                if(el.signature){
-                  doc.addImage(el.signature, 'PNG', x + 2, y + 2, 15, 15)
-                }
-              })
+            if (data.row.section === 'body' && data.column.dataKey === 'signature') {
+              const { raw, x, y } = data.cell;
+
+              if (typeof raw === 'string') {
+                doc.addImage(raw, 'PNG', x + 10, y, 15, 15)
+              }
             }
           },
           styles: {font: 'Arial'}
         });
-      doc.save('table.pdf');
+
+      const docOutput = doc.output('arraybuffer');
+      const docBuffer = Buffer.from(docOutput as any, 'ascii');
+
       res.setHeader('Content-Disposition', 'attachment; filename="two-by-four.pdf"');
       res.setHeader('Content-Type', 'application/pdf');
-      res.send(doc.output());
+      res.send(docBuffer);
     }
   } catch (error) {
     console.log(error);
