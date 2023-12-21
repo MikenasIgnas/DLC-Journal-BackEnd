@@ -784,12 +784,39 @@ module.exports = {
         res.json({"status":"completed"});
         })
     },
+    updateClientsEmployeesPhoto: async (req, res) => {
+        const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter');
+        const clientsEmployeesCollection = client.db('ChecklistDB').collection('companyEmployees');
+        const companyName = req.query.companyName.replace(/\s+/g, '');  
+        const companyId = req.query.companyId
+        const employeeId = req.query.employeeId
+        const fileName =  `${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
+        const storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+              cb(null, (`C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos`) )
+            },
+            filename: function (req, file, cb) {
+                cb(null, fileName)
+            }
+        })
+      const upload = multer({ storage:storage }).single('file')
+      await clientsEmployeesCollection.findOneAndUpdate({companyId:Number(companyId), employeeId: Number(employeeId)}, { $set: {
+        employeePhoto: `${fileName}` 
+      }})
+      
+      upload(req,res,function(err) {
+        if(err) {
+            return handleError(err, res);
+        }
+        res.json({"status":"completed"});
+        })
+    },
     deleteClientsEmployee: async (req, res) => {
         const clientsEmployees = client.db('ChecklistDB').collection('companyEmployees');
         const employeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter');
         const companyId = Number(req.query.companyId)
         const employeeId = Number(req.query.employeeId)
-        const companyName = req.query.companyName
+        const companyName = req.query.companyName.split(' ').join('')
         await clientsEmployees.findOneAndDelete({companyId, employeeId})
         const filePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
         fs.unlink(filePath, (err) => {

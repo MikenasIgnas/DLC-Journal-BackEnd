@@ -65,6 +65,7 @@ const {
     uploadCompanysPhoto,
     deleteCompany,
     uploadCliesntEmployeesPhoto,
+    updateClientsEmployeesPhoto,
     deleteClientsEmployee,
     updateClientsEmployee,
     updateCompaniesData,
@@ -120,6 +121,7 @@ router.post("/postLatestPhotos",                  verifyToken, postLatestPhotos)
 router.post("/uploadPhoto",                       uploadPhoto)
 router.post("/uploadCompanysPhoto",               uploadCompanysPhoto)
 router.post("/uploadCliesntEmployeesPhoto",       uploadCliesntEmployeesPhoto)
+router.post("/updateClientsEmployeesPhoto",       updateClientsEmployeesPhoto)
 router.post("/postVisitDetails",                  verifyToken, postVisitDetails)
 
 router.get("/startVisit",                         verifyToken, startVisit)
