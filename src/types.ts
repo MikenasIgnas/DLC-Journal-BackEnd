@@ -57,3 +57,60 @@ export type VisitsType = {
   companyId:          number;
   scheduledVisitTime: string | undefined;
 }
+
+export type HistoryDataType = {
+  startDate:          string;
+  startTime:          string;
+  endDate:            string;
+  endTime:            string;
+  routeNumber:        number | undefined;
+  id:                 number;
+  userName:           string;
+  problemCount:       number;
+  pageID:             number;
+  _id:                string;
+  secret:             string;
+  userRole:           string;
+  filledData: {
+    values: {
+      [key: string]: {
+        [key: string]: boolean
+        }[]
+    },
+    pageID:           number;
+    routeNumber:      number;
+  }[]
+  values: {
+      [key: string]: {
+        [key: string]: boolean;
+      }[],
+    },
+
+};
+
+export type RouteType = {
+  id:                 number;
+  routenumber:        number;
+  floor:              string;
+  title:              string;
+};
+
+export type AreaType = {
+  id:                 number;
+  routesId:           number;
+  areaNumber:         string;
+  roomName:           string;
+};
+
+export type TodoType = {
+  areasId:            number;
+  duty:               string;
+  id:                 number;
+};
+
+export type PossibleProblemsType = {
+  id:                 number;
+  todoId:             number;
+  possibleProblem:    string;
+  reaction:           string;
+};

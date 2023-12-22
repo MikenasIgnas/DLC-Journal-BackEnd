@@ -10,7 +10,7 @@ const getCurrentTime  = () => {
     const currentdate = new Date()
     const currentTime = currentdate.getHours() + ':'
                     + currentdate.getMinutes()
-    return currentTime
+    return currentTime.padStart(2, '0')
 }
 
 module.exports = {

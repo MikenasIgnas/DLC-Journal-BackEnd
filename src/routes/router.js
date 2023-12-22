@@ -102,6 +102,7 @@ const { default: singleVisitPdfController} = require("../controllers/singleVisit
 const { default: multipleVisitPdfController} = require("../controllers/multipleVisitPdfController");
 const { default: allCollocationsCsvController} = require("../controllers/allCollocationsCsvController");
 const { default: singleCollocationCsvController} = require("../controllers/singleCollocationCsvController");
+const { default: multipleChecklistHistoryPdfController} = require("../controllers/multipleChecklistHistoryPdfController");
 
 router.post("/logInUser",                         login)
 router.post("/createUser",                        verifyToken, registerValidation, createUser)
@@ -200,6 +201,9 @@ router.get('/generatePdf',                        verifyToken, singleVisitPdfCon
 router.get('/generateMultipleVisitPdf',           verifyToken, multipleVisitPdfController)
 router.post('/generateAllCollocationsCSV',        verifyToken, allCollocationsCsvController)
 router.post('/generateSingleCollocationCSV',      verifyToken, singleCollocationCsvController)
+
+router.get('/generateMultipleChecklistHistoryPdf',verifyToken, multipleChecklistHistoryPdfController)
+
 
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)

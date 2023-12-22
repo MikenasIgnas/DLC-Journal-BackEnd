@@ -36,7 +36,6 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
       visitsByDate.map((visit: VisitsType, index: number) => {
         if (index > 0) {
           doc.addPage();
-          doc.addImage(backgroundBuffer, 'PNG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
         }
 
         doc.addFont("src/Fonts/arial.ttf", "Arial", "bold");
