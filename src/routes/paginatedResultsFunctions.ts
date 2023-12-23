@@ -38,12 +38,27 @@ const paginatedResults = (model: any, collection: any) => {
         } else if (selectFilter !== undefined) {
           const filterFunction = (item: any) => {
               for (const key in item) {
+
                   if (key === 'signature') {
                       continue;
                   }
+
+                  if(selectFilter === 'hasProblems'){
+                    if(item.problemCount > 0){
+                      return true
+                    }
+                  }
+
+                  if(selectFilter === 'noProblems'){
+                    if(item.problemCount <= 0){
+                      return true
+                    }
+                  }
+
                   if (typeof item[key] === 'string' && item[key].toLowerCase() === selectFilter.toLowerCase()) {
                       return true;
                   }
+                  
               }
               return false;
           };
