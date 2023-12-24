@@ -39,7 +39,7 @@ module.exports = {
                     if (oldUser) {
                         return res.status(409).send("User Already Exist. Please Login");
                     }
-                    encryptedPassword = await bcrypt.hash(passwordOne, 10);
+                    const encryptedPassword = await bcrypt.hash(passwordOne, 10);
                     const secret = uid()
                     const user = {
                         email: email.toLowerCase(),
