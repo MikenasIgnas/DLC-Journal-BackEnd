@@ -205,6 +205,7 @@ router.post('/generateSingleCollocationCSV',      verifyToken, singleCollocation
 router.get('/generateMultipleChecklistHistoryPdf',verifyToken, multipleChecklistHistoryPdfController)
 
 
+
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)
 })
