@@ -97,11 +97,13 @@ const {
     updateVisitInformation,
     addSignature,
     deleteSignature,
+    addCollocation,
+    deleteCollocation,
 } = require("../controllers/mainController");
-const { default: singleVisitPdfController} = require("../controllers/singleVisitPdfController");
-const { default: multipleVisitPdfController} = require("../controllers/multipleVisitPdfController");
-const { default: allCollocationsCsvController} = require("../controllers/allCollocationsCsvController");
-const { default: singleCollocationCsvController} = require("../controllers/singleCollocationCsvController");
+const { default: singleVisitPdfController}              = require("../controllers/singleVisitPdfController");
+const { default: multipleVisitPdfController}            = require("../controllers/multipleVisitPdfController");
+const { default: allCollocationsCsvController}          = require("../controllers/allCollocationsCsvController");
+const { default: singleCollocationCsvController}        = require("../controllers/singleCollocationCsvController");
 const { default: multipleChecklistHistoryPdfController} = require("../controllers/multipleChecklistHistoryPdfController");
 
 router.post("/logInUser",                         login)
@@ -195,6 +197,8 @@ router.get('/filterByStatus',                     verifyToken, filterByStatus)
 router.get('/removeClientsGuest',                 verifyToken, removeClientsGuest)
 router.get('/removeCarPlates',                    verifyToken, removeCarPlates)
 router.post('/addSignature',                      verifyToken, addSignature)
+router.post('/addCollocation',                    verifyToken, addCollocation)
+router.post('/deleteCollocation',                 verifyToken, deleteCollocation)
 router.get('/deleteSignature',                    verifyToken, deleteSignature)
 
 router.get('/generatePdf',                        verifyToken, singleVisitPdfController)

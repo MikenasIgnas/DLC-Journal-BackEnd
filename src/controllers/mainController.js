@@ -69,14 +69,14 @@ module.exports = {
 
     login: async (req, res) => {
         try {
-            const { email, password } = req.body;
+            const { loginEmail, loginPassword } = req.body;
             const collection = client.db('ChecklistDB').collection('registeredusers');
-            const user = await collection.findOne({ email });;
-            if (!(email && password)) {
+            const user = await collection.findOne({ email: loginEmail });;
+            if (!(loginEmail && loginPassword)) {
               res.status(400).send("All input is required");
             }
-            if (user && (await bcrypt.compare(password, user.password)) ) {
-              const payload = { email, userId: user._id, userRole: user.userRole, secret: user.secret, id: user.id};
+            if (user && (await bcrypt.compare(loginPassword, user.password)) ) {
+              const payload = { loginEmail, userId: user._id, userRole: user.userRole, secret: user.secret, id: user.id};
               const options = { expiresIn: '30m', algorithm: 'HS256' };
               const token = jwt.sign(payload, config.TOKEN_KEY, options);
               user.token = token;
@@ -244,7 +244,7 @@ module.exports = {
         const users = client.db('ChecklistDB').collection('registeredusers');
         const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
         const {id} = req.params
-        const username = req.body.username
+        const username = req.body.employee
         const email = req.body.email
         const userRole = req.body.userRole
         const passwordOne = req.body.passwordOne
@@ -271,7 +271,7 @@ module.exports = {
 
     changedUsername: async (req,res) => {
         const checklistHistoryData = client.db('ChecklistDB').collection('checklistHistoryData');
-        const username = req.body.username
+        const username = req.body.employee
         const {id} = req.params
         const changeUsernameInHistoryElements = await checklistHistoryData.updateMany(
             {id: Number(id)},
