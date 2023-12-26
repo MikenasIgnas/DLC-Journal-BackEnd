@@ -65,7 +65,6 @@ const paginatedResults = (model: any, collection: any) => {
 
       }else if( tableSorter !== undefined){
         if(tableSorter === 'asc'){
-          console.log(tableSorter)
           query = dbCollection.find().sort({id: 1});
         }else{
           query = dbCollection.find().sort({id: -1});
@@ -146,7 +145,6 @@ const paginatedResults = (model: any, collection: any) => {
           query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } });
       }else if( tableSorter !== undefined){
         if(tableSorter === 'asc'){
-          console.log(tableSorter)
           query = dbCollection.find().sort({id: 1});
         }else{
           query = dbCollection.find().sort({id: -1});
