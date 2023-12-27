@@ -10,7 +10,6 @@ import { DecodedToken } from '../controllers/authControllers/types'
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers['token']
-
     if (!token) {
       res.status(401).json({ message: 'No token provided' })
     } else if (typeof token === 'string') {

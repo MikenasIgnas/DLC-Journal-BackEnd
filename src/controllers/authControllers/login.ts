@@ -14,7 +14,6 @@ interface LoginBody {
 export default async (req: TypedRequestBody<LoginBody>, res: Response) => {
   try {
       const { email, password } = req.body;
-
       if (!(email && password)) {
         res.status(400).send("All input is required")
       }

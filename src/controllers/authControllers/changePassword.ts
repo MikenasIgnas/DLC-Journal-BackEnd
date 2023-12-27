@@ -15,9 +15,7 @@ interface ChangePasswordBody {
 export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) => {
   try {
     const { password, repeatPassword, oldPassword } = req.body
-
-    const id = getLoggedInUserId(req)
-
+    const id = await getLoggedInUserId(req)
     if (!password || !repeatPassword || !oldPassword) {
       res.status(500).json({ message: 'All fields required' })
     }

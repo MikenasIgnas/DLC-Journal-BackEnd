@@ -1,5 +1,4 @@
 import { Response }         from 'express'
-
 import { getPagination }    from '../../helpers.js'
 import { TypedRequestBody } from '../../types.js'
 import UserSchema           from '../../shemas/UserSchema.js'
@@ -13,7 +12,6 @@ export default async (req: TypedRequestBody<GetAllUsersBody>, res: Response) => 
     const { isDisabled, page, limit } = req.query
 
     const { parsedLimit, skip } = getPagination(page, limit)
-
     let users
 
     if (isDisabled === undefined || isDisabled === null) {

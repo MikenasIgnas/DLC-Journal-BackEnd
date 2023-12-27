@@ -11,7 +11,6 @@ interface DeleteUserBody {
 export default async (req: TypedRequestBody<DeleteUserBody>, res: Response) => {
   try {
     const { id } = req.query
-
     if (!id) {
       res.status(500).json({ message: 'Id is required' })
     }

@@ -39,7 +39,7 @@ export const getLoggedInUserId = async (req: Request) => {
 
   if (typeof token === 'string') {
     const decoded = jwt.verify(token, process.env.TOKEN_KEY) as DecodedToken
-   
+
     return decoded?.userId
   }
 }

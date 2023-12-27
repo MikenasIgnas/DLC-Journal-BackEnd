@@ -11,15 +11,14 @@ import getAllUsersCount from '../controllers/usersControllers/getAllUsersCount'
 import deleteUser       from '../controllers/usersControllers/deleteUser'
 import editUser         from '../controllers/usersControllers/editUser'
 
-
 const router = Router()
 
-router.get("/delete", verifyToken, deleteUser)
-router.get("/getAll", verifyToken, getAllUsers)
-router.get("/getAll/count", verifyToken, getAllUsersCount)
-router.get("/getbyid", verifyToken, getUserById)
+router.get("/delete", verifyToken, deleteUser)// done
+router.get("/getAll", verifyToken, getAllUsers) //done
+router.get("/getAll/count", verifyToken, getAllUsersCount) //done
+router.get("/getbyid", verifyToken, getUserById)//done
 router.post("/changeStatus", verifyToken, changeUserStatus)
-router.post("/create", verifyToken, createUser)
+router.post("/create", verifyToken, createUser) //done
 router.post("/edit", verifyToken, editUser)
 
 export default router

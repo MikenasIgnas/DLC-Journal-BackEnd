@@ -5,7 +5,6 @@ import { TypedRequestBody } from '../../types.js'
 import RoleSchema           from '../../shemas/RoleSchema.js'
 import UserSchema           from '../../shemas/UserSchema.js'
 
-
 interface CreateUserBody {
   email:    string
   name:     string
@@ -13,11 +12,9 @@ interface CreateUserBody {
   roleId:   number
 }
 
-
 export default async (req: TypedRequestBody<CreateUserBody>, res: Response) => {
   try {
     const { email, password, name, roleId } = req.body
-    
     
     if (!(email && password && name && roleId)) {
       res.status(400).json({ messsage: 'Bad request' })

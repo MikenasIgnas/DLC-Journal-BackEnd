@@ -8,6 +8,7 @@ import mainRouter  from './routes/router'
 import rolesRouter from './routes/roleRoutes'
 import usersRouter from './routes/userRoutes'
 
+require('dotenv').config();
 
 mongoose.connect(process.env.MONGO_PATH)
   .then(() => {
