@@ -30,8 +30,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 }
 
 export const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  const id = getLoggedInUserId(req)
-
+  const id = await getLoggedInUserId(req)
   const user = await UserSchema.findById({ _id: id })
 
   if (user?.isAdmin) {
