@@ -14,7 +14,7 @@ interface CreateRoleBody {
 export const createRole = async (req: TypedRequestBody<CreateRoleBody>, res: Response) => {
   try {
     const { name } = req.body
-    console.log(req.body)
+
     if (!name) {
       res.status(400).json({ messsage: 'Bad request' })
     }
