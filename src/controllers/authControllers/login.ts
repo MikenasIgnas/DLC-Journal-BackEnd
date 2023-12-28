@@ -6,43 +6,49 @@ import { TypedRequestBody } from "../../types"
 import UserSchema           from "../../shemas/UserSchema"
 
 interface LoginBody {
-  email:    string
+  login:    string
   password: string
 }
 
 
 export default async (req: TypedRequestBody<LoginBody>, res: Response) => {
   try {
-      const { email, password } = req.body;
-      if (!(email && password)) {
-        res.status(400).send("All input is required")
-      }
+    const { login, password } = req.body
 
-      const user = await UserSchema.findOne({ email })
-
-      if (user) {
-        if (user.isDisabled) {
-          res.status(401).send("User disabled")
-        } else {
-          const isPasswordValid = await bcrypt.compare(password, user.password)
-          if (isPasswordValid) {
-            const payload = { email, userId: user._id }
-
-            const token = jwt.sign(payload, process.env.TOKEN_KEY, { expiresIn: '8h', algorithm: 'HS256' })
-
-            res.status(200).json({
-              email,
-              name: user.name,
-              token,
-             })
-          } else {
-            res.status(400).send("Invalid password")
-          }
-        }
-      } else {
-        res.status(400).send("User does not exist")
-      }
-    } catch (err) {
-      res.status(500).send("Unexpected error")
+    if (!(login && password)) {
+      res.status(400).send("All input is required")
     }
+
+    let user = await UserSchema.findOne({ email: login })
+
+    if (!user) {
+      user = await UserSchema.findOne({ username: login })
+    }
+
+    if (user) {
+      if (user.isDisabled) {
+        res.status(401).send("User disabled")
+      } else {
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+        if (isPasswordValid) {
+          const payload = { email: user.email, userId: user._id }
+
+          const token = jwt.sign(payload, process.env.TOKEN_KEY, { expiresIn: '8h', algorithm: 'HS256' })
+
+          res.status(200).json({
+            email: user.email,
+            name: user.name,
+            token,
+            username: user.username,
+            })
+        } else {
+          res.status(400).send("Invalid password")
+        }
+      }
+    } else {
+      res.status(400).send("User does not exist")
+    }
+  } catch (err) {
+    res.status(500).send("Unexpected error")
+  }
 }

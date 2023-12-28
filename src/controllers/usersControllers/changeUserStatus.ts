@@ -22,9 +22,7 @@ export default async (req: TypedRequestBody<DisableRoleBody>, res: Response) => 
       return res.status(500).send("User does not exist")
     }
 
-    await UserSchema.findOneAndUpdate({
-      _id: id,
-    }, { isDisabled, deleted})
+    await UserSchema.findOneAndUpdate({ _id: id }, { isDisabled, deleted })
 
     res.status(201).json({ message: 'User status updated' })
   } catch (error) {

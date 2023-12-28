@@ -11,7 +11,6 @@ const multer =                              require('multer');
 const { getCurrentDate, getCurrentTime } =  require("../helpers");
 const nodemailer =                          require("nodemailer");
 
-require('dotenv').config()
 
 module.exports = {
     routeData: async (req, res) => {

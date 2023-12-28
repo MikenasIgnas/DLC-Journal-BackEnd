@@ -1,6 +1,7 @@
 import { Router }       from 'express'
 
 import {
+  verifyAdmin,
   verifyToken,
 }                       from '../middleware/middle'
 import createUser       from '../controllers/usersControllers/createUser'
@@ -17,8 +18,8 @@ router.get("/delete", verifyToken, deleteUser)
 router.get("/getAll", verifyToken, getAllUsers)
 router.get("/getAll/count", verifyToken, getAllUsersCount)
 router.get("/getbyid", verifyToken, getUserById)
-router.post("/changeStatus", verifyToken, changeUserStatus)
-router.post("/create", verifyToken, createUser)
+router.post("/changeStatus", verifyToken, verifyAdmin, changeUserStatus)
+router.post("/create", verifyToken, verifyAdmin, createUser)
 router.post("/edit", verifyToken, editUser)
 
 export default router
