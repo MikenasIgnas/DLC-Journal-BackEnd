@@ -1,7 +1,7 @@
 import bcrypt                from 'bcrypt'
 import { Response }          from 'express'
 
-// import { getLoggedInUserId } from '../../helpers.js'
+import { getLoggedInUserId } from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
 import UserSchema            from '../../shemas/UserSchema.js'
 
@@ -14,8 +14,9 @@ interface ChangePasswordBody {
 
 export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) => {
   try {
-    const {id, password, repeatPassword, oldPassword } = req.body
-    // const id = await getLoggedInUserId(req)
+    const { password, repeatPassword, oldPassword } = req.body
+
+    const id = await getLoggedInUserId(req)
     
     if (!password || !repeatPassword || !oldPassword) {
       res.status(500).json({ message: 'All fields required' })

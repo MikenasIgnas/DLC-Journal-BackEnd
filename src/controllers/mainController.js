@@ -916,7 +916,6 @@ module.exports = {
         updateClientsGests: async (req, res) => {
             const visitId = req.query.visitId;
             const visitsCollection = client.db('ChecklistDB').collection('Visits');
-            console.log(req.body )
             const result =  visitsCollection.findOneAndUpdate(
                 { id: Number(visitId) },
                 { $push: { 'clientsGuests':  req.body.value  } }, 

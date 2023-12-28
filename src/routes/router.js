@@ -114,7 +114,7 @@ router.get("/getSingleHistoryELementData/:id",    verifyToken, getSingleHistoryE
 router.get("/checklistHistoryCount",              verifyToken, checklistHistoryCount)
 router.get("/visitsCount",                        verifyToken, visitsCount)
 
-router.get("/getTotalAreasCount",                 verifyToken, getTotalAreasCount)
+router.get("/getTotalAreasCount",                  getTotalAreasCount)
 router.get("/deleteVisit/:id",                    verifyToken, deleteVisit)
 router.get("/deleteHistoryItem/:id",              verifyToken, deleteHistoryItem)
 router.get("/latestHistoryItem",                  verifyToken, latestHistoryItem)

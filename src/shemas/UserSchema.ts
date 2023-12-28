@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose'
 const User = new Schema({
     created:    { type: Date, default: Date.now },
     email:      { type: String, required: true },
-    end:        Date,
+    deleted:     Date,
     isDisabled: { type: Boolean, required: true },
     name:       { type: String, required: true },
     password:   { type: String, required: true },

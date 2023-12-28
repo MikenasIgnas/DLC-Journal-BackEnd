@@ -7,10 +7,10 @@ import { getRole }      from '../controllers/roleControllers/getRole'
 
 const router = Router()
 
-router.post("/create", createRole) //done
+router.post("/create", createRole) 
 router.post("/disable", disableRole)
 router.post("/enable", enableRole)
-router.get("/getAll", getAllRoles) //done
-router.get("/getRole", getRole) //done
+router.get("/getAll", getAllRoles) 
+router.get("/getRole", getRole) 
 
 export default router

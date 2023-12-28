@@ -12,6 +12,7 @@ interface EditUserBody {
 export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
   try {
     const { id, name, email } = req.body
+
     if (!id) {
       res.status(500).json({ message: 'Id is required' })
     }
@@ -20,6 +21,7 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
       name,
       email,
     })
+    
     res.status(201).json(user)
   } catch (error) {
     res.status(500).json({ message: 'Unexpected error' })

@@ -6,14 +6,15 @@ import { TypedRequestBody } from '../../types.js'
 import UserSchema           from '../../shemas/UserSchema.js'
 
 interface DisableRoleBody {
-  id:         string
-  isDisabled: boolean
+  id:           string
+  isDisabled:   boolean
+  deleted:      Date
 }
 
 
 export default async (req: TypedRequestBody<DisableRoleBody>, res: Response) => {
   try {
-    const { id, isDisabled } = req.body
+    const { id, isDisabled, deleted } = req.body
     
     const userExists = await UserSchema.exists({ _id: id })
 
@@ -23,7 +24,7 @@ export default async (req: TypedRequestBody<DisableRoleBody>, res: Response) => 
 
     await UserSchema.findOneAndUpdate({
       _id: id,
-    }, { isDisabled })
+    }, { isDisabled, deleted})
 
     res.status(201).json({ message: 'User status updated' })
   } catch (error) {

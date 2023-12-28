@@ -7,7 +7,7 @@ import changePassword   from '../controllers/authControllers/changePassword'
 
 const router = Router()
 
-router.post("/changePassword", verifyToken, changePassword) //done
-router.post("/login", login) //done
+router.post("/changePassword", verifyToken, changePassword)
+router.post("/login", login)
 
 export default router
