@@ -20,8 +20,8 @@ export default async (req: TypedRequestBody<GetAllUsersBody>, res: Response) => 
       users = await UserSchema.find({ isDisabled }).limit(parsedLimit).skip(skip)
     }
 
-    res.status(201).json(users)
+    return res.status(201).json(users)
   } catch (error) {
-    res.status(500).json({ message: 'Unexpected error' })
+    return res.status(500).json({ message: 'Unexpected error' })
   }
 }

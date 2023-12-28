@@ -16,7 +16,7 @@ export default async (req: TypedRequestBody<LoginBody>, res: Response) => {
     const { login, password } = req.body
 
     if (!(login && password)) {
-      res.status(400).send("All input is required")
+      return res.status(400).send("All input is required")
     }
 
     let user = await UserSchema.findOne({ email: login })
@@ -27,7 +27,7 @@ export default async (req: TypedRequestBody<LoginBody>, res: Response) => {
 
     if (user) {
       if (user.isDisabled) {
-        res.status(401).send("User disabled")
+        return res.status(401).send("User disabled")
       } else {
         const isPasswordValid = await bcrypt.compare(password, user.password)
         if (isPasswordValid) {
@@ -42,13 +42,13 @@ export default async (req: TypedRequestBody<LoginBody>, res: Response) => {
             username: user.username,
             })
         } else {
-          res.status(400).send("Invalid password")
+          return res.status(400).send("Invalid password")
         }
       }
     } else {
-      res.status(400).send("User does not exist")
+      return res.status(400).send("User does not exist")
     }
   } catch (err) {
-    res.status(500).send("Unexpected error")
+    return res.status(500).send("Unexpected error")
   }
 }

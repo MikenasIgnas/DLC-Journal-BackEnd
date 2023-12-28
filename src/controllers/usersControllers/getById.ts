@@ -15,15 +15,15 @@ export default async (req: TypedRequestBody<GetUserByIdBody>, res: Response) => 
     const { id } = req.query
     
     if (!id) {
-      res.status(500).json({ message: 'Id is required' })
+      return res.status(500).json({ message: 'Id is required' })
     }
 
     const user = await UserSchema.findById({
       _id: id,
     })
 
-    res.status(201).json(user)
+    return res.status(201).json(user)
   } catch (error) {
-    res.status(500).json({ message: 'Unexpected error' })
+    return res.status(500).json({ message: 'Unexpected error' })
   }
 }

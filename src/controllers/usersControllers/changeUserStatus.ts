@@ -5,14 +5,14 @@ import {
 import { TypedRequestBody } from '../../types.js'
 import UserSchema           from '../../shemas/UserSchema.js'
 
-interface DisableRoleBody {
+interface ChangeUserStatusBody {
   id:           string
   isDisabled:   boolean
   deleted:      Date
 }
 
 
-export default async (req: TypedRequestBody<DisableRoleBody>, res: Response) => {
+export default async (req: TypedRequestBody<ChangeUserStatusBody>, res: Response) => {
   try {
     const { id, isDisabled, deleted } = req.body
     
@@ -20,12 +20,12 @@ export default async (req: TypedRequestBody<DisableRoleBody>, res: Response) => 
 
     if (!userExists) {
       return res.status(500).send("User does not exist")
+    } else {
+      await UserSchema.findOneAndUpdate({ _id: id }, { isDisabled, deleted })
+  
+      return res.status(201).json({ message: 'User status updated' })
     }
-
-    await UserSchema.findOneAndUpdate({ _id: id }, { isDisabled, deleted })
-
-    res.status(201).json({ message: 'User status updated' })
   } catch (error) {
-    res.status(500).json({ message: 'Unexpected error' })
+    return res.status(500).json({ message: 'Unexpected error' })
   }
 }

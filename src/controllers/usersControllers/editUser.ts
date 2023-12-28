@@ -15,17 +15,17 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
     const { id, name, email, username } = req.body
 
     if (!id) {
-      res.status(500).json({ message: 'Id is required' })
+      return res.status(500).json({ message: 'Id is required' })
+    } else {
+      const user = await UserSchema.findOneAndUpdate(
+        { _id: id },
+        { name, email, username },
+        { new: true }
+      )
+      
+      return res.status(201).json(user)
     }
- 
-    const user = await UserSchema.findOneAndUpdate(
-      { _id: id },
-      { name, email, username },
-      { new: true }
-    )
-    
-    res.status(201).json(user)
   } catch (error) {
-    res.status(500).json({ message: 'Unexpected error' })
+    return res.status(500).json({ message: 'Unexpected error' })
   }
 }

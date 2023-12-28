@@ -19,17 +19,17 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
     const id = await getLoggedInUserId(req)
     
     if (!password || !repeatPassword || !oldPassword) {
-      res.status(500).json({ message: 'All fields required' })
+      return res.status(500).json({ message: 'All fields required' })
     }
     
     if (repeatPassword !== password) {
-      res.status(500).json({ message: 'Repeat password does not match' })
+      return res.status(500).json({ message: 'Repeat password does not match' })
     }
 
     const user = await UserSchema.findById({_id: id })
 
     if (!user) {
-      res.status(500).json({ message: 'Could not find user by that id' })
+      return res.status(500).json({ message: 'Could not find user by that id' })
     } else {
       const isPasswordValid = await bcrypt.compare(oldPassword, user.password)
       
@@ -42,13 +42,12 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
 
         await user.save()
 
-        res.status(201).json({ message: 'Password changed successfully' })
-
+        return res.status(201).json({ message: 'Password changed successfully' })
       } else {
-        res.status(500).json({ message: 'Wrong old password' })
+        return res.status(500).json({ message: 'Wrong old password' })
       }
     }
   } catch (error) {
-    res.status(500).json({ message: 'Unexpected error' })
+    return res.status(500).json({ message: 'Unexpected error' })
   }
 }
