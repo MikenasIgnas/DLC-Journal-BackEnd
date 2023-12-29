@@ -20,6 +20,6 @@ router.get("/getAll/count", verifyToken, getAllUsersCount)
 router.get("/getbyid", verifyToken, getUserById)
 router.post("/changeStatus", verifyToken, verifyAdmin, changeUserStatus)
 router.post("/create", verifyToken, verifyAdmin, createUser)
-router.post("/edit", verifyToken, verifyAdmin, editUser)
+router.post("/edit", verifyToken, editUser)
 
 export default router
