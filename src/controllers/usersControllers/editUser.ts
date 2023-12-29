@@ -42,7 +42,7 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
         { new: true }
       );
         
-        return res.status(201).json(user)
+      return res.status(201).json(user)
     }
   } catch (error) {
     return res.status(500).json({ message: 'Unexpected error' })
