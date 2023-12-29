@@ -457,13 +457,12 @@ module.exports = {
 
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, ('C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-BackEnd/uploads') )
+              cb(null, ('C:/Users/Public/Desktop/DLC-Checklist-main/DLC-Checklist-BackEnd/uploads') )
             },
             filename: function (req, file, cb) {
               cb(null, `asdasdasd.jpeg`)
             }
           })
-  
       const upload = multer({ storage:storage }).single('file')
 
       upload(req,res,function(err) {
@@ -473,12 +472,14 @@ module.exports = {
           res.json({"status":"completed"});
       })
     },
+
+    
     uploadCompanysPhoto: async (req, res) => {
         const companyIdCounter = client.db('ChecklistDB').collection('companiesIdCounter');
         const companiesCollection =  client.db('ChecklistDB').collection('companies');
         const companyId = await companyIdCounter.findOne({id:"companyId"})
         const companyName = req.query.companyName.replace(/\s+/g, '');  
-        const filePath = 'C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/CompanyLogos'
+        const filePath = 'C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/CompanyLogos'
         const fileName =  `${companyName}Logo${companyId.seq -1}.jpeg`
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
@@ -723,17 +724,16 @@ module.exports = {
         )
         const deletedEmployees = await companyEmployees.deleteMany({companyId: Number(id)})
         const numDocumentsDeleted = deletedEmployees.deletedCount;
-        const companyLogofilePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/CompanyLogos/${companyName}Logo${id}.jpeg`
+        const companyLogofilePath = `C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/CompanyLogos/${companyName}Logo${id}.jpeg`
 
         fs.unlink(companyLogofilePath, (err) => {
             if (err) {
                 console.error('Error deleting file:', err);
             } 
         });
-
         for(let i = 1; i<= numDocumentsDeleted; i++){
             for(let i = Number(clientsEmployees[0].employeeId); i <= Number(clientsEmployees[clientsEmployees.length - 1].employeeId); i++ ){
-                const companyEmployeePhotoFilePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${id}employeeId${i}.jpeg`
+                const companyEmployeePhotoFilePath = `C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${id}employeeId${i}.jpeg`
                 fs.unlink(companyEmployeePhotoFilePath, (err) => {
                     if (err) {
                         console.error('Error deleting file:', err);
@@ -766,7 +766,7 @@ module.exports = {
         const fileName =  `${companyName}companyId${companyId}employeeId${employeeId.seq - 1}.jpeg`
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, (`C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos`) )
+              cb(null, (`C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos`) )
             },
             filename: function (req, file, cb) {
                 cb(null, fileName)
@@ -793,7 +793,7 @@ module.exports = {
         const fileName =  `${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, (`C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos`) )
+              cb(null, (`C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos`) )
             },
             filename: function (req, file, cb) {
                 cb(null, fileName)
@@ -818,7 +818,7 @@ module.exports = {
         const employeeId = Number(req.query.employeeId)
         const companyName = req.query.companyName.split(' ').join('')
         await clientsEmployees.findOneAndDelete({companyId, employeeId})
-        const filePath = `C:/Users/ignas/OneDrive/Desktop/DLC-Checklist-main/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
+        const filePath = `C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
         fs.unlink(filePath, (err) => {
             if (err) {
                 console.error('Error deleting file:', err);
