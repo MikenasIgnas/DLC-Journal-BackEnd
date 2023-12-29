@@ -710,30 +710,31 @@ module.exports = {
     deleteCompany: async (req, res) => {
         const company = client.db('ChecklistDB').collection('companies');
         const companyEmployees = client.db('ChecklistDB').collection('companyEmployees');
-        const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter')
-        const companiesEmployeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
-        const {id} = req.params
-        const companyData = await company.findOne({id: Number(id)})
+        const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter');
+        const companiesEmployeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter');
         const clientsEmployees = await companyEmployees.find().toArray()
-        const companyName = companyData.companyInfo.companyName.replace(/\s+/g, '');  
-        await company.findOneAndDelete({id: Number(id)}, )
-        company.findOneAndUpdate(  
-        { parentCompanyId: Number(id), "wasMainClient": true },
-        { $unset: { "wasMainClient": "", "parentCompanyId": "" } },
-        { multi: true }
-        )
-        const deletedEmployees = await companyEmployees.deleteMany({companyId: Number(id)})
+    
+        const companyId = Number(req.query.companyId);
+        const parentCompanyId = Number(req.query.parentCompanyId);
+        const companyData = await company.findOneAndDelete({ id: companyId });
+        if (!companyData.value) {
+            return res.status(404).send({ success: false, message: 'Company not found' });
+        }
+
+        const deletedEmployees = await companyEmployees.deleteMany({ companyId: companyId });
         const numDocumentsDeleted = deletedEmployees.deletedCount;
-        const companyLogofilePath = `C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/CompanyLogos/${companyName}Logo${id}.jpeg`
+        const companyName = companyData.value.companyInfo.companyName.replace(/\s+/g, '');
+        const companyLogofilePath = `C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/CompanyLogos/${companyName}Logo${companyId}.jpeg`;
 
         fs.unlink(companyLogofilePath, (err) => {
             if (err) {
-                console.error('Error deleting file:', err);
-            } 
+                console.error('Error deleting company logo file:', err);
+            }
         });
+
         for(let i = 1; i<= numDocumentsDeleted; i++){
             for(let i = Number(clientsEmployees[0].employeeId); i <= Number(clientsEmployees[clientsEmployees.length - 1].employeeId); i++ ){
-                const companyEmployeePhotoFilePath = `C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${id}employeeId${i}.jpeg`
+                const companyEmployeePhotoFilePath = `C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${i}.jpeg`
                 fs.unlink(companyEmployeePhotoFilePath, (err) => {
                     if (err) {
                         console.error('Error deleting file:', err);
@@ -741,7 +742,12 @@ module.exports = {
                 });
         }}
 
-          companiesEmployeesIdCounter.findOneAndUpdate(
+        await company.updateMany(
+            { parentCompanyId: companyId },
+            { $unset: { parentCompanyId: '' } }
+        );
+    
+        companiesEmployeesIdCounter.findOneAndUpdate(
             { id: "employeeId" },
             { $inc: { seq: -numDocumentsDeleted } }, 
             { new: true, upsert: true },
@@ -754,7 +760,7 @@ module.exports = {
               }
             }
           );
-
+    
         res.send({success: true})
     },
     uploadCliesntEmployeesPhoto: async (req, res) => {

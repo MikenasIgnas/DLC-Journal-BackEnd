@@ -167,7 +167,7 @@ router.get('/getSingleClientsCollocations',       verifyToken, getSingleClientsC
 router.get('/getClientsEmployee',                 verifyToken, getClientsEmployees)
 router.get('/getClientsEmployeesCompanyName/:id', verifyToken, getClientsEmployeesCompanyName)
 router.get('/getAllClientsEmployees',             verifyToken, getAllClientsEmployees)
-router.get('/deleteCompany/:id',                  verifyToken, deleteCompany)
+router.get('/deleteCompany',                      verifyToken, deleteCompany)
 router.get('/deleteClientsEmployee',              verifyToken, deleteClientsEmployee)
 router.get('/deleteCompaniesSubClient',           verifyToken, deleteCompaniesSubClient)
 router.get('/getSubClients',                      verifyToken, getSubClients)
