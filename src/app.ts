@@ -1,6 +1,6 @@
-import express     from 'express'
 import bodyparser  from 'body-parser'
 import cors        from 'cors'
+import express     from 'express'
 import mongoose    from 'mongoose'
 
 import authRouter  from './routes/authRoutes'
@@ -22,6 +22,7 @@ app.use(express.json())
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
 app.listen(4000)
+
 app.use("/", mainRouter)
 app.use("/auth", authRouter)
 app.use("/user", usersRouter)

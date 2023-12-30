@@ -24,7 +24,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
         next()
       } catch (err) {
-        return res.status(401).json({ message: 'Unexpected error' })
+        return res.status(401).json({ message: 'Unauthorized' })
       } 
   }
 }

@@ -1,21 +1,21 @@
 import { Response }          from 'express'
 
+import { getLoggedInUserId } from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
 import UserSchema            from '../../shemas/UserSchema.js'
-import { getLoggedInUserId } from '../../helpers.js'
 
 interface EditUserBody {
   email:    string
   id:       string
+  isAdmin:  boolean
   name:     string
   username: string
-  isAdmin:  boolean
 }
 interface UpdatedFields {
-  name:     string
   email:    string
-  username: string
   isAdmin?: boolean
+  name:     string
+  username: string
 }
 
 
@@ -25,12 +25,12 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
 
     const loggedInUserId = await getLoggedInUserId(req)
 
-    const loggedInUser = await UserSchema.findById({_id: loggedInUserId})
+    const loggedInUser = await UserSchema.findById({ _id: loggedInUserId })
     
     if (!id) {
       return res.status(500).json({ message: 'Id is required' })
     }else{
-      const updatedFields: UpdatedFields = { name, email, username };
+      const updatedFields: UpdatedFields = { name, email, username }
 
       if (loggedInUser?.isAdmin) {
         updatedFields.isAdmin = isAdmin
