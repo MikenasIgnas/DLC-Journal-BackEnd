@@ -1,6 +1,6 @@
 import { Response }                     from 'express';
 import { TypedRequestBody, VisitsType } from '../types';
-import { jsPDF }                        from 'jspdf';
+import jsPDF                            from "jspdf";
 import autoTable                        from 'jspdf-autotable';
 
 const MongoClient = require('mongodb').MongoClient;
