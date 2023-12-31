@@ -5,96 +5,14 @@ const FilledChecklistData =                 require("../shemas/FilledChecklistDa
 const jwt =                                 require('jsonwebtoken')
 const config =                              process.env;
 const MongoClient =                         require('mongodb').MongoClient;
-const client =                              new MongoClient('mongodb://10.81.7.29:27017/');
+const client =                              new MongoClient(process.env.MONGO_PATH);
 const fs =                                  require('fs');
 const multer =                              require('multer');
 const { getCurrentDate, getCurrentTime } =  require("../helpers");
 const nodemailer =                          require("nodemailer");
 
-require('dotenv').config()
 
 module.exports = {
-    createUser: async (req, res) => {
-        const users = client.db('ChecklistDB').collection('registeredusers');
-        const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
-        const userIdCounter = client.db('ChecklistDB').collection('userIdCounter');
-        userIdCounter.findOneAndUpdate(
-            { id: "userId" },
-            { "$inc": { "seq": 1 } },
-            { new: true, upsert: true },
-            async (err, cd) => {
-                let seqId
-                  if (!cd || !cd.value.seq) {
-                        seqId = 1;
-                    }
-                    else {
-                        seqId = cd.value.seq;
-                    }
-                try {
-                    const { email, passwordOne, passwordTwo, username, userRole, status, dateCreated, defaultTheme } = req.body
-                    if (!(email && passwordOne && username, userRole)) {
-                        res.status(400).send("All input is required");
-                    }
-                    const oldUser = await users.findOne({ email });
-                    if (oldUser) {
-                        return res.status(409).send("User Already Exist. Please Login");
-                    }
-                    encryptedPassword = await bcrypt.hash(passwordOne, 10);
-                    const secret = uid()
-                    const user = {
-                        email: email.toLowerCase(),
-                        password: encryptedPassword,
-                        repeatPassword: encryptedPassword,
-                        username,
-                        userRole,
-                        status,
-                        dateCreated,
-                        dateDeleted: '',
-                        defaultTheme,
-                        key: seqId,
-                        id: seqId,
-                        secret: secret
-                    };
-        
-                    await users.insertOne(user);
-                    await archivedUsers.insertOne(user);
-    
-                    res.status(201).json(user);
-                } catch (err) {
-                    console.log(err);
-                }
-            }
-        );
-    },
-
-    login: async (req, res) => {
-        try {
-            const { email, password } = req.body;
-            const collection = client.db('ChecklistDB').collection('registeredusers');
-            const user = await collection.findOne({ email });;
-            if (!(email && password)) {
-              res.status(400).send("All input is required");
-            }
-            if (user && (await bcrypt.compare(password, user.password)) ) {
-              const payload = { email, userId: user._id, userRole: user.userRole, secret: user.secret, id: user.id};
-              const options = { expiresIn: '30m', algorithm: 'HS256' };
-              const token = jwt.sign(payload, config.TOKEN_KEY, options);
-              user.token = token;
-              res.status(200).json(user);
-            } else {
-              res.status(400).send("Invalid Credentials");
-            }
-          } catch (err) {
-            console.log(err);
-          }
-    },
-
-    getAllUsers: async (req, res) => {
-        const collection = client.db('ChecklistDB').collection('registeredusers');
-        const allUsers = await collection.find().toArray()
-        return sendRes(res, false, "all good", allUsers)
-    },
-
     routeData: async (req, res) => {
         const collection = client.db('ChecklistDB').collection('routesTable');
         const routes = await collection.find().sort({id: 1}).toArray()
@@ -170,20 +88,10 @@ module.exports = {
         const totalHistoryData = await checklistHistoryData.countDocuments()
         return sendRes(res, false, "totalHistoryData",totalHistoryData)
     },
-    allUsersCount: async (req, res) => {
-        const registeredUsers = client.db('ChecklistDB').collection('registeredusers');
-        const registeredUsersCount = await registeredUsers.countDocuments()
-        return sendRes(res, false, "totalHistoryData",registeredUsersCount)
-    },
     visitsCount: async (req, res) => {
         const visits = client.db('ChecklistDB').collection('Visits');
         const visitsCount = await visits.countDocuments()
         return sendRes(res, false, "totalHistoryData",visitsCount)
-    },
-    archivedUsersCount: async (req, res) => {
-        const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
-        const archivedUsersCount = await archivedUsers.countDocuments()
-        return sendRes(res, false, "totalHistoryData",archivedUsersCount)
     },
     totalVisitsEntries: async (req, res) => {
         const visitsData = client.db('ChecklistDB').collection('Visits');
@@ -195,80 +103,12 @@ module.exports = {
         const totalAreasCount = await collection.countDocuments()
         return sendRes(res, false, "totalAreasCount",totalAreasCount)
     },
-
-    FindUser: async(req, res) => {
-        const users = client.db('ChecklistDB').collection('registeredusers');
-        const {id} = req.params
-        const user = await users.findOne({id:Number(id)})
-        return sendRes(res, false, 'User', user)
-    },
-
-    deleteUser: async (req, res) => {
-        const users = client.db('ChecklistDB').collection('registeredusers');
-        const {id} = req.params
-        await users.findOneAndDelete({id: Number(id)})
-        res.send({success: true})
-    },
     deleteVisit: async (req, res) => {
         const visits = client.db('ChecklistDB').collection('Visits');
         const {id} = req.params
         await visits.findOneAndDelete({id: Number(id)})
         res.send({success: true})
     },
-    changePassword:async(req, res) => {
-        const users = client.db('ChecklistDB').collection('registeredusers');
-        const passwordOne = req.body.passwordOne
-        const email = req.body.email
-        const password = await bcrypt.hash(passwordOne, 10)
-        const repeatPassword = password
-        const user = await users.findOneAndUpdate(
-            {email: email},
-            {$set: {password, repeatPassword: repeatPassword}},
-        )
-        await user.save()
-        return sendRes(res, false, 'User', user)
-    },
-
-    changeUsersRole:async(req, res) => {
-        const users = client.db('ChecklistDB').collection('registeredusers');
-        const {id} = req.params
-        const userRole = req.body.userRole
-        const newRole = await users.findOneAndUpdate(
-            {id: Number(id)},
-            {$set: {userRole:userRole}},
-        )
-        return sendRes(res, false, 'newRole', newRole)
-    },
-
-    editUserProfile:async(req,res)=> {
-        const users = client.db('ChecklistDB').collection('registeredusers');
-        const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
-        const {id} = req.params
-        const username = req.body.username
-        const email = req.body.email
-        const userRole = req.body.userRole
-        const passwordOne = req.body.passwordOne
-        if(!passwordOne){
-            const editedProfileData = await users.findOneAndUpdate(
-                {id: Number(id)},
-                {$set: {username, email,userRole}},
-            )
-             await archivedUsers.findOneAndUpdate(
-                {id: Number(id)},
-                {$set: {username, email,userRole}},
-            )
-            return sendRes(res, false, 'editedProfileData', editedProfileData)   
-            }else{
-            const password = await bcrypt.hash(passwordOne, 10)
-            const repeatPassword = password
-            const editedProfileData = await users.findOneAndUpdate(
-                {id: Number(id)},
-                {$set: {username, email,userRole, password, repeatPassword}},
-            )
-            return sendRes(res, false, 'editedProfileData', editedProfileData)
-            }    
-    },
-
     changedUsername: async (req,res) => {
         const checklistHistoryData = client.db('ChecklistDB').collection('checklistHistoryData');
         const username = req.body.username
@@ -279,14 +119,6 @@ module.exports = {
         )
         return sendRes(res, false, 'changeUsernameInHistoryElements', changeUsernameInHistoryElements)
     },
-
-    FindSingleUser: async (req, res)=> {
-        const users = client.db('ChecklistDB').collection('registeredusers');
-        const {id} = req.params
-        const singleUser = await users.findOne({id: Number(id)})
-        return sendRes(res, false, 'User', singleUser)
-    },
-
     updateUsersTheme:async (req, res) => {
         const users = client.db('ChecklistDB').collection('registeredusers');
         const {id}= req.params
@@ -297,18 +129,6 @@ module.exports = {
         )
         return sendRes(res, false, 'changeUsernameInHistoryElements', updateTheme)
     },
-
-    changeUsersStatus: async (req,res)=> {
-        const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
-        const {id}= req.params
-        const status = req.body.status
-        const updateUsersStatus = await archivedUsers.findOneAndUpdate(
-            {id: Number(id)},
-            {$set: {status}},
-        )
-        return sendRes(res, false, 'updateUsersStatus', updateUsersStatus)
-    },
-
     addDeletionData: async (req, res) => {
         const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
         const {id}= req.params
@@ -1095,7 +915,6 @@ module.exports = {
         updateClientsGests: async (req, res) => {
             const visitId = req.query.visitId;
             const visitsCollection = client.db('ChecklistDB').collection('Visits');
-            console.log(req.body )
             const result =  visitsCollection.findOneAndUpdate(
                 { id: Number(visitId) },
                 { $push: { 'clientsGuests':  req.body.value  } }, 
