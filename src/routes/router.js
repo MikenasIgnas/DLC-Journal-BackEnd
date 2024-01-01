@@ -5,16 +5,14 @@ const FilledChecklistData = require("../shemas/FilledChecklistData");
 const VisitsData =          require('../shemas/VisitsSchema')
 const AllUsersData =        require('../shemas/AllUsersSchema')
 const MongoClient =         require('mongodb').MongoClient;
-const client =              new MongoClient('mongodb://10.81.7.29:27017/');
+require('dotenv').config();
+const client =              new MongoClient(process.env.MONGO_PATH);
+
 const {
-    registerValidation,
-    passwordChangeValidation,
     verifyToken,
 } = require("../middleware/middle")
 
 const {
-  createUser, 
-    login,
     routeData,
     areasData,
     todoData,
@@ -23,21 +21,11 @@ const {
     getSingleHistoryELementData,
     updateFilledChecklistData,
     checklistHistoryCount,
-    allUsersCount,
     visitsCount,
-    archivedUsersCount,
     getTotalAreasCount,
-    FindUser,
-    getAllUsers,
-    deleteUser,
     deleteVisit,
-    changePassword,
-    changeUsersRole,
-    editUserProfile,
     changedUsername,
-    FindSingleUser,
     updateUsersTheme,
-    changeUsersStatus,
     addDeletionData,
     deleteHistoryItem,
     latestHistoryItem,
@@ -106,16 +94,10 @@ const { default: allCollocationsCsvController}          = require("../controller
 const { default: singleCollocationCsvController}        = require("../controllers/singleCollocationCsvController");
 const { default: multipleChecklistHistoryPdfController} = require("../controllers/multipleChecklistHistoryPdfController");
 
-router.post("/logInUser",                         login)
-router.post("/createUser",                        verifyToken, registerValidation, createUser)
 router.post('/postChecklistData',                 verifyToken, postFilledChecklistData)
 router.post('/updateFilledChecklistData',         verifyToken, updateFilledChecklistData)
-router.post('/changePassword',                    verifyToken, passwordChangeValidation,changePassword)
-router.post("/changeUsersRole/:id",               verifyToken, changeUsersRole)
-router.post("/editUserProfile/:id",               verifyToken, editUserProfile)
 router.post("/changedUsername/:id",               verifyToken, changedUsername)
 router.post("/updateUsersTheme/:id",              verifyToken, updateUsersTheme)
-router.post("/changeUsersStatus/:id",             verifyToken, changeUsersStatus)
 router.post("/addDeletionDate/:id",               verifyToken, addDeletionData)
 router.post("/updateHistoryItem/:id",             verifyToken, updateHistoryItem)
 router.post("/postPhotos",                        verifyToken, postPhotos)
@@ -135,17 +117,11 @@ router.get("/areasData",                          verifyToken, areasData)
 router.get("/todoData",                           verifyToken, todoData)
 router.get("/problemsData",                       verifyToken, problemsData)
 router.get("/getSingleHistoryELementData/:id",    verifyToken, getSingleHistoryELementData)
-router.get('/FindUser/:id',                       verifyToken, FindUser)
-router.get('/FindSingleUser/:id',                 verifyToken, FindSingleUser)
-router.get('/getAllUsers',                        verifyToken, getAllUsers)
 
 router.get("/checklistHistoryCount",              verifyToken, checklistHistoryCount)
-router.get("/allUsersCount",                      verifyToken, allUsersCount)
 router.get("/visitsCount",                        verifyToken, visitsCount)
-router.get("/archivedUsersCount",                 verifyToken, archivedUsersCount)
 
-router.get("/getTotalAreasCount",                 verifyToken, getTotalAreasCount)
-router.get("/deleteUser/:id",                     verifyToken, deleteUser)
+router.get("/getTotalAreasCount",                  getTotalAreasCount)
 router.get("/deleteVisit/:id",                    verifyToken, deleteVisit)
 router.get("/deleteHistoryItem/:id",              verifyToken, deleteHistoryItem)
 router.get("/latestHistoryItem",                  verifyToken, latestHistoryItem)
@@ -223,6 +199,6 @@ router.get('/getArchivedUsers',                   verifyToken, paginatedResults(
   res.json(res.paginatedResults.results)
 })
 
-module.exports = router
+export default router
 
                                   
