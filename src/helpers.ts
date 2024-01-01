@@ -7,8 +7,8 @@ import { requestRequery } from "./types"
 
 export const getCurrentDate = () =>  {
     const currentdate = new Date()
-    const datetime = currentdate.getFullYear() + '/'
-                    + (currentdate.getMonth()+1) + '/'
+    const datetime = currentdate.getFullYear() + '-'
+                    + (currentdate.getMonth()+1) + '-'
                     + currentdate.getDate()
     return datetime
 }
@@ -18,7 +18,7 @@ export const getCurrentTime  = () => {
     const currentdate = new Date()
     const currentTime = currentdate.getHours() + ':'
                     + currentdate.getMinutes()
-    return currentTime
+    return currentTime.padStart(2, '0')
 }
 
 

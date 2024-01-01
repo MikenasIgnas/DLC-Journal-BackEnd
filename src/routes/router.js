@@ -1,11 +1,12 @@
+import {paginatedResults, paginatedVisitsResults}     from "./paginatedResultsFunctions";
 const express =             require("express")
 const router =              express.Router()
 const FilledChecklistData = require("../shemas/FilledChecklistData");
 const VisitsData =          require('../shemas/VisitsSchema')
 const AllUsersData =        require('../shemas/AllUsersSchema')
 const MongoClient =         require('mongodb').MongoClient;
-require('dotenv').config();
 const client =              new MongoClient(process.env.MONGO_PATH);
+require('dotenv').config();
 
 const {
     verifyToken,
@@ -39,9 +40,7 @@ const {
     uploadPhoto,
     getCompanies,
     getCompaniesSites,
-    getCompaniesPremises,
-    getCompaniesColocation,
-    singleCompanyPage,
+    getSingleCompany,
     getSingleCompaniesEmployees,
     postVisitDetails,
     getVisits,
@@ -54,6 +53,7 @@ const {
     uploadCompanysPhoto,
     deleteCompany,
     uploadCliesntEmployeesPhoto,
+    updateClientsEmployeesPhoto,
     deleteClientsEmployee,
     updateClientsEmployee,
     updateCompaniesData,
@@ -68,7 +68,6 @@ const {
     changeSubClientToMainClient,
     getSingleSubClient,
     getAllHistoryData,
-    generateMonthlyPDFReport,
     getAllClientsEmployees,
     getSingleClientsCollocations,
     getSpecificDateReport,
@@ -86,7 +85,14 @@ const {
     updateVisitInformation,
     addSignature,
     deleteSignature,
-} = require("../controllers/mainController")
+    addCollocation,
+    deleteCollocation,
+} = require("../controllers/mainController");
+const { default: singleVisitPdfController}              = require("../controllers/singleVisitPdfController");
+const { default: multipleVisitPdfController}            = require("../controllers/multipleVisitPdfController");
+const { default: allCollocationsCsvController}          = require("../controllers/allCollocationsCsvController");
+const { default: singleCollocationCsvController}        = require("../controllers/singleCollocationCsvController");
+const { default: multipleChecklistHistoryPdfController} = require("../controllers/multipleChecklistHistoryPdfController");
 
 router.post('/postChecklistData',                 verifyToken, postFilledChecklistData)
 router.post('/updateFilledChecklistData',         verifyToken, updateFilledChecklistData)
@@ -100,6 +106,7 @@ router.post("/postLatestPhotos",                  verifyToken, postLatestPhotos)
 router.post("/uploadPhoto",                       uploadPhoto)
 router.post("/uploadCompanysPhoto",               uploadCompanysPhoto)
 router.post("/uploadCliesntEmployeesPhoto",       uploadCliesntEmployeesPhoto)
+router.post("/updateClientsEmployeesPhoto",       updateClientsEmployeesPhoto)
 router.post("/postVisitDetails",                  verifyToken, postVisitDetails)
 
 router.get("/startVisit",                         verifyToken, startVisit)
@@ -123,23 +130,20 @@ router.get('/getPhotos/:photoId',                 verifyToken, getPhotos)
 router.get('/latestPhotos',                       verifyToken, latestPhotos)
 router.get('/deletePhoto/:photoId',               verifyToken, deletePhoto)
 router.get('/getAllHistoryData',                  verifyToken, getAllHistoryData)
-router.get('/generateMonthlyPDFReport',           verifyToken,   generateMonthlyPDFReport)
 
 router.get('/getCompanies',                       verifyToken, getCompanies)
 router.get('/getCompaniesSites',                  verifyToken, getCompaniesSites)
-router.get('/getCompaniesPremises',               verifyToken, getCompaniesPremises)
-router.get('/getCompaniesColocation',             verifyToken, getCompaniesColocation)
 
-router.get('/SingleCompanyPage/:id',              verifyToken, singleCompanyPage)
-router.get('/getSingleCompaniesEmployees/:id',    verifyToken, getSingleCompaniesEmployees)
+router.get('/getSingleCompany',                   verifyToken, getSingleCompany)
+router.get('/getSingleCompaniesEmployees',        verifyToken, getSingleCompaniesEmployees)
 router.get('/getVisits',                          verifyToken, getVisits)
-router.get('/getSingleVisit/:id',                 verifyToken, getSingleVisit)
+router.get('/getSingleVisit',                     verifyToken, getSingleVisit)
 router.get('/getCollocations',                    verifyToken, getCollocations)
 router.get('/getSingleClientsCollocations',       verifyToken, getSingleClientsCollocations)
 router.get('/getClientsEmployee',                 verifyToken, getClientsEmployees)
 router.get('/getClientsEmployeesCompanyName/:id', verifyToken, getClientsEmployeesCompanyName)
 router.get('/getAllClientsEmployees',             verifyToken, getAllClientsEmployees)
-router.get('/deleteCompany/:id',                  verifyToken, deleteCompany)
+router.get('/deleteCompany',                      verifyToken, deleteCompany)
 router.get('/deleteClientsEmployee',              verifyToken, deleteClientsEmployee)
 router.get('/deleteCompaniesSubClient',           verifyToken, deleteCompaniesSubClient)
 router.get('/getSubClients',                      verifyToken, getSubClients)
@@ -169,13 +173,23 @@ router.get('/filterByStatus',                     verifyToken, filterByStatus)
 router.get('/removeClientsGuest',                 verifyToken, removeClientsGuest)
 router.get('/removeCarPlates',                    verifyToken, removeCarPlates)
 router.post('/addSignature',                      verifyToken, addSignature)
+router.post('/addCollocation',                    verifyToken, addCollocation)
+router.post('/deleteCollocation',                 verifyToken, deleteCollocation)
 router.get('/deleteSignature',                    verifyToken, deleteSignature)
+
+router.get('/generatePdf',                        verifyToken, singleVisitPdfController)
+router.get('/generateMultipleVisitPdf',           verifyToken, multipleVisitPdfController)
+router.post('/generateAllCollocationsCSV',        verifyToken, allCollocationsCsvController)
+router.post('/generateSingleCollocationCSV',      verifyToken, singleCollocationCsvController)
+
+router.get('/generateMultipleChecklistHistoryPdf',verifyToken, multipleChecklistHistoryPdfController)
+
+
 
 router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)
 })
-
-router.get('/visitsData',                         verifyToken, paginatedResults(VisitsData, 'Visits'), async(req,res) => {
+router.get('/visitsData',                         verifyToken, paginatedVisitsResults(VisitsData, 'visits'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
 router.get('/allUsers',                           verifyToken, paginatedResults(AllUsersData, 'registeredusers'), async(req,res) => {
@@ -185,69 +199,6 @@ router.get('/getArchivedUsers',                   verifyToken, paginatedResults(
   res.json(res.paginatedResults.results)
 })
 
-function paginatedResults(model, collection) {
-  return async (req, res, next) => {
-    const dbCollection =  client.db('ChecklistDB').collection(collection);
-    const page =          parseInt(req.query.page);
-    const limit =         parseInt(req.query.limit);
-    const filterOption =  req.query.filter;
-    const startIndex =    (page - 1) * limit;
-    const endIndex =      page * limit;
-    const results =       {};
-    const selectFilter =  req.query.selectFilter;
-    try {
-      if (endIndex < await model.countDocuments().exec()) {
-        results.next = { page: page + 1, limit: limit };
-      }
-      if (startIndex > 0) {
-        results.previous = { page: page - 1, limit: limit };
-      }
-
-      let query;
-      if (filterOption !== undefined) {
-        const filterFunction = item => {
-          for (const key in item) {
-            if (key === 'signature') {
-              continue
-            }
-            if (typeof item[key] === 'string' && item[key].toLowerCase().includes(filterOption)) {
-              return true;
-            }
-          }
-          return false;
-        };
-        const allDocuments = await dbCollection.find().toArray();
-        const filteredDocuments = allDocuments.filter(filterFunction);
-        query = dbCollection.find({ _id: { $in: filteredDocuments.map(doc => doc._id) } });
-      } else if (selectFilter !== undefined) {
-        const filterFunction = item => {
-            for (const key in item) {
-                if (key === 'signature') {
-                    continue;
-                }
-                if (typeof item[key] === 'string' && item[key].toLowerCase() === selectFilter.toLowerCase()) {
-                    return true;
-                }
-            }
-            return false;
-        };
-    
-        const allDocuments = await dbCollection.find().toArray();
-        const filteredDocuments = allDocuments.filter(filterFunction);
-        query = dbCollection.find({ _id: { $in: filteredDocuments.map(doc => doc._id) } });
-    }else {
-        query = dbCollection.find().sort({id: -1});
-      }
-
-      results.results = await query.skip(startIndex).limit(limit).toArray();
-      res.paginatedResults = results;
-      next();
-    } catch (e) {
-      res.status(500).json({ message: e.message });
-    }
-  };
-}
-  
-  module.exports = router
+export default router
 
                                   
