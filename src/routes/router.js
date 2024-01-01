@@ -5,8 +5,8 @@ const FilledChecklistData = require("../shemas/FilledChecklistData");
 const VisitsData =          require('../shemas/VisitsSchema')
 const AllUsersData =        require('../shemas/AllUsersSchema')
 const MongoClient =         require('mongodb').MongoClient;
-const client =              new MongoClient(process.env.MONGO_PATH);
 require('dotenv').config();
+const client =              new MongoClient(process.env.MONGO_PATH);
 
 const {
     verifyToken,
