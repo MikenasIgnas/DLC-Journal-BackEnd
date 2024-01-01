@@ -5,14 +5,15 @@ import { DecodedToken }   from './controllers/authControllers/types'
 import { requestRequery } from "./types"
 
 
-export const getCurrentDate = () =>  {
-    const currentdate = new Date()
-    const datetime = currentdate.getFullYear() + '-'
-                    + (currentdate.getMonth()+1) + '-'
-                    + currentdate.getDate()
-    return datetime
-}
+export const getCurrentDate = () => {
+  const currentdate = new Date()
+  const year = currentdate.getFullYear()
+  const month = (currentdate.getMonth() + 1).toString().padStart(2, '0')
+  const day = currentdate.getDate().toString().padStart(2, '0')
 
+  const formattedDate = `${year}-${month}-${day}`
+  return formattedDate
+}
 
 export const getCurrentTime  = () => {
     const currentdate = new Date()

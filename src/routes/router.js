@@ -192,12 +192,10 @@ router.get('/checklistHistoryData',               verifyToken, paginatedResults(
 router.get('/visitsData',                         verifyToken, paginatedVisitsResults(VisitsData, 'visits'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
-router.get('/allUsers',                           verifyToken, paginatedResults(AllUsersData, 'registeredusers'), async(req,res) => {
+router.get('/allUsers',                           verifyToken, paginatedResults(AllUsersData, 'users'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
-router.get('/getArchivedUsers',                   verifyToken, paginatedResults(AllUsersData, 'archivedusers'), async(req,res) => {
-  res.json(res.paginatedResults.results)
-})
+
 
 export default router
 
