@@ -119,16 +119,6 @@ module.exports = {
         )
         return sendRes(res, false, 'changeUsernameInHistoryElements', changeUsernameInHistoryElements)
     },
-    updateUsersTheme:async (req, res) => {
-        const users = client.db('ChecklistDB').collection('registeredusers');
-        const {id}= req.params
-        const defaultTheme = req.body.defaultPageTheme
-        const updateTheme = await users.findOneAndUpdate(
-            {id: Number(id)},
-            {$set: {defaultTheme}},
-        )
-        return sendRes(res, false, 'changeUsernameInHistoryElements', updateTheme)
-    },
     addDeletionData: async (req, res) => {
         const archivedUsers = client.db('ChecklistDB').collection('archivedusers');
         const {id}= req.params
