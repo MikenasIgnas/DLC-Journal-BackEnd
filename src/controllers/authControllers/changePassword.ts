@@ -19,17 +19,17 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
     const id = await getLoggedInUserId(req)
     
     if (!password || !repeatPassword || !oldPassword) {
-      return res.status(500).json({ message: 'All fields required' })
+      return res.status(500).json({ message: 'Visi laukai privalomi' })
     }
     
     if (repeatPassword !== password) {
-      return res.status(500).json({ message: 'Repeat password does not match' })
+      return res.status(500).json({ message: 'Slaptažodžiai nesutampa' })
     }
 
     const user = await UserSchema.findById({_id: id })
 
     if (!user) {
-      return res.status(500).json({ message: 'Could not find user by that id' })
+      return res.status(500).json({ message: 'Nerastas vartotojas' })
     } else {
       const isPasswordValid = await bcrypt.compare(oldPassword, user.password)
       
@@ -42,9 +42,9 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
 
         await user.save()
 
-        return res.status(201).json({ message: 'Password changed successfully' })
+        return res.status(201).json({ message: 'Slaptažodis pakeistas' })
       } else {
-        return res.status(500).json({ message: 'Wrong old password' })
+        return res.status(500).json({ message: 'Neteisingas senas slaptažodis' })
       }
     }
   } catch (error) {

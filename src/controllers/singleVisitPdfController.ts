@@ -89,7 +89,7 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
           styles: {font: 'Arial'},
           startY: 50,
         });
-        if(Object.keys(visit?.visitCollocation).length !== 0){
+        if(visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0){
          const firstTableEnd = (doc as any).lastAutoTable.finalY;
          doc.setFontSize(10)
          doc.text('Kolokacijos', 15, firstTableEnd + 10);
@@ -102,7 +102,7 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
             startY: firstTableEnd + 15,
           });
         }
-        if(visit.clientsGuests.length > 0){
+        if(visit.clientsGuests && visit.clientsGuests.length > 0){
           const secondTableEnd = (doc as any).lastAutoTable.finalY;
           doc.setFontSize(10)
           doc.text('Palyda', 15, secondTableEnd + 10);

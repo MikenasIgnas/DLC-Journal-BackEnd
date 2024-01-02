@@ -1,10 +1,10 @@
-
 const MongoClient =         require('mongodb').MongoClient;
-const client =              new MongoClient('mongodb://10.81.7.29:27017/');
+require('dotenv').config();
+const client =              new MongoClient(process.env.MONGO_PATH);
 
-const paginatedResults = (model: any, collection: any) => {
+const paginatedResults = (model: any, db: string, collection: any) => {
     return async (req: any, res: any, next: any) => {
-      const dbCollection =  client.db('ChecklistDB').collection(collection);
+      const dbCollection =  client.db(db).collection(collection);
       const page =          parseInt(req.query.page);
       const limit =         parseInt(req.query.limit);
       const filterOption =  req.query.filter;
@@ -50,6 +50,26 @@ const paginatedResults = (model: any, collection: any) => {
                   }
                   if(selectFilter === 'noProblems'){
                     if(item.problemCount <= 0){
+                      return true
+                    }
+                  }
+                  if(selectFilter === 'user'){
+                    if(!item.isAdmin){
+                      return true
+                    }
+                  }
+                  if(selectFilter === 'admin'){
+                    if(item.isAdmin){
+                      return true
+                    }
+                  }
+                  if(selectFilter === 'active'){
+                    if(!item.isDisabled){
+                      return true
+                    }
+                  }
+                  if(selectFilter === 'inactive'){
+                    if(item.isDisabled){
                       return true
                     }
                   }
