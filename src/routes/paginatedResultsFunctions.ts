@@ -7,7 +7,7 @@ const paginatedResults = (model: any, db: string, collection: any) => {
       const dbCollection =  client.db(db).collection(collection);
       const page =          parseInt(req.query.page);
       const limit =         parseInt(req.query.limit);
-      const filterOption =  req.query.filter;
+      const filterOption =  req.query.search;
       const startIndex =    (page - 1) * limit;
       const endIndex =      page * limit;
       const results: any =       {};
@@ -106,7 +106,7 @@ const paginatedResults = (model: any, db: string, collection: any) => {
       const dbCollection  = client.db('ChecklistDB').collection(collection);
       const page          = parseInt(req.query.page);
       const limit         = parseInt(req.query.limit);
-      const filterOption  = req.query.filter;
+      const filterOption  = req.query.search;
       const startIndex    = (page - 1) * limit;
       const endIndex      = page * limit;
       const results: any  = {};
