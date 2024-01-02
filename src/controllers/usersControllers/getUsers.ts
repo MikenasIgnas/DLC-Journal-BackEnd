@@ -26,7 +26,6 @@ export default async (req: Request, res: Response) => {
       const user = await UserSchema.findById({
         _id: id,
       })
-  
       return res.status(201).json(user)
     } else {
       const { parsedLimit, skip } = getPagination(page, limit)

@@ -53,7 +53,7 @@ module.exports = {
                     seqId = cd.value.seq;
                 }
                 const filledData = {
-                    userName:req.body.userName,
+                    userName:req.body.employee,
                     filledData: req.body.filledData,
                     startDate: req.body.startDate,
                     startTime: req.body.startTime,
@@ -62,7 +62,7 @@ module.exports = {
                     problemCount: req.body.problemCount,
                     secret: req.body.secret,
                     userRole:req.body.userRole,
-                    id: seqId
+                    id: String(seqId)
                 }
                  await checklistHistoryData.insertOne(filledData);
             }
@@ -105,7 +105,7 @@ module.exports = {
     },
     deleteVisit: async (req, res) => {
         const visits = client.db('ChecklistDB').collection('visits');
-        const {id} = req.params
+        const id = req.query.id
         await visits.findOneAndDelete({id: Number(id)})
         res.send({success: true})
     },
@@ -132,8 +132,8 @@ module.exports = {
 
     deleteHistoryItem: async (req, res) => {
         const historyItem = client.db('ChecklistDB').collection('checklistHistoryData');
-        const {id} = req.params
-        const result = await historyItem.findOneAndDelete({ id: Number(id) });
+        const id = req.query.id
+        const result = await historyItem.findOneAndDelete({ id: id });
         if (result.value === null) {
           return res.status(404).json({ error: 'Document not found' });
         }  
@@ -282,15 +282,16 @@ module.exports = {
           res.json({"status":"completed"});
       })
     },
-
     
     uploadCompanysPhoto: async (req, res) => {
-        const companyIdCounter = client.db('ChecklistDB').collection('companiesIdCounter');
-        const companiesCollection =  client.db('ChecklistDB').collection('companies');
-        const companyId = await companyIdCounter.findOne({id:"companyId"})
-        const companyName = req.query.companyName.replace(/\s+/g, '');  
-        const filePath = 'C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/CompanyLogos'
-        const fileName =  `${companyName}Logo${companyId.seq -1}.jpeg`
+        const companyIdCounterCollection    = client.db('ChecklistDB').collection('companiesIdCounter');
+        const companiesCollection           = client.db('ChecklistDB').collection('companies');
+        const companyIdCounter              = await companyIdCounterCollection.findOne({id:"companyId"})
+        const companyName                   = req.query.companyName.replace(/\s+/g, '');  
+        const filePath                      = 'C:/Users/Public/Desktop/DLC JOURNAL/DLC-Checklist-FrontEnd/public/CompanyLogos'
+        const companyId                     = Number(req.query.companyId)
+        const fileName                      = `${companyName}Logo${companyId ? companyId : companyIdCounter.seq -1}.jpeg`
+
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
                 cb(null, (filePath) )
@@ -299,11 +300,13 @@ module.exports = {
                 cb(null, fileName)
             }
         })
-        const upload = multer({ storage:storage }).single('file')
-        
-        await companiesCollection.findOneAndUpdate({id: companyId.seq - 1}, { $set: {
-            'companyInfo.companyPhoto': `${fileName}`}} )
 
+        const upload = multer({ storage:storage }).single('file')
+
+        await companiesCollection.findOneAndUpdate({id: companyId ? companyId : companyIdCounter.seq -1},
+        { $set: {
+            'companyInfo.companyPhoto': `${fileName}`}
+        })
             
       upload(req,res,function(err) {
           if(err) {
@@ -312,6 +315,7 @@ module.exports = {
           res.json({"status":"completed"});
       })
     },
+
     getCompanies: async (req, res) => {
         const companiesCollection = client.db('ChecklistDB').collection('companies');
         const companies = await companiesCollection.find().toArray()

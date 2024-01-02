@@ -119,8 +119,8 @@ router.get("/checklistHistoryCount",              verifyToken, checklistHistoryC
 router.get("/visitsCount",                        verifyToken, visitsCount)
 
 router.get("/getTotalAreasCount",                  getTotalAreasCount)
-router.get("/deleteVisit/:id",                    verifyToken, deleteVisit)
-router.get("/deleteHistoryItem/:id",              verifyToken, deleteHistoryItem)
+router.get("/deleteVisit",                    verifyToken, deleteVisit)
+router.get("/deleteHistoryItem",              verifyToken, deleteHistoryItem)
 router.get("/latestHistoryItem",                  verifyToken, latestHistoryItem)
 router.get('/getHistoryData',                     verifyToken, getHistoryData)
 router.get('/getPhotos/:photoId',                 verifyToken, getPhotos)
@@ -183,12 +183,13 @@ router.get('/generateMultipleChecklistHistoryPdf',verifyToken, multipleChecklist
 
 
 
-router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'checklistHistoryData'), (req,res) => {
+router.get('/checklistHistoryData',               verifyToken, paginatedResults(FilledChecklistData, 'ChecklistDB', 'checklistHistoryData'), (req,res) => {
   res.json(res.paginatedResults.results)
 })
 router.get('/visitsData',                         verifyToken, paginatedVisitsResults(VisitsData, 'visits'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
+
 
 export default router
 

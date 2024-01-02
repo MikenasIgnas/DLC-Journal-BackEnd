@@ -4,7 +4,8 @@ import { jsPDF }                        from 'jspdf';
 import autoTable                        from 'jspdf-autotable';
 
 const MongoClient = require('mongodb').MongoClient;
-const client      = new MongoClient('mongodb://10.81.7.29:27017/');
+require('dotenv').config();
+const client =              new MongoClient(process.env.MONGO_PATH);
 const fs          = require('fs');
 interface ChangePasswordBody {
   id:             string;
@@ -16,28 +17,30 @@ interface ChangePasswordBody {
 export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) => {
   try {
     const visits                  = client.db('ChecklistDB').collection('visits');
+
     const allVisits: VisitsType[] = await visits.find().toArray()
+
+
     const backgroundPath          = 'src/Images/PDFbackround.png';
     const backgroundBuffer        = fs.readFileSync(backgroundPath);
     const dateFrom                = req.query.dateFrom
     const dateTo                  = req.query.dateTo
     const startDate               = new Date(dateFrom as string);
     const endDate                 = new Date(dateTo as string);
-
-    const visitsByDate = allVisits.filter((item: any) => {
+    const visitsByDate = allVisits?.filter((item: VisitsType) => {
         const visitDate = new Date(item.startDate);
         return visitDate >= startDate && visitDate <= endDate;
-      }).sort((a: any, b: any) => b.id - a.id);
-
+    }).sort((a: any, b: any) => b.id - a.id);
+    
     if (!visitsByDate) {
       res.status(500).json({ message: 'Could not find visit by that id' });
     } else {
       const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' });
-      visitsByDate.map((visit: VisitsType, index: number) => {
+      visitsByDate?.map((visit: VisitsType, index: number) => {
         if (index > 0) {
           doc.addPage();
         }
-
+        
         doc.addFont("src/Fonts/arial.ttf", "Arial", "bold");
         doc.setFont("Arial", "bold"); 
         doc.setFontSize(20);
@@ -70,9 +73,9 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
             el?.selectedVisitor?.occupation,
             el?.selectedVisitor?.phoneNr,
             el?.selectedVisitor?.email,
-            el.idType,
-            el.selectedVisitor.permissions.map((el: string) => `${el}\n`),
-            el.signature,
+            el?.idType,
+            el?.selectedVisitor?.permissions?.map((el: string) => `${el}\n`),
+            el?.signature,
           ]), 
           columns: [
             { header: 'Vardas', dataKey: 'name' },
@@ -102,7 +105,7 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
           styles: {font: 'Arial'},
           startY: 50,
         });
-        if(Object.keys(visit?.visitCollocation).length !== 0){
+        if(visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0){
          const firstTableEnd = (doc as any).lastAutoTable.finalY;
          doc.setFontSize(10)
          doc.text('Kolokacijos', 15, firstTableEnd + 10);
@@ -115,7 +118,7 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
             startY: firstTableEnd + 15,
           });
         }
-        if(visit.clientsGuests.length > 0){
+        if(visit.clientsGuests && visit.clientsGuests.length > 0){
           const secondTableEnd = (doc as any).lastAutoTable.finalY;
           doc.setFontSize(10)
           doc.text('Palyda', 15, secondTableEnd + 10);
