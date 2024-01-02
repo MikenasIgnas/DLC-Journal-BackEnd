@@ -3,7 +3,6 @@ const express =             require("express")
 const router =              express.Router()
 const FilledChecklistData = require("../shemas/FilledChecklistData");
 const VisitsData =          require('../shemas/VisitsSchema')
-const AllUsersData =        require('../shemas/AllUsersSchema')
 const MongoClient =         require('mongodb').MongoClient;
 require('dotenv').config();
 const client =              new MongoClient(process.env.MONGO_PATH);
@@ -25,7 +24,6 @@ const {
     getTotalAreasCount,
     deleteVisit,
     changedUsername,
-    updateUsersTheme,
     addDeletionData,
     deleteHistoryItem,
     latestHistoryItem,
@@ -97,7 +95,6 @@ const { default: multipleChecklistHistoryPdfController} = require("../controller
 router.post('/postChecklistData',                 verifyToken, postFilledChecklistData)
 router.post('/updateFilledChecklistData',         verifyToken, updateFilledChecklistData)
 router.post("/changedUsername/:id",               verifyToken, changedUsername)
-router.post("/updateUsersTheme/:id",              verifyToken, updateUsersTheme)
 router.post("/addDeletionDate/:id",               verifyToken, addDeletionData)
 router.post("/updateHistoryItem/:id",             verifyToken, updateHistoryItem)
 router.post("/postPhotos",                        verifyToken, postPhotos)
@@ -190,9 +187,6 @@ router.get('/checklistHistoryData',               verifyToken, paginatedResults(
   res.json(res.paginatedResults.results)
 })
 router.get('/visitsData',                         verifyToken, paginatedVisitsResults(VisitsData, 'visits'), async(req,res) => {
-  res.json(res.paginatedResults.results)
-})
-router.get('/allUsers',                           verifyToken, paginatedResults(AllUsersData, 'test', 'users'), async(req,res) => {
   res.json(res.paginatedResults.results)
 })
 
