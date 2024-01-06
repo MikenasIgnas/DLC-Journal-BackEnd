@@ -1,28 +1,20 @@
 import {
   Response,
+  Request
 }                           from 'express';
 
-import { TypedRequestBody } from '../../types.js';
 import UserSchema           from '../../shemas/UserSchema.js';
 
-interface GetAllUsersBody {
-  isDisabled: boolean
-}
+import getUserFilterParams  from './getUserFilterParams.js';
 
 
-export default async (req: TypedRequestBody<GetAllUsersBody>, res: Response) => {
+export default async (req: Request, res: Response) => {
   try {
-    const { isDisabled } = req.query
+    const params = getUserFilterParams(req.query)
 
-    let users
+    const count = await UserSchema.find(params).countDocuments()
 
-    if (isDisabled === undefined || isDisabled === null) {
-      users = await UserSchema.find().countDocuments()
-    } else {
-      users = await UserSchema.find({ isDisabled }).countDocuments()
-    }
-
-    return res.status(200).json(users)
+    return res.status(200).json(count)
   } catch (error) {
     return res.status(500).json({ message: 'Unexpected error' })
   }
