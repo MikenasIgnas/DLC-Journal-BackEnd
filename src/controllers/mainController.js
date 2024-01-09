@@ -376,69 +376,77 @@ module.exports = {
                     return sendRes(res, false, "all good", visitRegistrationData.id)
                 }
                 );
-        if(req.body.visitAddress === 'T72'){
-            const visitors = req.body.visitors.map((el) => `${el.selectedVisitor.name} ${el.selectedVisitor.lastName}`) 
-            const imagePath = 'src/Images/signatureLogo.png'
-
-            const sendEmail = () => {
-                return new Promise((resolve, reject) => {
-                  const transporter = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                      user: 'mikenasignas@gmail.com',
-                      pass: 'czwj jdyw xdyn qphs'
-                    }
-                  });
-              
-                  const mail_configs = {
-                    from: 'mikenasignas@gmail.com',
-                    to: 'ignas.mikenas@datalogistics.lt',
-                    subject: `${req.body.visitingClient}  ${req.body.creationDate} ${req.body.creationTime}`,
-                    attachments: [{
-                        filename: 'signatureLogo.png',
-                        path: imagePath,
-                        cid: 'unique@nodemailer.com',
-                    }],
-                    html: `<!DOCTYPE html>
-                          <html lang="en" >
-                              <head>
-                                  <meta charset="UTF-8">
-                              </head>
-                              <body>
-                                  <div style="font-family: Helvetica,Arial,sans-serif;overflow:auto;line-height:2">
-                                      <div style="margin:50px auto;width:70%;padding:20px 0">
-                                          <p style="font-size:1.1em">Sveiki, </p>
-                                          <span>Vizitas į DATAINN</span>
-                                          <p>Klientas: ${req.body.visitingClient}</p>
-                                          <p>Data/Laikas: ${req.body.scheduledVisitTime}</p>
-                                          <p>Įmonės atstovai: ${req.body.visitors.map((el) => `${el.selectedVisitor.name} ${el.selectedVisitor.lastName}<br>`).join('')}</p>
-                                          ${req.body.clientsGuests.length > 0 ? `<p>Palyda: ${req.body.clientsGuests.map((el) =>`${el}<br>`).join('')}</p>` : ''}
-                                          ${req.body.carPlates.length > 0 ? `<p>Automobilių Nr.: ${req.body.carPlates.map((el) =>`${el}<br>`).join('')}</p>` : ''}
-                                      </div>
-                                      <div style="margin:50px auto;width:70%;padding:20px 0">
-                                          <img src="cid:unique@nodemailer.com"/>
-                                          <p style="font-size: 10px">Pagarbiai,</p>
-                                          <p style="font-size: 10px">Monitoringo centras</p>
-                                          <p style="font-size: 10px">UAB Duomenų logistikos centras  |  A. Juozapavičiaus g. 13  |  LT-09311 Vilnius</p>
-                                          <p style="font-size: 10px">Mob. +370 618 44 445;  +370 674 44 455 |</p>
-                                          <p style="font-size: 10px">El.paštas noc@datalogistics.lt</p>
-                                          <p style="font-size: 10px">www.datalogistics.lt</p>
-                                      </div>
-                                  </div>
-                              </body>
-                          </html>`,
-                  };
-              
-                  transporter.sendMail(mail_configs, function (error, info) {
-                    if (error) {
-                      return reject({ message: `An error has occurred` });
-                    }
-                    return resolve({ message: 'Email sent successfully' });
-                  });
-                });
-              };
-              sendEmail()
-        }
+                if(req.body.visitAddress === 'T72'){
+                    const visitors = req.body.visitors.map((el) => `${el.selectedVisitor.name} ${el.selectedVisitor.lastName}`) 
+                    const imagePath = 'src/Images/signatureLogo.png'
+                    const sendEmail = () => {
+                        return new Promise((resolve, reject) => {
+                          const transporter = nodemailer.createTransport({
+                            host: process.env.SMTP_ADDRESS,
+                            port: process.env.SMTP_PORT,
+                            secure: false,
+                            auth: {
+                                user: '',
+                                pass: '',
+                            },
+                          });
+                          const mail_configs = {
+                            from: process.env.SENDER_ADDRESS,
+                            to: process.env.RECIPIENT_ADDRESS,
+                            subject: `${req.body.visitingClient}  ${req.body.creationDate} ${req.body.creationTime}`,
+                            attachments: [{
+                                filename: 'signatureLogo.png',
+                                path: imagePath,
+                                cid: 'unique@nodemailer.com',
+                            }],
+                            html: `<!DOCTYPE html>
+                                  <html lang="en" >
+                                      <head>
+                                          <meta charset="UTF-8">
+                                      </head>
+                                      <body>
+                                          <div style="font-family: Helvetica,Arial,sans-serif;overflow:auto;line-height:2">
+                                              <div style="margin:50px auto;width:70%;padding:20px 0">
+                                                  <p style="font-size:1.1em">Sveiki, </p>
+                                                  <span>Vizitas į DATAINN</span>
+                                                  <p>Klientas: ${req.body.visitingClient}</p>
+                                                  <p>Data/Laikas: ${req.body.scheduledVisitTime}</p>
+                                                  <p>Įmonės atstovai: ${req.body.visitors.map((el) => `${el.selectedVisitor.name} ${el.selectedVisitor.lastName}<br>`).join('')}</p>
+                                                  ${req.body.clientsGuests.length > 0 ? `<p>Palyda: ${req.body.clientsGuests.map((el) =>`${el}<br>`).join('')}</p>` : ''}
+                                                  ${req.body.carPlates.length > 0 ? `<p>Automobilių Nr.: ${req.body.carPlates.map((el) =>`${el}<br>`).join('')}</p>` : ''}
+                                              </div>
+                                              <div style="margin:50px auto;width:70%;padding:20px 0">
+                                                  <img src="cid:unique@nodemailer.com"/>
+                                                  <p style="font-size: 10px">Pagarbiai,</p>
+                                                  <p style="font-size: 10px">Monitoringo centras</p>
+                                                  <p style="font-size: 10px">UAB Duomenų logistikos centras  |  A. Juozapavičiaus g. 13  |  LT-09311 Vilnius</p>
+                                                  <p style="font-size: 10px">Mob. +370 618 44 445;  +370 674 44 455 |</p>
+                                                  <p style="font-size: 10px">El.paštas noc@datalogistics.lt</p>
+                                                  <p style="font-size: 10px">www.datalogistics.lt</p>
+                                              </div>
+                                          </div>
+                                      </body>
+                                  </html>`,
+                          };
+                      
+                          transporter.sendMail(mail_configs, function (error, info) {
+                            if (error) {
+                              return reject({ message: `An error has occurred ${error}` });
+                            }
+                            return resolve({ message: 'Email sent successfully' });
+                          });
+                        });
+                      };
+                      sendEmail()
+                      .then((result) => {
+                          console.log(result.message);
+                      })
+                      .catch((error) => {
+                          console.log(error.message);
+                      });
+                }else {
+                    console.log('Not sending email for other visit addresses');
+                }
     },
     getVisits: async (req, res) => {
         const visistsCollection = client.db('ChecklistDB').collection('visits');
