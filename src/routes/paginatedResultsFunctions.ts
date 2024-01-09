@@ -146,7 +146,7 @@ const paginatedResults = (model: any, db: string, collection: any) => {
             filterFunction(item, filterOption)
           );
         
-          query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } });
+          query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } }).sort({id: -1});
         }else if (selectFilter !== undefined) {
           const filterFunction = (item: any) => {
               for (const key in item) {
@@ -162,7 +162,7 @@ const paginatedResults = (model: any, db: string, collection: any) => {
       
           const allDocuments = await dbCollection.find().toArray();
           const filteredDocuments = allDocuments.filter(filterFunction);
-          query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } });
+          query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) }}).sort({id: -1});
       }else if( tableSorter !== undefined){
         if(tableSorter === 'asc'){
           query = dbCollection.find().sort({id: 1});
