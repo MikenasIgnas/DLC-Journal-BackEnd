@@ -1,9 +1,9 @@
 import {
   Response,
-}                           from 'express';
+}                           from 'express'
 
-import { TypedRequestBody } from '../../types.js';
-import UserSchema           from '../../shemas/UserSchema.js';
+import { TypedRequestBody } from '../../types.js'
+import UserSchema           from '../../shemas/UserSchema.js'
 
 interface GetAllUsersBody {
   isDisabled: boolean

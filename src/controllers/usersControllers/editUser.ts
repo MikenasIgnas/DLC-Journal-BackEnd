@@ -26,7 +26,7 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
     const loggedInUserId = await getLoggedInUserId(req)
 
     const loggedInUser = await UserSchema.findById({ _id: loggedInUserId })
-    
+
     if (!id) {
       return res.status(500).json({ message: 'Id is required' })
     }else{
@@ -35,13 +35,13 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
       if (loggedInUser?.isAdmin) {
         updatedFields.isAdmin = isAdmin
       }
-      
+
       const user = await UserSchema.findOneAndUpdate(
         { _id: id },
         updatedFields,
         { new: true }
-      );
-        
+      )
+
       return res.status(201).json(user)
     }
   } catch (error) {
