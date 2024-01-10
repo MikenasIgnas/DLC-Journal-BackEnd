@@ -1,4 +1,4 @@
-import express                        from 'express'
+import { Router }                     from 'express'
 
 import {
   routeData,
@@ -54,7 +54,7 @@ import {
   addMainCompanyAsSubClient,
   changeSubClientToMainClient,
   getSingleSubClient,
-  getAllHistoryData,
+  // getAllHistoryData,
   getAllClientsEmployees,
   getSingleClientsCollocations,
   getSpecificDateReport,
@@ -89,8 +89,7 @@ import {
   paginatedVisitsResults,
 }                                     from './paginatedResultsFunctions'
 
-const router = express.Router()
-
+const router = Router()
 
 
 router.post('/postChecklistData', verifyToken, postFilledChecklistData)
@@ -127,7 +126,7 @@ router.get('/getHistoryData', verifyToken, getHistoryData)
 router.get('/getPhotos/:photoId', verifyToken, getPhotos)
 router.get('/latestPhotos', verifyToken, latestPhotos)
 router.get('/deletePhoto/:photoId', verifyToken, deletePhoto)
-router.get('/getAllHistoryData', verifyToken, getAllHistoryData)
+// router.get('/getAllHistoryData', verifyToken, getAllHistoryData)
 
 router.get('/getCompanies', verifyToken, getCompanies)
 router.get('/getCompaniesSites', verifyToken, getCompaniesSites)

@@ -11,8 +11,13 @@ import {
 }                          from '../helpers'
 import sendRes             from '../modules/UniversalRes'
 
+// needs fixing
+// eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
+require('dotenv').config()
+
+// needs fixing
 // eslint-disable-next-line no-undef
-const client =   new MongoClient(process.env.MONGO_PATH)
+const client = new MongoClient(process.env.MONGO_PATH)
 
 export async function routeData(req, res) {
   const collection = client.db('ChecklistDB').collection('routesTable')

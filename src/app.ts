@@ -7,6 +7,10 @@ import authRouter  from './routes/authRoutes'
 import mainRouter  from './routes/router'
 import usersRouter from './routes/userRoutes'
 
+// needs fixing
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config()
+
 mongoose.connect(process.env.MONGO_PATH)
   .then(() => {
     console.log('CONNECTED OK')
