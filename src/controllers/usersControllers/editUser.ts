@@ -5,20 +5,20 @@ import { TypedRequestBody }  from '../../types.js'
 import UserSchema            from '../../shemas/UserSchema.js'
 
 interface EditUserBody {
-  email:      string
-  id:         string
-  isAdmin:    boolean
-  isSecurity: boolean
-  name:       string
-  username:   string
+  email:        string
+  id:           string
+  isAdmin:      boolean
+  isSecurity:   boolean
+  name:         string
+  username:     string
 }
 
 interface UpdatedFields {
-  email:       string
-  isAdmin?:    boolean
-  isSecurity?: boolean
-  name:        string
-  username:    string
+  email:        string
+  isAdmin?:     boolean
+  name:         string
+  username:     string
+  isSecurity?:  boolean
 }
 
 
@@ -46,6 +46,9 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
         } else if (isSecurity) {
           updatedFields.isAdmin = false
           updatedFields.isSecurity = isSecurity
+        }else if (!isAdmin && !isSecurity){
+          updatedFields.isAdmin = false
+          updatedFields.isSecurity = false
         }
       }
 

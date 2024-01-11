@@ -1,10 +1,10 @@
-import bodyparser  from 'body-parser'
-import cors        from 'cors'
-import express     from 'express'
-import mongoose    from 'mongoose'
+import bodyparser from 'body-parser'
+import cors from 'cors'
+import express from 'express'
+import mongoose from 'mongoose'
 
-import authRouter  from './routes/authRoutes'
-import mainRouter  from './routes/router'
+import authRouter from './routes/authRoutes'
+import mainRouter from './routes/router'
 import usersRouter from './routes/userRoutes'
 
 // needs fixing
@@ -29,7 +29,7 @@ app.use(cors({
 app.use(express.json())
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
-app.listen(4000)
+app.listen(4002)
 
 app.use('/', mainRouter)
 app.use('/auth', authRouter)
