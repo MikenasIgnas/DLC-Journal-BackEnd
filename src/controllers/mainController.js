@@ -20,6 +20,7 @@ require('dotenv').config()
 const client = new MongoClient(process.env.MONGO_PATH)
 
 export async function routeData(req, res) {
+  console.log('tests')
   const collection = client.db('ChecklistDB').collection('routesTable')
   const routes = await collection.find().sort({ id: 1 }).toArray()
   return sendRes(res, false, 'all routes', routes)
