@@ -4,23 +4,14 @@ import {
 }                           from 'express'
 
 import { getPagination }    from '../../helpers.js'
-import { RequestQuery }     from '../../types.js'
 import UserSchema           from '../../shemas/UserSchema.js'
 
-interface Filters {
-  isAdmin?:    RequestQuery
-  isDisabled?: RequestQuery
-  $or?: [
-    { name: { $regex: RequestQuery, $options: 'i' } },
-    { email: { $regex: RequestQuery, $options: 'i' } },
-    { username: { $regex: RequestQuery, $options: 'i' } }
-  ]
-}
+import getUserFilterParams  from './getUserFilterParams.js'
 
 
 export default async (req: Request, res: Response) => {
   try {
-    const { id, isAdmin, isDisabled, page, limit, search } = req.query
+    const { id, isAdmin, isDisabled, isSecurity, page, limit, search } = req.query
 
     if (id) {
       const user = await UserSchema.findById({
@@ -32,7 +23,7 @@ export default async (req: Request, res: Response) => {
 
       let users = undefined
 
-      const params: Filters = {}
+      const params = getUserFilterParams({ isAdmin, isDisabled, isSecurity, search })
 
       if (isDisabled !== undefined && isDisabled !== null) {
         params.isDisabled = isDisabled
