@@ -53,8 +53,8 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
         { _id: id },
         updatedFields,
         { new: true }
-      );
-        
+      )
+
       return res.status(201).json(user)
     }
   } catch (error) {

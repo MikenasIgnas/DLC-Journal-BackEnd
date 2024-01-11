@@ -21,9 +21,27 @@ export default async (req: Request, res: Response) => {
     } else {
       const { parsedLimit, skip } = getPagination(page, limit)
 
+      let users = undefined
+
       const params = getUserFilterParams({ isAdmin, isDisabled, isSecurity, search })
 
-      const users = await UserSchema.find(params).limit(parsedLimit).skip(skip)
+      if (isDisabled !== undefined && isDisabled !== null) {
+        params.isDisabled = isDisabled
+      }
+
+      if (isAdmin !== undefined && isDisabled !== null) {
+        params.isAdmin = isAdmin
+      }
+
+      if (search) {
+        params.$or = [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { username: { $regex: search, $options: 'i' } },
+        ]
+      }
+
+      users = await UserSchema.find(params).limit(parsedLimit).skip(skip)
 
       return res.status(201).json(users)
     }

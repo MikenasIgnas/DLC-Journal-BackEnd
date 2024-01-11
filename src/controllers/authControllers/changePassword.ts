@@ -17,11 +17,11 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
     const { password, repeatPassword, oldPassword } = req.body
 
     const id = await getLoggedInUserId(req)
-    
+
     if (!password || !repeatPassword || !oldPassword) {
       return res.status(500).json({ message: 'Visi laukai privalomi' })
     }
-    
+
     if (repeatPassword !== password) {
       return res.status(500).json({ message: 'Slaptažodžiai nesutampa' })
     }
@@ -32,9 +32,9 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
       return res.status(500).json({ message: 'Nerastas vartotojas' })
     } else {
       const isPasswordValid = await bcrypt.compare(oldPassword, user.password)
-      
+
       if (isPasswordValid) {
-        const encryptedPassword = await bcrypt.hash(password, 10);
+        const encryptedPassword = await bcrypt.hash(password, 10)
 
         await user.updateOne({
           password: encryptedPassword,
