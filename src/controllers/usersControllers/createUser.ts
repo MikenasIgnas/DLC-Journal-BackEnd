@@ -8,20 +8,25 @@ import UserSchema           from '../../shemas/UserSchema.js'
 
 
 interface CreateUserBody {
-  email:    string
-  name:     string
-  password: string
-  isAdmin:  boolean
-  username: string
+  email:      string
+  isAdmin:    boolean
+  isSecurity: boolean
+  name:       string
+  password:   string
+  username:   string
 }
 
 
 export default async (req: TypedRequestBody<CreateUserBody>, res: Response) => {
   try {
-    const { email, password, name, isAdmin, username } = req.body
+    const { email, password, name, isAdmin, isSecurity, username } = req.body
 
     if (!(email && password && name && username)) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ messsage: 'All fields required' })
+    }
+
+    if (isSecurity && isAdmin) {
+      return res.status(400).json({ messsage: 'Security cant be admin' })
     }
 
     const isValid = emailvalidator.validate(email)
@@ -45,6 +50,7 @@ export default async (req: TypedRequestBody<CreateUserBody>, res: Response) => {
         email:      email.toLowerCase(),
         isAdmin,
         isDisabled: false,
+        isSecurity,
         name,
         password:   encryptedPassword,
         username,
