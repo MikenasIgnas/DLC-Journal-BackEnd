@@ -7,13 +7,14 @@ export interface TypedRequestBody<T> extends Request {
   body: T
 }
 
-export type EmployeesType = {
-  _id:            string;
-  companyId:      number | undefined;
-  name:           string;
-  lastName:       string;
-  occupation:     string;
-  employeeId:     number | undefined;
+
+export type Employees = {
+  _id:            string
+  companyId:      number | undefined
+  name:           string
+  lastName:       string
+  occupation:     string
+  employeeId:     number | undefined
   permissions:    string[];
   employeePhoto?: string;
   email?:         string;
@@ -22,7 +23,7 @@ export type EmployeesType = {
   notes?:         string;
 }
 
-export type VisitStatusType = 'success' | 'processing' | 'error' | 'default' | 'warning' | undefined;
+export type VisitStatus = 'success' | 'processing' | 'error' | 'default' | 'warning' | undefined
 
 
 export type CollocationType = {
@@ -32,13 +33,13 @@ export type CollocationType = {
 export type VisitorsType = {
   idType?:            string | null | undefined;
   signature?:         string | undefined;
-  selectedVisitor:    EmployeesType;
+  selectedVisitor:    Employees
 };
 
 export type VisitsType = {
   id:                 number;
   visitPurpose:       string[];
-  visitStatus:        VisitStatusType;
+  visitStatus:        VisitStatus
   visitors:           VisitorsType[];
   dlcEmployees:       string;
   visitAddress:       string;
@@ -103,14 +104,14 @@ export type AreaType = {
 };
 
 export type TodoType = {
-  areasId:            number;
-  duty:               string;
-  id:                 number;
+  areasId:            number
+  duty:               string
+  id:                 number
 };
 
 export type PossibleProblemsType = {
-  id:                 number;
-  todoId:             number;
-  possibleProblem:    string;
-  reaction:           string;
-};
+  id:                 number
+  todoId:             number
+  possibleProblem:    string
+  reaction:           string
+}

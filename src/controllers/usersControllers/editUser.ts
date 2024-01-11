@@ -12,6 +12,7 @@ interface EditUserBody {
   name:         string
   username:     string
 }
+
 interface UpdatedFields {
   email:        string
   isAdmin?:     boolean
@@ -28,10 +29,14 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
     const loggedInUserId = await getLoggedInUserId(req)
 
     const loggedInUser = await UserSchema.findById({ _id: loggedInUserId })
-    
+
+    if (isSecurity && isAdmin) {
+      return res.status(400).json({ messsage: 'Security cant be admin' })
+    }
+
     if (!id) {
       return res.status(500).json({ message: 'Id is required' })
-    }else{
+    } else {
       const updatedFields: UpdatedFields = { name, email, username }
 
       if (loggedInUser?.isAdmin) {
@@ -46,13 +51,13 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
           updatedFields.isSecurity = false
         }
       }
-      
+
       const user = await UserSchema.findOneAndUpdate(
         { _id: id },
         updatedFields,
         { new: true }
-      );
-        
+      )
+
       return res.status(201).json(user)
     }
   } catch (error) {

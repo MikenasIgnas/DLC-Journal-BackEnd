@@ -1,7 +1,7 @@
 import { Response }         from 'express'
 
-import { TypedRequestBody } from '../../types.js';
-import UserSchema           from '../../shemas/UserSchema.js';
+import { TypedRequestBody } from '../../types.js'
+import UserSchema           from '../../shemas/UserSchema.js'
 
 interface DeleteUserBody {
   id: string
@@ -11,11 +11,11 @@ interface DeleteUserBody {
 export default async (req: TypedRequestBody<DeleteUserBody>, res: Response) => {
   try {
     const { id } = req.query
-    
+
     if (!id) {
       return res.status(500).json({ message: 'Id is required' })
     }
-    
+
     const user = await UserSchema.findOneAndDelete({
       _id: id,
     })

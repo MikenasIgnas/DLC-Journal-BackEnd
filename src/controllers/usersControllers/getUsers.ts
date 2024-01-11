@@ -4,23 +4,14 @@ import {
 }                           from 'express'
 
 import { getPagination }    from '../../helpers.js'
-import { requestQuery }     from '../../types.js'
 import UserSchema           from '../../shemas/UserSchema.js'
 
-interface Filters {
-  isAdmin?:    requestQuery
-  isDisabled?: requestQuery
-  $or?: [
-    { name: { $regex: requestQuery, $options: "i" } },
-    { email: { $regex: requestQuery, $options: "i" } },
-    { username: { $regex: requestQuery, $options: "i" } }
-  ]
-}
+import getUserFilterParams  from './getUserFilterParams.js'
 
 
 export default async (req: Request, res: Response) => {
   try {
-    const { id, isAdmin, isDisabled, page, limit, search } = req.query
+    const { id, isAdmin, isDisabled, isSecurity, page, limit, search } = req.query
 
     if (id) {
       const user = await UserSchema.findById({
@@ -29,10 +20,10 @@ export default async (req: Request, res: Response) => {
       return res.status(201).json(user)
     } else {
       const { parsedLimit, skip } = getPagination(page, limit)
-  
-      let users
 
-      const params: Filters = {}
+      let users = undefined
+
+      const params = getUserFilterParams({ isAdmin, isDisabled, isSecurity, search })
 
       if (isDisabled !== undefined && isDisabled !== null) {
         params.isDisabled = isDisabled
@@ -44,9 +35,9 @@ export default async (req: Request, res: Response) => {
 
       if (search) {
         params.$or = [
-          { name: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-          { username: { $regex: search, $options: "i" } }
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { username: { $regex: search, $options: 'i' } },
         ]
       }
 
