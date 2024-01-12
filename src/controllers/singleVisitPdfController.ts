@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express'
 import { MongoClient }       from 'mongodb'
@@ -125,21 +126,25 @@ export default async (req: Request, res: Response) => {
         styles: {font: 'Arial'},
         startY: 50,
       })
-      if(visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0){
+      if (visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0) {
         const firstTableEnd = doc?.lastAutoTable?.finalY
         if(firstTableEnd){
-          doc.addFont('src/Fonts/arial.ttf', 'Arial', 'bold')
-          doc.setFont('Arial', 'bold')
           doc.setFontSize(10)
           doc.text('Kolokacijos', 15, firstTableEnd + 10)
           doc.setFontSize(originalFontSize)
+
           autoTable(doc, {
             head: [
               ['Patalpa', 'Spinta'],
             ],
-            body:   Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
-            startY: firstTableEnd + 15,
-            styles: {font: 'Arial'},
+            columns: [
+              { header: 'Patalpa', dataKey: 'premise' },
+              { header: 'Spinta', dataKey: 'rack' },
+            ],
+            body:         Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
+            startY:       firstTableEnd + 15,
+            styles:       {font: 'Arial'},
+            columnStyles: { premise: {cellWidth: 50}},
           })
         }
       }
@@ -161,9 +166,8 @@ export default async (req: Request, res: Response) => {
               { header: 'Vardas/Pavardė', dataKey: 'name' },
               { header: 'Įmonė', dataKey: 'company' },
             ],
-            startY:       secondTableEnd + 15,
-            styles:       {font: 'Arial'},
-            columnStyles: { premise: {cellWidth: 50}},
+            startY: secondTableEnd + 15,
+            styles: {font: 'Arial'},
           })
         }
       }
