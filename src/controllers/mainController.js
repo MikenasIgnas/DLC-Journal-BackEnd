@@ -15,12 +15,10 @@ import sendRes             from '../modules/UniversalRes'
 // eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
 require('dotenv').config()
 
-// needs fixing
 // eslint-disable-next-line no-undef
 const client = new MongoClient(process.env.MONGO_PATH)
 
 export async function routeData(req, res) {
-  console.log('tests')
   const collection = client.db('ChecklistDB').collection('routesTable')
   const routes = await collection.find().sort({ id: 1 }).toArray()
   return sendRes(res, false, 'all routes', routes)

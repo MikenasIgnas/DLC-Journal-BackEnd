@@ -10,14 +10,16 @@ import fs              from 'fs'
 import { VisitsType }  from '../types'
 
 const client = new MongoClient(process.env.MONGO_PATH)
-
+interface ExtendedJsPDF extends jsPDF {
+  lastAutoTable?: {
+      finalY?: number;
+  };
+}
 
 export default async (req: Request, res: Response) => {
   try {
-    const visits = client.db('ChecklistDB').collection<VisitsType>('visits')
-
-    const allVisits = await visits.find().toArray()
-
+    const visits           = client.db('ChecklistDB').collection<VisitsType>('visits')
+    const allVisits        = await visits.find().toArray()
     const backgroundPath   = 'src/Images/PDFbackround.png'
     const backgroundBuffer = fs.readFileSync(backgroundPath)
     const dateFrom         = req.query.dateFrom
@@ -33,8 +35,7 @@ export default async (req: Request, res: Response) => {
     if (!visitsByDate) {
       res.status(500).json({ message: 'Could not find visit by that id' })
     } else {
-      const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' })
-
+      const doc: ExtendedJsPDF = new jsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' })
       visitsByDate?.map((visit: VisitsType, index: number) => {
         if (index > 0) {
           doc.addPage()
@@ -49,7 +50,7 @@ export default async (req: Request, res: Response) => {
           'PNG',
           0,
           0,
-          doc.internal.pageSize.width,
+          doc.internal.pageSize.width + 50,
           doc.internal.pageSize.height
         )
 
@@ -83,7 +84,6 @@ export default async (req: Request, res: Response) => {
         )
 
         doc.setFontSize(originalFontSize)
-
         autoTable(doc, {
           head: [
             [
@@ -102,14 +102,14 @@ export default async (req: Request, res: Response) => {
             minCellHeight: 20,
           },
           body: visit?.visitors?.map((el) => [
-            el?.selectedVisitor?.name,
-            el?.selectedVisitor?.lastName,
+            el?.selectedVisitor?.name || '',
+            el?.selectedVisitor?.lastName || '',
             el?.selectedVisitor?.birthday || '',
             el?.selectedVisitor?.occupation,
             el?.selectedVisitor?.phoneNr || '',
             el?.selectedVisitor?.email || '',
             el?.idType || '',
-            el?.selectedVisitor?.permissions?.map((el: string) => `${el}\n`),
+            el?.selectedVisitor?.permissions?.map((el: string) => `${el}\n`) || '',
             el?.signature || '',
           ]),
           columns: [
@@ -142,43 +142,44 @@ export default async (req: Request, res: Response) => {
         })
 
         if (visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0) {
-          // TO DO FIX THIS!!
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const firstTableEnd = (doc as any).lastAutoTable.finalY
+          const firstTableEnd = doc?.lastAutoTable?.finalY
+          if(firstTableEnd){
 
-          doc.setFontSize(10)
-          doc.text('Kolokacijos', 15, firstTableEnd + 10)
-          doc.setFontSize(originalFontSize)
+            doc.setFontSize(10)
+            doc.text('Kolokacijos', 15, firstTableEnd + 10)
+            doc.setFontSize(originalFontSize)
 
-          autoTable(doc, {
-            head:   [['Patalpa', 'Spinta']],
-            body:   Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
-            startY: firstTableEnd + 15,
-          })
+            autoTable(doc, {
+              head: [
+                ['Patalpa', 'Spinta'],
+              ],
+              body:   Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
+              startY: firstTableEnd + 15,
+            })
+          }
         }
 
         if (visit.clientsGuests && visit.clientsGuests.length > 0) {
-          // TO DO FIX THIS
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const secondTableEnd = (doc as any).lastAutoTable.finalY
+          const secondTableEnd = doc?.lastAutoTable?.finalY
+          if(secondTableEnd){
 
-          doc.setFontSize(10)
-          doc.text('Palyda', 15, secondTableEnd + 10)
-          doc.setFontSize(originalFontSize)
+            doc.setFontSize(10)
+            doc.text('Palyda', 15, secondTableEnd + 10)
+            doc.setFontSize(originalFontSize)
 
-          autoTable(doc, {
-            head:   [['Palyda']],
-            body:   visit.clientsGuests.map((el) => [`${el}`]),
-            startY: secondTableEnd + 15,
-          })
+            autoTable(doc, {
+              head: [
+                ['Palyda'],
+              ],
+              body:   visit.clientsGuests.map((el) => [`${el}`]),
+              startY: secondTableEnd + 15,
+            })
+          }
         }
       })
 
       const docOutput = doc.output('arraybuffer')
-      // TO DO FIX THIS!!
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const docBuffer = Buffer.from(docOutput as any, 'ascii')
-
+      const docBuffer = Buffer.from(docOutput)
       res.setHeader('Content-Disposition', 'attachment; filename="two-by-four.pdf"')
       res.setHeader('Content-Type', 'application/pdf')
       res.send(docBuffer)

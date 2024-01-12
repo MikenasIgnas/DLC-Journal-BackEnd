@@ -1,12 +1,12 @@
-import { RequestQuery } from '../../types'
+import { requestQuery } from '../../types'
 
 export interface UsersFilters {
-  isAdmin?:    RequestQuery
-  isDisabled?: RequestQuery
-  isSecurity?: RequestQuery
+  isAdmin?:    requestQuery
+  isDisabled?: requestQuery
+  isSecurity?: requestQuery
   $or?: [
-    { name: { $regex: RequestQuery, $options: 'i' } },
-    { email: { $regex: RequestQuery, $options: 'i' } },
-    { username: { $regex: RequestQuery, $options: 'i' } }
+    { name: { $regex: requestQuery, $options: 'i' } },
+    { email: { $regex: requestQuery, $options: 'i' } },
+    { username: { $regex: requestQuery, $options: 'i' } }
   ]
 }

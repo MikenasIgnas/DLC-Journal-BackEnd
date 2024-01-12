@@ -7,9 +7,6 @@ import authRouter  from './routes/authRoutes'
 import mainRouter  from './routes/router'
 import usersRouter from './routes/userRoutes'
 
-// needs fixing
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config()
 
 mongoose.connect(process.env.MONGO_PATH)
   .then(() => {
@@ -29,7 +26,7 @@ app.use(cors({
 app.use(express.json())
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
-app.listen(4000)
+app.listen(4002)
 
 app.use('/', mainRouter)
 app.use('/auth', authRouter)

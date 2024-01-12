@@ -1,39 +1,39 @@
-import { Request, Response }                     from 'express'
-import { MongoClient } from 'mongodb'
-import {  VisitsType } from '../types'
-import jsPDF                            from 'jspdf'
-import autoTable                        from 'jspdf-autotable'
-import fs from 'fs'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Request, Response } from 'express'
+import { MongoClient }       from 'mongodb'
+import {  VisitsType }       from '../types'
+import jsPDF                 from 'jspdf'
+import autoTable             from 'jspdf-autotable'
+import fs                    from 'fs'
 
-const client      = new MongoClient('mongodb://10.81.7.29:27017/')
-
+const client = new MongoClient(process.env.MONGO_PATH)
+interface ExtendedJsPDF extends jsPDF {
+  lastAutoTable?: {
+      finalY?: number;
+  };
+}
 
 export default async (req: Request, res: Response) => {
   try {
-    const visits = client.db('ChecklistDB').collection<VisitsType>('visits')
-
-    const visitId = req.query.visitId
-
-    const visit = await visits.findOne({ id: Number(visitId) })
-
+    const visits           = client.db('ChecklistDB').collection<VisitsType>('visits')
+    const visitId          = req.query.visitId
+    const visit            = await visits.findOne({ id: Number(visitId) })
     const backgroundPath   = 'src/Images/PDFbackround.png'
     const backgroundBuffer = fs.readFileSync(backgroundPath)
 
     if (!visit) {
       res.status(500).json({ message: 'Could not find visit by that id' })
     } else {
-      const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' })
-
+      const doc: ExtendedJsPDF = new jsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' })
       doc.addFont('src/Fonts/arial.ttf', 'Arial', 'bold')
       doc.setFont('Arial', 'bold')
       doc.setFontSize(20)
-
       doc.addImage(
         backgroundBuffer,
         'PNG',
         0,
         0,
-        doc.internal.pageSize.width,
+        doc.internal.pageSize.width + 50,
         doc.internal.pageSize.height
       )
 
@@ -85,16 +85,16 @@ export default async (req: Request, res: Response) => {
         bodyStyles: {
           minCellHeight: 20,
         },
-        body: visit?.visitors?.map((el: any) => [
-          el?.selectedVisitor?.name,
-          el?.selectedVisitor?.lastName,
-          el?.selectedVisitor?.birthday,
-          el?.selectedVisitor?.occupation,
-          el?.selectedVisitor?.phoneNr,
-          el?.selectedVisitor?.email,
-          el.idType,
-          el.selectedVisitor.permissions.map((el: string) => `${el}\n`).join(''),
-          el.signature,
+        body: visit?.visitors?.map((el) => [
+          el?.selectedVisitor?.name || '',
+          el?.selectedVisitor?.lastName || '',
+          el?.selectedVisitor?.birthday || '',
+          el?.selectedVisitor?.occupation || '',
+          el?.selectedVisitor?.phoneNr || '',
+          el?.selectedVisitor?.email || '',
+          el.idType || '',
+          el?.selectedVisitor?.permissions?.map((el: string) => `${el}\n`).join('') || '',
+          el?.signature || null,
         ]),
         columns: [
           { header: 'Vardas', dataKey: 'name' },
@@ -126,33 +126,37 @@ export default async (req: Request, res: Response) => {
         startY: 50,
       })
       if(visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0){
-        const firstTableEnd = (doc as any).lastAutoTable.finalY
-        doc.setFontSize(10)
-        doc.text('Kolokacijos', 15, firstTableEnd + 10)
-        doc.setFontSize(originalFontSize)
-        autoTable(doc, {
-          head: [
-            ['Patalpa', 'Spinta'],
-          ],
-          body:   Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
-          startY: firstTableEnd + 15,
-        })
+        const firstTableEnd = doc?.lastAutoTable?.finalY
+        if(firstTableEnd){
+          doc.setFontSize(10)
+          doc.text('Kolokacijos', 15, firstTableEnd + 10)
+          doc.setFontSize(originalFontSize)
+          autoTable(doc, {
+            head: [
+              ['Patalpa', 'Spinta'],
+            ],
+            body:   Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
+            startY: firstTableEnd + 15,
+          })
+        }
       }
       if(visit.clientsGuests && visit.clientsGuests.length > 0){
-        const secondTableEnd = (doc as any).lastAutoTable.finalY
-        doc.setFontSize(10)
-        doc.text('Palyda', 15, secondTableEnd + 10)
-        doc.setFontSize(originalFontSize)
-        autoTable(doc, {
-          head: [
-            ['Palyda'],
-          ],
-          body:   visit.clientsGuests.map((el) => [`${el}`]),
-          startY: secondTableEnd + 15,
-        })
+        const secondTableEnd = doc?.lastAutoTable?.finalY
+        if(secondTableEnd){
+          doc.setFontSize(10)
+          doc.text('Palyda', 15, secondTableEnd + 10)
+          doc.setFontSize(originalFontSize)
+          autoTable(doc, {
+            head: [
+              ['Palyda'],
+            ],
+            body:   visit.clientsGuests.map((el) => [`${el}`]),
+            startY: secondTableEnd + 15,
+          })
+        }
       }
       const docOutput = doc.output('arraybuffer')
-      const docBuffer = Buffer.from(docOutput as any, 'ascii')
+      const docBuffer = Buffer.from(docOutput)
       res.setHeader('Content-Disposition', 'attachment; filename="two-by-four.pdf"')
       res.setHeader('Content-Type', 'application/pdf')
       res.send(docBuffer)
