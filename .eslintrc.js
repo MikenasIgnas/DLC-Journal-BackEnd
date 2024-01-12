@@ -62,5 +62,8 @@ module.exports = {
         },
       ],
       '@typescript-eslint/explicit-module-boundary-types': [0],
-    },
+      "keyword-spacing": ["error", { "after": true, "before": true }],
+      "space-before-blocks": ["error", "always"],
+      "space-before-function-paren": ["error", "always"]
+    }
 }
