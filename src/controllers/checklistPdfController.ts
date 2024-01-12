@@ -1,11 +1,13 @@
-/* eslint-disable max-len */
 import {
   Request,
   Response,
 }                      from 'express'
+
 import { jsPDF }       from 'jspdf'
 import { MongoClient } from 'mongodb'
-import autoTable, { RowInput }       from 'jspdf-autotable'
+import { RowInput }    from 'jspdf-autotable'
+
+import autoTable       from 'jspdf-autotable'
 import fs              from 'fs'
 
 import {
@@ -13,24 +15,19 @@ import {
   HistoryDataType,
   PossibleProblemsType,
   RouteType,
+  PremiseDutyDetails,
   TodoType,
 }                      from '../types'
 
-const client = new MongoClient('mongodb://10.81.7.29:27017/')
+const client = new MongoClient(process.env.MONGO_PATH)
 
-type RowType = {
-  id: number;
-  roomName: string;
-  duty: string;
-  possibleProblem: string;
-  reaction: string;
-  [key: string]: number | string;
-};
+interface Row extends PremiseDutyDetails {
+  [key: string]:    number | string
+}
 
 export default async (req: Request, res: Response) => {
   try {
-    const db = client.db('ChecklistDB')
-
+    const db                         = client.db('ChecklistDB')
     const checklistHistoryCollection = db.collection<HistoryDataType>('checklistHistoryData')
     const routesCollection           = db.collection<RouteType>('routesTable')
     const areasCollection            = db.collection<AreaType>('areasTable')
@@ -110,10 +107,17 @@ export default async (req: Request, res: Response) => {
         doc.setFontSize(15)
         doc.setFontSize(originalFontSize)
 
-        const problemRoute    = item.filledData.map((el) => routes.find((item) => el.routeNumber === item.id))
-        const area            = problemRoute.map((el) => areas?.find((item) => el?.id === item.routesId))
-        const todoInArea      = area.map((el) => todo.find((item) => el?.id === item.areasId))
-        const problemsInArea  = todoInArea.map((el) =>problems.find((item) => el?.id === item.todoId))
+        const problemRoute    = item.filledData.map((el) =>
+          routes.find((item) => el.routeNumber === item.id))
+
+        const area            = problemRoute.map((el) =>
+          areas?.find((item) => el?.id === item.routesId))
+
+        const todoInArea      = area.map((el) =>
+          todo.find((item) => el?.id === item.areasId))
+
+        const problemsInArea  = todoInArea.map((el) =>
+          problems.find((item) => el?.id === item.todoId))
 
         const bodyRows = (
           rowCount: number,
@@ -135,7 +139,7 @@ export default async (req: Request, res: Response) => {
           return body
         }
 
-        const raw: RowType[]  = bodyRows(item.filledData.length, area, todoInArea, problemsInArea)
+        const raw: Row[]  = bodyRows(item.filledData.length, area, todoInArea, problemsInArea)
         const body  = []
 
         for (let i = 0; i < raw.length; i++) {

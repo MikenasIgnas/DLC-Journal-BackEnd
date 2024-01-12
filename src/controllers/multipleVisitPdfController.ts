@@ -1,19 +1,21 @@
-/* eslint-disable max-len */
 import {
   Request,
   Response,
 }                      from 'express'
+
 import { jsPDF }       from 'jspdf'
 import { MongoClient } from 'mongodb'
+
 import autoTable       from 'jspdf-autotable'
 import fs              from 'fs'
 
 import { VisitsType }  from '../types'
 
 const client = new MongoClient(process.env.MONGO_PATH)
+
 interface ExtendedJsPDF extends jsPDF {
   lastAutoTable?: {
-      finalY?: number;
+      finalY?: number
   };
 }
 
@@ -138,13 +140,13 @@ export default async (req: Request, res: Response) => {
               }
             }
           },
-          styles: {font: 'Arial'},
+          styles: { font: 'Arial' },
           startY: 50,
         })
 
         if (visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0) {
           const firstTableEnd = doc?.lastAutoTable?.finalY
-          if(firstTableEnd){
+          if (firstTableEnd) {
             doc.setFontSize(10)
             doc.text('Kolokacijos', 15, firstTableEnd + 10)
             doc.setFontSize(originalFontSize)
@@ -157,17 +159,18 @@ export default async (req: Request, res: Response) => {
                 { header: 'Patalpa', dataKey: 'premise' },
                 { header: 'Spinta', dataKey: 'rack' },
               ],
-              body:         Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
+              body: Object.entries(visit?.visitCollocation).map(([key, value]) =>
+                [key, value]),
               startY:       firstTableEnd + 15,
-              styles:       {font: 'Arial'},
-              columnStyles: { premise: {cellWidth: 50}},
+              styles:       { font: 'Arial' },
+              columnStyles: { premise: { cellWidth: 50 } },
             })
           }
         }
 
-        if(visit.clientsGuests && visit.clientsGuests.length > 0){
+        if (visit.clientsGuests && visit.clientsGuests.length > 0) {
           const secondTableEnd = doc?.lastAutoTable?.finalY
-          if(secondTableEnd){
+          if (secondTableEnd) {
             doc.setFontSize(10)
             doc.text('Palyda', 15, secondTableEnd + 10)
             doc.setFontSize(originalFontSize)
@@ -184,7 +187,7 @@ export default async (req: Request, res: Response) => {
                 { header: 'Įmonė', dataKey: 'company' },
               ],
               startY: secondTableEnd + 15,
-              styles: {font: 'Arial'},
+              styles: { font: 'Arial' },
             })
           }
         }
