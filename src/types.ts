@@ -36,6 +36,11 @@ export type VisitorsType = {
   selectedVisitor:    Employees
 };
 
+export type ClientsGuestsType = {
+  guestName:    string;
+  companyName:  string;
+}
+
 export type VisitsType = {
   id:                 number;
   visitPurpose:       string[];
@@ -44,7 +49,7 @@ export type VisitsType = {
   dlcEmployees:       string;
   visitAddress:       string;
   visitingClient:     string;
-  clientsGuests:      string[];
+  clientsGuests:      ClientsGuestsType[];
   carPlates:          string[];
   signature:          string;
   visitCollocation:   CollocationType

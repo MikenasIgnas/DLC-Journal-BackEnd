@@ -1,16 +1,16 @@
-import { createTransport } from 'nodemailer'
-import { diskStorage }     from 'multer'
-import { MongoClient }     from 'mongodb'
-import { unlink }          from 'fs'
-import multer              from 'multer'
-
-import { findOneAndUpdate } from '../shemas/FilledChecklistData'
+import { createTransport }   from 'nodemailer'
+import { diskStorage }       from 'multer'
+import { MongoClient }       from 'mongodb'
+import { unlink }            from 'fs'
+import multer                from 'multer'
+import UserSchema            from '../shemas/UserSchema.js'
+import { findOneAndUpdate }  from '../shemas/FilledChecklistData'
 import {
   getCurrentDate,
   getCurrentTime,
-}                          from '../helpers'
-import sendRes             from '../modules/UniversalRes'
-
+}                            from '../helpers'
+import sendRes               from '../modules/UniversalRes'
+import { getLoggedInUserId } from '../helpers.js'
 // needs fixing
 // eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
 require('dotenv').config()
@@ -980,14 +980,17 @@ export async function endVisit(req, res) {
 }
 export async function startVisit(req, res) {
   const visistsCollection = client.db('ChecklistDB').collection('visits')
+  const id = await getLoggedInUserId(req)
+  const user = await UserSchema.findById({_id: id })
   const updateVisitStatus = await visistsCollection.findOneAndUpdate(
     { id: Number(req.query.visitId) },
     { $set: {
-      visitStatus: 'success',
-      startDate:   getCurrentDate(),
-      startTime:   getCurrentTime(),
-      endDate:     '',
-      endTime:     '',
+      visitStatus:  'success',
+      startDate:    getCurrentDate(),
+      startTime:    getCurrentTime(),
+      dlcEmployees: user.name,
+      endDate:      '',
+      endTime:      '',
     } }
   )
   return sendRes(res, false, 'all good', [updateVisitStatus.value])

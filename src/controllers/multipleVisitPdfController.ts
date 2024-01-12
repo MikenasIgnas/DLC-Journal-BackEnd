@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {
   Request,
   Response,
@@ -144,7 +145,6 @@ export default async (req: Request, res: Response) => {
         if (visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0) {
           const firstTableEnd = doc?.lastAutoTable?.finalY
           if(firstTableEnd){
-
             doc.setFontSize(10)
             doc.text('Kolokacijos', 15, firstTableEnd + 10)
             doc.setFontSize(originalFontSize)
@@ -153,26 +153,38 @@ export default async (req: Request, res: Response) => {
               head: [
                 ['Patalpa', 'Spinta'],
               ],
-              body:   Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
-              startY: firstTableEnd + 15,
+              columns: [
+                { header: 'Patalpa', dataKey: 'premise' },
+                { header: 'Spinta', dataKey: 'rack' },
+              ],
+              body:         Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
+              startY:       firstTableEnd + 15,
+              styles:       {font: 'Arial'},
+              columnStyles: { premise: {cellWidth: 50}},
             })
           }
         }
 
-        if (visit.clientsGuests && visit.clientsGuests.length > 0) {
+        if(visit.clientsGuests && visit.clientsGuests.length > 0){
           const secondTableEnd = doc?.lastAutoTable?.finalY
           if(secondTableEnd){
-
             doc.setFontSize(10)
             doc.text('Palyda', 15, secondTableEnd + 10)
             doc.setFontSize(originalFontSize)
-
             autoTable(doc, {
               head: [
-                ['Palyda'],
+                ['Varads/Pavardė', 'Įmonė'],
               ],
-              body:   visit.clientsGuests.map((el) => [`${el}`]),
+              body: visit.clientsGuests.map((el) => [
+                el.guestName,
+                el.companyName,
+              ]),
+              columns: [
+                { header: 'Vardas/Pavardė', dataKey: 'name' },
+                { header: 'Įmonė', dataKey: 'company' },
+              ],
               startY: secondTableEnd + 15,
+              styles: {font: 'Arial'},
             })
           }
         }

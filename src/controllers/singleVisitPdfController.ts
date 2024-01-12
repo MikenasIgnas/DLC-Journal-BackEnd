@@ -128,6 +128,8 @@ export default async (req: Request, res: Response) => {
       if(visit?.visitCollocation && Object.keys(visit?.visitCollocation).length !== 0){
         const firstTableEnd = doc?.lastAutoTable?.finalY
         if(firstTableEnd){
+          doc.addFont('src/Fonts/arial.ttf', 'Arial', 'bold')
+          doc.setFont('Arial', 'bold')
           doc.setFontSize(10)
           doc.text('Kolokacijos', 15, firstTableEnd + 10)
           doc.setFontSize(originalFontSize)
@@ -137,6 +139,7 @@ export default async (req: Request, res: Response) => {
             ],
             body:   Object.entries(visit?.visitCollocation).map(([key, value]) => [key, value]),
             startY: firstTableEnd + 15,
+            styles: {font: 'Arial'},
           })
         }
       }
@@ -148,10 +151,19 @@ export default async (req: Request, res: Response) => {
           doc.setFontSize(originalFontSize)
           autoTable(doc, {
             head: [
-              ['Palyda'],
+              ['Varads/Pavardė', 'Įmonė'],
             ],
-            body:   visit.clientsGuests.map((el) => [`${el}`]),
-            startY: secondTableEnd + 15,
+            body: visit.clientsGuests.map((el) => [
+              el.guestName,
+              el.companyName,
+            ]),
+            columns: [
+              { header: 'Vardas/Pavardė', dataKey: 'name' },
+              { header: 'Įmonė', dataKey: 'company' },
+            ],
+            startY:       secondTableEnd + 15,
+            styles:       {font: 'Arial'},
+            columnStyles: { premise: {cellWidth: 50}},
           })
         }
       }
