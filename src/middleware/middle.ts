@@ -32,7 +32,19 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 export const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const id = await getLoggedInUserId(req)
   const user = await UserSchema.findById({ _id: id })
-  if (user?.isAdmin) {
+  if (user && user.isAdmin) {
+    next()
+  } else {
+    return res.status(401).json({ message: 'Unauthorized' })
+  }
+}
+
+export const verifyNonSecurity = async (req: Request, res: Response, next: NextFunction) => {
+  const id = await getLoggedInUserId(req)
+
+  const user = await UserSchema.findById({ _id: id })
+
+  if (user && !user.isSecurity) {
     next()
   } else {
     return res.status(401).json({ message: 'Unauthorized' })
