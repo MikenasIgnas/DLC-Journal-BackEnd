@@ -20,11 +20,11 @@ interface CreateUserBody {
 export default async (req: TypedRequestBody<CreateUserBody>, res: Response) => {
   try {
     const { email, password, name, isAdmin, isSecurity, username } = req.body
-    
+
     if (!(email && password && name && username)) {
       return res.status(400).json({ messsage: 'All fields required' })
     }
-    
+
     if (isSecurity && isAdmin) {
       return res.status(400).json({ messsage: 'Security cant be admin' })
     }

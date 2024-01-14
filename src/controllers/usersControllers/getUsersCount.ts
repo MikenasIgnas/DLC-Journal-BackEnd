@@ -1,11 +1,11 @@
 import {
   Response,
-  Request
-}                           from 'express';
+  Request,
+}                           from 'express'
 
-import UserSchema           from '../../shemas/UserSchema.js';
+import UserSchema           from '../../shemas/UserSchema.js'
 
-import getUserFilterParams  from './getUserFilterParams.js';
+import getUserFilterParams  from './getUserFilterParams.js'
 
 
 export default async (req: Request, res: Response) => {

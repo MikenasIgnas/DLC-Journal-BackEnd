@@ -15,12 +15,12 @@ export type Employees = {
   lastName:       string
   occupation:     string
   employeeId:     number | undefined
-  permissions:    string[];
-  employeePhoto?: string;
-  email?:         string;
-  phoneNr?:       string;
-  birthday?:      string;
-  notes?:         string;
+  permissions:    string[]
+  employeePhoto?: string
+  email?:         string
+  phoneNr?:       string
+  birthday?:      string
+  notes?:         string
 }
 
 export type VisitStatus = 'success' | 'processing' | 'error' | 'default' | 'warning' | undefined
@@ -31,87 +31,100 @@ export type CollocationType = {
 }
 
 export type VisitorsType = {
-  idType?:            string | null | undefined;
-  signature?:         string | undefined;
-  selectedVisitor:    Employees
+  idType?:         string | null | undefined
+  signature?:      string | undefined
+  selectedVisitor: Employees
 };
 
+export type ClientsGuestsType = {
+  guestName:    string
+  companyName:  string
+}
+
 export type VisitsType = {
-  id:                 number;
-  visitPurpose:       string[];
+  id:                 number
+  visitPurpose:       string[]
   visitStatus:        VisitStatus
-  visitors:           VisitorsType[];
-  dlcEmployees:       string;
-  visitAddress:       string;
-  visitingClient:     string;
-  clientsGuests:      string[];
-  carPlates:          string[];
-  signature:          string;
+  visitors:           VisitorsType[]
+  dlcEmployees:       string
+  visitAddress:       string
+  visitingClient:     string
+  clientsGuests:      ClientsGuestsType[]
+  carPlates:          string[]
+  signature:          string
   visitCollocation:   CollocationType
-  visitorsIdType:     string;
-  creationDate:       string;
-  creationTime:       string;
-  startDate:          string;
-  startTime:          string;
-  endDate:            string;
-  endTime:            string;
-  companyId:          number;
-  scheduledVisitTime: string | undefined;
+  visitorsIdType:     string
+  creationDate:       string
+  creationTime:       string
+  startDate:          string
+  startTime:          string
+  endDate:            string
+  endTime:            string
+  companyId:          number
+  scheduledVisitTime: string | undefined
 }
 
 export type HistoryDataType = {
-  startDate:          string;
-  startTime:          string;
-  endDate:            string;
-  endTime:            string;
-  routeNumber:        number | undefined;
-  id:                 number;
-  userName:           string;
-  problemCount:       number;
-  pageID:             number;
-  _id:                string;
-  secret:             string;
-  userRole:           string;
+  startDate:    string
+  startTime:    string
+  endDate:      string
+  endTime:      string
+  routeNumber:  number | undefined
+  id:           number
+  userName:     string
+  problemCount: number
+  pageID:       number
+  _id:          string
+  secret:       string
+  userRole:     string
   filledData: {
     values: {
       [key: string]: {
         [key: string]: boolean
         }[]
     },
-    pageID:           number;
-    routeNumber:      number;
+    pageID:           number
+    routeNumber:      number
   }[]
   values: {
       [key: string]: {
-        [key: string]: boolean;
+        [key: string]: boolean
       }[],
     },
 
 };
 
 export type RouteType = {
-  id:                 number;
-  routenumber:        number;
-  floor:              string;
-  title:              string;
+  id:          number
+  routenumber: number
+  floor:       string
+  title:       string
 };
 
 export type AreaType = {
-  id:                 number;
-  routesId:           number;
-  areaNumber:         string;
-  roomName:           string;
+  id:         number
+  routesId:   number
+  areaNumber: string
+  roomName:   string
 };
 
 export type TodoType = {
-  areasId:            number
-  duty:               string
-  id:                 number
+  areasId: number
+  duty:    string
+  id:      number
 };
 
 export type PossibleProblemsType = {
-  id:                 number
-  todoId:             number
-  possibleProblem:    string
-  reaction:           string
+  id:              number
+  todoId:          number
+  possibleProblem: string
+  reaction:        string
+}
+
+export interface PremiseDutyDetails {
+  id:              number
+  roomName:        string
+  duty:            string
+  possibleProblem: string
+  reaction:        string
 }

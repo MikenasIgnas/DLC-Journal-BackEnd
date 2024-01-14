@@ -1,15 +1,12 @@
-import bodyparser from 'body-parser'
-import cors from 'cors'
-import express from 'express'
-import mongoose from 'mongoose'
+import bodyparser  from 'body-parser'
+import cors        from 'cors'
+import express     from 'express'
+import mongoose    from 'mongoose'
 
-import authRouter from './routes/authRoutes'
-import mainRouter from './routes/router'
+import authRouter  from './routes/authRoutes'
+import mainRouter  from './routes/router'
 import usersRouter from './routes/userRoutes'
 
-// needs fixing
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config()
 
 mongoose.connect(process.env.MONGO_PATH)
   .then(() => {

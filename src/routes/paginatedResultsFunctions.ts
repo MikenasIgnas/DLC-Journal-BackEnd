@@ -137,48 +137,51 @@ const paginatedVisitsResults = (model: any, collection: any) => {
                 }
               }
             }
-          };
-        
-        }
-          const allDocuments = await dbCollection.find().toArray();
-          const filteredDocuments = allDocuments.filter((item: any) =>
-            filterFunction(item, filterOption)
-          );
-          query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } }).sort({id: -1});
-        }else if (selectFilter !== undefined) {
-          const filterFunction = (item: any) => {
-              for (const key in item) {
-                  if (key === 'signature') {
-                      continue;
-                  }
-                  if (typeof item[key] === 'string' && item[key].toLowerCase() === selectFilter.toLowerCase()) {
-                      return true;
-                  }
-              }
-              return false;
-          };
-      
-          const allDocuments = await dbCollection.find().toArray();
-          const filteredDocuments = allDocuments.filter(filterFunction);
-          query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) }}).sort({id: -1});
-        }else if( tableSorter !== undefined){
-          if(tableSorter === 'asc'){
-          query = dbCollection.find().sort({id: 1})
-          }else{
-          query = dbCollection.find().sort({id: -1})
+            return false
           }
-        }else {
-        query = dbCollection.find().sort({id: -1})
         }
 
-        results.results = await query.skip(startIndex).limit(limit).toArray()
-        res.paginatedResults = results
-        next()
-      } catch (e: any) {
-      res.status(500).json({ message: e.message })
+        const allDocuments = await dbCollection.find().toArray()
+        const filteredDocuments = allDocuments.filter((item: any) =>
+          filterFunction(item, filterOption)
+        )
+
+        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } })
+      }else if (selectFilter !== undefined) {
+        const filterFunction = (item: any) => {
+          for (const key in item) {
+            if (key === 'signature') {
+              continue
+            }
+            if (typeof item[key] === 'string' && item[key].toLowerCase() === selectFilter.toLowerCase()) {
+              return true
+            }
+          }
+          return false
+        }
+
+        const allDocuments = await dbCollection.find().toArray()
+        const filteredDocuments = allDocuments.filter(filterFunction)
+        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } })
+      }else if( tableSorter !== undefined){
+        if(tableSorter === 'asc'){
+          query = dbCollection.find().sort({id: 1})
+        }else{
+          query = dbCollection.find().sort({id: -1})
+        }
+      }else {
+        query = dbCollection.find().sort({id: -1})
       }
+
+      results.results = await query.skip(startIndex).limit(limit).toArray()
+      res.paginatedResults = results
+      next()
+    } catch (e: any) {
+      res.status(500).json({ message: e.message })
     }
   }
+}
+
 
 
 export {paginatedResults, paginatedVisitsResults}

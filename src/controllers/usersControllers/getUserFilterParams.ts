@@ -1,6 +1,6 @@
-import { requestQuery } from "../../types"
+import { requestQuery } from '../../types'
 
-import { UsersFilters } from "./types"
+import { UsersFilters } from './types'
 
 interface Params {
   isAdmin?:    requestQuery
@@ -27,9 +27,9 @@ export default ({ isAdmin, isDisabled, isSecurity, search }: Params) => {
 
   if (search) {
     params.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { email: { $regex: search, $options: "i" } },
-      { username: { $regex: search, $options: "i" } }
+      { name: { $regex: search, $options: 'i' } },
+      { email: { $regex: search, $options: 'i' } },
+      { username: { $regex: search, $options: 'i' } },
     ]
   }
 
