@@ -1,3 +1,5 @@
+// fuck it, vistiek bus ištrinta
+
 const MongoClient =         require('mongodb').MongoClient
 require('dotenv').config()
 const client =              new MongoClient(process.env.MONGO_PATH)
