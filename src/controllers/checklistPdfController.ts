@@ -2,11 +2,9 @@ import {
   Request,
   Response,
 }                      from 'express'
-
 import { jsPDF }       from 'jspdf'
-import { MongoClient } from 'mongodb'
 import { RowInput }    from 'jspdf-autotable'
-
+import { MongoClient } from 'mongodb'
 import autoTable       from 'jspdf-autotable'
 import fs              from 'fs'
 

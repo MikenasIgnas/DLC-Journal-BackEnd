@@ -2,13 +2,12 @@ import {
   Request,
   Response,
 }                      from 'express'
-
 import { MongoClient } from 'mongodb'
-import { VisitsType }  from '../types'
-
-import jsPDF           from 'jspdf'
 import autoTable       from 'jspdf-autotable'
 import fs              from 'fs'
+import jsPDF           from 'jspdf'
+
+import { VisitsType }  from '../types'
 
 const client = new MongoClient(process.env.MONGO_PATH)
 
