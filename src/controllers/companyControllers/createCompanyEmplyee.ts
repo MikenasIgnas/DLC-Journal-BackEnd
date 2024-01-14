@@ -34,8 +34,9 @@ export default async (req: TypedRequestBody<CreateCompanyEmployeeBody>, res: Res
       occupation,
       permissions,
       phone,
-      photo,
     } = req.body
+
+    const photo = req.file?.path
 
     if (!(
       birthday &&

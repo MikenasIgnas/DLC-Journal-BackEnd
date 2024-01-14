@@ -5,6 +5,8 @@ import {
 
 import { getPagination } from '../../helpers.js'
 import CompanySchema     from '../../shemas/CompanySchema.js'
+import getArrayPhotos    from '../../utility/getArrayPhotos.js'
+import getSinglePhoto    from '../../utility/getSinglePhoto.js'
 
 
 export default async (req: Request, res: Response) => {
@@ -13,6 +15,8 @@ export default async (req: Request, res: Response) => {
 
     if (id) {
       const company = await CompanySchema.findById({ _id: id })
+
+      getSinglePhoto(company)
 
       return res.status(200).json(company)
     } else {
@@ -25,6 +29,8 @@ export default async (req: Request, res: Response) => {
       } else {
         companies = await CompanySchema.find({ name }).limit(parsedLimit).skip(skip)
       }
+
+      getArrayPhotos(companies)
 
       return res.status(200).json(companies)
     }

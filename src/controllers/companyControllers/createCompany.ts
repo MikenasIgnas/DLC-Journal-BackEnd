@@ -8,16 +8,17 @@ interface CreateCompanyBody {
   description: string
   isDisabled?: boolean
   name:        string
-  photo?:      string
-  racks:       ObjectId[]
+  racks?:      ObjectId[]
 }
 
 
 export default async (req: TypedRequestBody<CreateCompanyBody>, res: Response) => {
   try {
-    const { description, isDisabled, name, photo, racks } = req.body
+    const { description, isDisabled, name, racks } = req.body
 
-    if (!(description && name && racks)) {
+    const photo = req.file?.path
+
+    if (!(description && name)) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
@@ -26,7 +27,13 @@ export default async (req: TypedRequestBody<CreateCompanyBody>, res: Response) =
     if (exists) {
       return res.status(409).json({ message: 'Company Already Exist.' })
     } else {
-      const instance = new CompanySchema({ description, isDisabled, name, photo, racks })
+      const instance = new CompanySchema({
+        description,
+        isDisabled,
+        name,
+        photo,
+        racks: racks ? racks : [],
+      })
 
       await instance.save()
 

@@ -17,7 +17,6 @@ interface EditCompanyEmployeeBody {
   occupation:  string
   permissions: ObjectId[],
   phone:       string
-  photo:       string
 }
 
 
@@ -34,21 +33,15 @@ export default async (req: TypedRequestBody<EditCompanyEmployeeBody>, res: Respo
       occupation,
       permissions,
       phone,
-      photo,
     } = req.body
 
-    if (!(
-      birthday &&
-      name &&
-      companyId &&
-      id &&
-      email &&
-      lastname &&
-      occupation &&
-      permissions &&
-      phone &&
-      photo
-    )) {
+    let photo: string | undefined
+
+    if (req.file) {
+      photo = req.file?.path
+    }
+
+    if (!id) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 

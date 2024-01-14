@@ -128,3 +128,7 @@ export interface PremiseDutyDetails {
   possibleProblem: string
   reaction:        string
 }
+
+export interface IncludesPhoto {
+  photo?: string
+}

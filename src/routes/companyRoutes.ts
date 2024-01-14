@@ -1,6 +1,10 @@
 import { Router }            from 'express'
 
-import { verifyAdmin, verifyToken }       from '../middleware/middle'
+import {
+  verifyAdmin,
+  verifyToken,
+}                            from '../middleware/middle'
+import { upload }            from '../utility/uploadPhoto'
 import createCompany         from '../controllers/companyControllers/createCompany'
 import createCompanyEmplyee  from '../controllers/companyControllers/createCompanyEmplyee'
 import createPermission      from '../controllers/companyControllers/createPermission'
@@ -22,14 +26,20 @@ router.put('/permission', verifyToken, verifyAdmin, editPermission)
 router.delete('/permission', verifyToken, verifyAdmin, deletePermission)
 router.get('/permission', verifyToken, getPermission)
 
-router.post('/company', verifyToken, verifyAdmin, createCompany)
-router.put('/company', verifyToken, verifyAdmin, editCompany)
+router.post('/company', verifyToken, verifyAdmin, upload.single('photo'), createCompany)
+router.put('/company', verifyToken, verifyAdmin, upload.single('photo'), editCompany)
 router.delete('/company', verifyToken, verifyAdmin, deleteCompany)
 router.get('/company', verifyToken, getCompany)
 
-router.post('/companyEmployee', verifyToken, verifyAdmin, createCompanyEmplyee)
+router.post(
+  '/companyEmployee',
+  verifyToken,
+  verifyAdmin,
+  upload.single('photo'),
+  createCompanyEmplyee
+)
 router.delete('/CompanyEmployee', verifyToken, verifyAdmin, deleteCompanyEmployee)
-router.put('/CompanyEmployee', verifyToken, verifyAdmin, editCompanyEmployee)
+router.put('/CompanyEmployee', verifyToken, verifyAdmin,upload.single('photo'), editCompanyEmployee)
 router.get('/CompanyEmployee', verifyToken, getCompanyEmployee)
 
 export default router
