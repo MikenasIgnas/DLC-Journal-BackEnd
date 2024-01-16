@@ -1,12 +1,15 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      MONGO_PATH:         string
-      TOKEN_KEY:          string
-      SMTP_ADDRESS:       string
-      SMTP_PORT:          number
-      SENDER_ADDRESS:     string
-      RECIPIENT_ADDRESS:  string
+      MONGO_PATH:           string
+      TOKEN_KEY:            string
+      SMTP_ADDRESS:         string
+      SMTP_PORT:            number
+      SENDER_ADDRESS:       string
+      RECIPIENT_ADDRESS:    string
+      CARBON_COPY_ADDRESS:  string
+      CORS_ORIGIN:          string
+      SERVER_PORT:          string
     }
   }
 }

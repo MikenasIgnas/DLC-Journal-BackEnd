@@ -81,7 +81,7 @@ import checklistPdfController         from '../controllers/checklistPdfControlle
 import FilledChecklistData            from '../shemas/FilledChecklistData'
 import multipleVisitPdfController     from '../controllers/multipleVisitPdfController'
 import singleCollocationCsvController from '../controllers/singleCollocationCsvController'
-import singleVisitPdfController       from'../controllers/singleVisitPdfController'
+import singleVisitPdfController       from '../controllers/singleVisitPdfController'
 import VisitsData                     from '../shemas/VisitsSchema'
 
 import {
@@ -194,7 +194,7 @@ router.get(
   '/visitsData',
   verifyToken,
   paginatedVisitsResults(VisitsData, 'visits'),
-  async(req, res) => { res.json(res.paginatedResults.results) }
+  async (req, res) => { res.json(res.paginatedResults.results) }
 )
 
 
