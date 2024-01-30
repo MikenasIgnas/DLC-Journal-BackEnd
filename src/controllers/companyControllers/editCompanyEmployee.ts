@@ -17,6 +17,7 @@ interface EditCompanyEmployeeBody {
   occupation:  string
   permissions: ObjectId[],
   phone:       string
+  note?:       string
 }
 
 
@@ -33,6 +34,7 @@ export default async (req: TypedRequestBody<EditCompanyEmployeeBody>, res: Respo
       occupation,
       permissions,
       phone,
+      note,
     } = req.body
 
     let photo: string | undefined
@@ -74,6 +76,7 @@ export default async (req: TypedRequestBody<EditCompanyEmployeeBody>, res: Respo
         permissions,
         phone,
         photo,
+        note,
       },
       { new: true }
     )

@@ -19,6 +19,7 @@ interface CreateCompanyEmployeeBody {
   permissions: ObjectId[],
   phone:       string
   photo:       string
+  note:        string
 }
 
 
@@ -34,6 +35,7 @@ export default async (req: TypedRequestBody<CreateCompanyEmployeeBody>, res: Res
       occupation,
       permissions,
       phone,
+      note,
     } = req.body
 
     const photo = req.file?.path
@@ -46,8 +48,7 @@ export default async (req: TypedRequestBody<CreateCompanyEmployeeBody>, res: Res
       lastname &&
       occupation &&
       permissions &&
-      phone &&
-      photo
+      phone
     )) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
@@ -85,6 +86,7 @@ export default async (req: TypedRequestBody<CreateCompanyEmployeeBody>, res: Res
       permissions,
       phone,
       photo,
+      note,
     })
 
     await instance.save()

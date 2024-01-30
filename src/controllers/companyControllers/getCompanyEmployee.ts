@@ -6,12 +6,24 @@ import {
 import { getPagination }     from '../../helpers.js'
 import CompanyEmployeeSchema from '../../shemas/CompanyEmployeeSchema.js'
 import getArrayPhotos        from '../../utility/getArrayPhotos.js'
+import getSearchFilters      from '../../utility/getSearchFilters.js'
 import getSinglePhoto        from '../../utility/getSinglePhoto.js'
 
 
 export default async (req: Request, res: Response) => {
   try {
-    const { name, id, page, limit } = req.query
+    const {
+      companyId,
+      email,
+      id,
+      isDisabled,
+      lastname,
+      limit,
+      name,
+      occupation,
+      page,
+      phone,
+    } = req.query
 
     if (id) {
       const employee = await CompanyEmployeeSchema.findById({ _id: id })
@@ -22,13 +34,17 @@ export default async (req: Request, res: Response) => {
     } else {
       const { parsedLimit, skip } = getPagination(page, limit)
 
-      let employees
+      const params = getSearchFilters({
+        companyId,
+        name,
+        isDisabled,
+        email,
+        lastname,
+        occupation,
+        phone,
+      })
 
-      if (!name) {
-        employees = await CompanyEmployeeSchema.find().limit(parsedLimit).skip(skip)
-      } else {
-        employees = await CompanyEmployeeSchema.find({ name }).limit(parsedLimit).skip(skip)
-      }
+      const employees = await CompanyEmployeeSchema.find(params).limit(parsedLimit).skip(skip)
 
       getArrayPhotos(employees)
 
