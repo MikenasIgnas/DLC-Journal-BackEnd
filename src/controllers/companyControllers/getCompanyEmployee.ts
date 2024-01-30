@@ -11,7 +11,7 @@ import getSinglePhoto        from '../../utility/getSinglePhoto.js'
 
 export default async (req: Request, res: Response) => {
   try {
-    const { name, id, page, limit } = req.query
+    const { name, id, companyId, page, limit } = req.query
 
     if (id) {
       const employee = await CompanyEmployeeSchema.findById({ _id: id })
@@ -25,7 +25,7 @@ export default async (req: Request, res: Response) => {
       let employees
 
       if (!name) {
-        employees = await CompanyEmployeeSchema.find().limit(parsedLimit).skip(skip)
+        employees = await CompanyEmployeeSchema.find({ companyId }).limit(parsedLimit).skip(skip)
       } else {
         employees = await CompanyEmployeeSchema.find({ name }).limit(parsedLimit).skip(skip)
       }

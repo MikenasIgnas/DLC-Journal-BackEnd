@@ -13,8 +13,9 @@ const CompanyEmployee = new Schema({
   phone:       { type: String, required: true },
   email:       { type: String, required: true },
   companyId:   { type: Types.ObjectId, required: true },
-  photo:       { type: String, required: true },
+  photo:       { type: String, required: false },
   permissions: [{ type: Types.ObjectId, required: true }],
+  note:        { type: String, required: false },
 })
 
 export default model('CompanyEmployee', CompanyEmployee)
