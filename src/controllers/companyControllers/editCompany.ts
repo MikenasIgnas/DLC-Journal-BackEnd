@@ -9,13 +9,14 @@ interface EditCompanyBody {
   id:           ObjectId
   isDisabled?:  boolean
   name?:        string
+  parentId?:    ObjectId | 'null'
   racks?:       ObjectId[]
 }
 
 
 export default async (req: TypedRequestBody<EditCompanyBody>, res: Response) => {
   try {
-    const { description, id, isDisabled, name, racks } = req.body
+    const { description, id, isDisabled, parentId, name, racks } = req.body
 
     let photo: string | undefined
 
@@ -33,8 +34,10 @@ export default async (req: TypedRequestBody<EditCompanyBody>, res: Response) => 
         description,
         isDisabled,
         name,
+        parentId: parentId !== 'null' ? parentId : undefined,
         photo,
         racks,
+        $unset:   parentId === 'null' ? { parentId: 1 } : {},
       },
       { new: true }
     )

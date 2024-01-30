@@ -9,6 +9,7 @@ const Company = new Schema({
   isDisabled:  { type: Boolean, required: false },
   photo:       { type: String },
   name:        { type: String, required: true },
+  parentId:    { type: Types.ObjectId, required: false },
   racks:       [{ type: Types.ObjectId, required: true }],
 })
 

@@ -1,29 +1,33 @@
 import { isNonExistant } from '../typeChecks'
-import { requestQuery }  from '../types'
+import { RequestQuery }  from '../types'
 
 interface ReturnParams {
-  $or: SearchParam[]
+  $or?:        SearchParam[]
+  [x: string]: RequestQuery
 }
 
 interface SearchParam {
   [x: string]: {
     $options: string
-    $regex:   requestQuery
+    $regex:   RequestQuery
   }
 }
 
 
-export default (params: Record<string, requestQuery>) => {
-  const otherparams: ReturnParams = {
-    '$or': [],
-  }
+export default (params: Record<string, RequestQuery>) => {
+  const parsedParams: ReturnParams = {}
 
+  const $or: SearchParam[] = []
 
   Object.entries(params).map(([key, value]) => {
     if (!isNonExistant(value)) {
-      otherparams.$or.push({ [key]: { $regex: value, $options: 'i' } })
+      $or.push({ [key]: { $regex: value, $options: 'i' } })
     }
   })
 
-  return otherparams
+  if ($or.length > 0) {
+    parsedParams.$or = $or
+  }
+
+  return parsedParams
 }
