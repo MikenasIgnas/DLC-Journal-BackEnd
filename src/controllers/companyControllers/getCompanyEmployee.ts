@@ -4,6 +4,7 @@ import {
 }                            from 'express'
 
 import { getPagination }     from '../../helpers.js'
+import { isNonExistant }     from '../../typeChecks.js'
 import CompanyEmployeeSchema from '../../shemas/CompanyEmployeeSchema.js'
 import getArrayPhotos        from '../../utility/getArrayPhotos.js'
 import getSearchFilters      from '../../utility/getSearchFilters.js'
@@ -35,14 +36,20 @@ export default async (req: Request, res: Response) => {
       const { parsedLimit, skip } = getPagination(page, limit)
 
       const params = getSearchFilters({
-        companyId,
         name,
-        isDisabled,
         email,
         lastname,
         occupation,
         phone,
       })
+
+      if (!isNonExistant(isDisabled)) {
+        params.isDisabled = isDisabled
+      }
+
+      if (!isNonExistant(companyId)) {
+        params.comanyId = companyId
+      }
 
       const employees = await CompanyEmployeeSchema.find(params).limit(parsedLimit).skip(skip)
 
