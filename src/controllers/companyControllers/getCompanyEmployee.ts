@@ -48,7 +48,7 @@ export default async (req: Request, res: Response) => {
       }
 
       if (!isNonExistant(companyId)) {
-        params.comanyId = companyId
+        params.companyId = companyId
       }
 
       const employees = await CompanyEmployeeSchema.find(params).limit(parsedLimit).skip(skip)
