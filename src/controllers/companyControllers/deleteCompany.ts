@@ -25,7 +25,7 @@ export default async (req: TypedRequestBody<DeleteCompanyBody>, res: Response) =
     for (let index = 0; index < employees.length; index++) {
       const element = employees[index]
 
-      CompanyEmployeeSchema.findByIdAndDelete({ _id: element.id })
+      await CompanyEmployeeSchema.findByIdAndDelete(element._id)
     }
 
     return res.status(200).json({ message: 'Delete success' })

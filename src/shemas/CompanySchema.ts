@@ -5,7 +5,7 @@ import {
 } from 'mongoose'
 
 const Company = new Schema({
-  description: { type: String, required: true },
+  description: { type: String, required: false },
   isDisabled:  { type: Boolean, required: false },
   photo:       { type: String },
   name:        { type: String, required: true },

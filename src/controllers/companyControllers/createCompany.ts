@@ -5,11 +5,11 @@ import { TypedRequestBody } from '../../types.js'
 import CompanySchema        from '../../shemas/CompanySchema.js'
 
 interface CreateCompanyBody {
-  description: string
-  isDisabled?: boolean
-  name:        string
-  parentId?:   ObjectId
-  racks?:      ObjectId[]
+  description?: string
+  isDisabled?:  boolean
+  name:         string
+  parentId?:    ObjectId
+  racks?:       ObjectId[]
 }
 
 
@@ -19,7 +19,7 @@ export default async (req: TypedRequestBody<CreateCompanyBody>, res: Response) =
 
     const photo = req.file?.path
 
-    if (!(description && name)) {
+    if (!name) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
@@ -29,12 +29,12 @@ export default async (req: TypedRequestBody<CreateCompanyBody>, res: Response) =
       return res.status(409).json({ message: 'Company Already Exist.' })
     } else {
       const instance = new CompanySchema({
-        description,
+        description: description ? description : '',
         isDisabled,
         name,
         photo,
         parentId,
-        racks: racks ? racks : [],
+        racks:       racks ? racks : [],
       })
 
       await instance.save()
