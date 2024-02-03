@@ -1,11 +1,12 @@
-import bodyparser  from 'body-parser'
-import cors        from 'cors'
-import express     from 'express'
-import mongoose    from 'mongoose'
+import bodyparser    from 'body-parser'
+import cors          from 'cors'
+import express       from 'express'
+import mongoose      from 'mongoose'
 
-import authRouter  from './routes/authRoutes'
-import mainRouter  from './routes/router'
-import usersRouter from './routes/userRoutes'
+import authRouter    from './routes/authRoutes'
+import companyRoutes from './routes/companyRoutes'
+import mainRouter    from './routes/router'
+import usersRouter   from './routes/userRoutes'
 
 
 mongoose.connect(process.env.MONGO_PATH)
@@ -30,4 +31,5 @@ app.listen(4002)
 
 app.use('/', mainRouter)
 app.use('/auth', authRouter)
+app.use('/company', companyRoutes)
 app.use('/user', usersRouter)

@@ -1,12 +1,12 @@
-import { requestQuery } from '../../types'
+import { RequestQuery } from '../../types'
 
 import { UsersFilters } from './types'
 
 interface Params {
-  isAdmin?:    requestQuery
-  isDisabled?: requestQuery
-  isSecurity?: requestQuery
-  search?:     requestQuery
+  isAdmin?:    RequestQuery
+  isDisabled?: RequestQuery
+  isSecurity?: RequestQuery
+  search?:     RequestQuery
 }
 
 
