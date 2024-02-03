@@ -19,24 +19,19 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
-    await SiteSchema.findByIdAndDelete({ _id: id })
+    await SiteSchema.findByIdAndDelete(id)
 
     const premises = await PremiseSchema.find({ siteId: id })
 
     for (let index = 0; index < premises.length; index++) {
-      const premise = premises[index]
+      const premiseId = premises[index]._id
 
-      const racks = await RackSchema.find({ premiseId: premise.id })
+      const racks = await RackSchema.find({ premiseId })
 
-      await premise.delete()
-      await premise.save()
+      await PremiseSchema.findByIdAndDelete(premiseId)
 
       for (let index = 0; index < racks.length; index++) {
-        const rack = racks[index]
-
-        await rack.delete()
-
-        await rack.save()
+        await RackSchema.findByIdAndDelete(racks[index]._id)
       }
     }
 
