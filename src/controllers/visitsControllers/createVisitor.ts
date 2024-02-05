@@ -5,7 +5,6 @@ import { TypedRequestBody } from '../../types.js'
 import VisitorSchema        from '../../shemas/VisitorSchema.js'
 
 interface Body {
-  dlcEmployee: ObjectId
   employeeId:  ObjectId
   visitId:     ObjectId
 }
@@ -13,14 +12,13 @@ interface Body {
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
-    const { dlcEmployee, employeeId, visitId } = req.body
+    const { employeeId, visitId } = req.body
 
-    if (!(dlcEmployee && employeeId && visitId)) {
+    if (!(employeeId && visitId)) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
     const instance = new VisitorSchema({
-      dlcEmployee,
       employeeId,
       visitId,
     })

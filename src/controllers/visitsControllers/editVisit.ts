@@ -14,7 +14,6 @@ interface Body {
   permissions:         ObjectId[]
   racks:               ObjectId[]
   scheduledVisitTime?: Date
-  signature?:          string // file?
   visitorIdType:       ObjectId
 }
 

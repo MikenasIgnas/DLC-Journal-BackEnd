@@ -2,33 +2,29 @@ import { Response }         from 'express'
 import { ObjectId }         from 'mongoose'
 
 import { TypedRequestBody } from '../../types.js'
-import VisitorSchema        from '../../shemas/VisitorSchema.js'
+import VisitPurposeSchema   from '../../shemas/VisitPurposeSchema.js'
 
 interface Body {
-  id:            ObjectId
-  employeeId?:   ObjectId
-  visitId?:      ObjectId
-  visitorIdType: ObjectId
+  id:    ObjectId
+  name?: string
 }
 
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
-    const { id, employeeId, visitId, visitorIdType } = req.body
-
-    const signature = req.file?.path
+    const { id, name } = req.body
 
     if (!id) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
-    const rack = await VisitorSchema.findByIdAndUpdate(
+    const site = await VisitPurposeSchema.findByIdAndUpdate(
       { _id: id },
-      { employeeId, signature, visitId, visitorIdType },
+      { name },
       { new: true }
     )
 
-    return res.status(201).json(rack)
+    return res.status(201).json(site)
   } catch (error) {
     return res.status(500).json({ message: 'Unexpected error' })
   }

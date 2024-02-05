@@ -1,9 +1,10 @@
 import { Response }          from 'express'
 import { ObjectId }          from 'mongoose'
 
+import { getLoggedInUserId } from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
 import VisitSchema           from '../../shemas/VisitSchema.js'
-import visitStatusSchema from '../../shemas/visitStatusSchema.js'
+import visitStatusSchema     from '../../shemas/visitStatusSchema.js'
 
 
 interface Body {
@@ -14,6 +15,8 @@ interface Body {
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
+    const dlcEmlpyee = await getLoggedInUserId(req)
+
     const { visitId, statusId } = req.body
 
     if (!visitId && !statusId) {
@@ -35,6 +38,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const visit = await VisitSchema.findByIdAndUpdate(
       { _id: visitId },
       {
+        dlcEmlpyee,
         statusId,
         startDate: Date.now(),
       },

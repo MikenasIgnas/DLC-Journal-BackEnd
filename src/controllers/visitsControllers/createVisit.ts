@@ -1,7 +1,10 @@
 import { Response }          from 'express'
 import { ObjectId }          from 'mongoose'
 
-import { TypedRequestBody }  from '../../types.js'
+import {
+  Guest,
+  TypedRequestBody,
+}                            from '../../types.js'
 import CompanySchema         from '../../shemas/CompanySchema.js'
 import VisitSchema           from '../../shemas/VisitSchema.js'
 
@@ -9,15 +12,15 @@ import VisitSchema           from '../../shemas/VisitSchema.js'
 interface Body {
   carPlates?:         string[]
   companyId:          ObjectId
-  date:               Date
   endDate?:           Date
-  guests?:            string[]
+  guests?:            Guest[]
   permissions:        ObjectId[]
-  racks:              ObjectId[]
+  siteId:             ObjectId
+  racks?:             ObjectId[]
   scheduledVisitTime: Date
   startDate?:         Date
   statusId:           ObjectId
-  visitorIdType?:     ObjectId
+  visitPurpose:       ObjectId[]
 }
 
 
@@ -26,24 +29,25 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const {
       carPlates,
       companyId,
-      date,
-      endDate,
       guests,
       permissions,
       racks,
       scheduledVisitTime,
-      startDate,
+      siteId,
       statusId,
-      visitorIdType,
+      visitPurpose,
     } = req.body
 
-    let signature: string | undefined
-
-    if (req.file) {
-      signature = req.file?.path
-    }
-
-    if (!(companyId && permissions && racks && racks.length > 0 && statusId)) {
+    if (!(
+      companyId &&
+      permissions &&
+      racks &&
+      racks.length > 0 &&
+      statusId &&
+      visitPurpose &&
+      visitPurpose.length > 0 &&
+      siteId
+    )) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
@@ -56,16 +60,13 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const instance = new VisitSchema({
       carPlates,
       companyId,
-      date,
-      endDate,
       guests,
       permissions,
       racks,
       scheduledVisitTime,
-      signature,
-      startDate,
       statusId,
-      visitorIdType,
+      visitPurpose,
+      siteId,
     })
 
     await instance.save()

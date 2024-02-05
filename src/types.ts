@@ -34,7 +34,12 @@ export type VisitorsType = {
   idType?:         string | null | undefined
   signature?:      string | undefined
   selectedVisitor: Employees
-};
+}
+
+export interface Guest {
+  name:     string
+  comapany: string
+}
 
 export type ClientsGuestsType = {
   guestName:    string

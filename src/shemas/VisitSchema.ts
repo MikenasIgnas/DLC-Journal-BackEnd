@@ -6,9 +6,9 @@ import {
 
 const Visit = new Schema({
   companyId:          { type: Types.ObjectId, required: true },
-  signature:          { type: String },
   date:               { type: Date, default: Date.now },
-  guests:             [{ type: String }],
+  dlcEmlpyee:         { type: Types.ObjectId },
+  guests:             [{ type: { name: String, company: String } }],
   carPlates:          [{ type: String }],
   scheduledVisitTime: { type: Date },
   startDate:          { type: Date },
@@ -16,7 +16,8 @@ const Visit = new Schema({
   statusId:           { type: Types.ObjectId },
   racks:              [{ type: Types.ObjectId }],
   permissions:        [{ type: Types.ObjectId }],
-  visitorIdType:      { type: Types.ObjectId },
+  siteId:             { type: Types.ObjectId },
+  visitPurpose:       [{ type: Types.ObjectId }],
 })
 
 export default model('Visit', Visit)
