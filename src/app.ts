@@ -6,6 +6,7 @@ import mongoose      from 'mongoose'
 import authRouter    from './routes/authRoutes'
 import companyRoutes from './routes/companyRoutes'
 import mainRouter    from './routes/router'
+import siteRoutes    from './routes/siteRoutes'
 import usersRouter   from './routes/userRoutes'
 
 
@@ -33,3 +34,4 @@ app.use('/', mainRouter)
 app.use('/auth', authRouter)
 app.use('/company', companyRoutes)
 app.use('/user', usersRouter)
+app.use('/site', siteRoutes)
