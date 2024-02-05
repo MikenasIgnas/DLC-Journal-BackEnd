@@ -2,26 +2,27 @@ import { Response }         from 'express'
 import { ObjectId }         from 'mongoose'
 
 import { TypedRequestBody } from '../../types.js'
-import RackSchema           from '../../shemas/RackSchema.js'
+import VisitorSchema        from '../../shemas/VisitorSchema.js'
 
 interface Body {
   id:         ObjectId
-  name?:      string
-  premiseId?: number
+  dlcEmployee: ObjectId
+  employeeId:  ObjectId
+  visitId:     ObjectId
 }
 
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
-    const { id, name , premiseId } = req.body
+    const { id, dlcEmployee, employeeId, visitId } = req.body
 
     if (!id) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
-    const rack = await RackSchema.findByIdAndUpdate(
+    const rack = await VisitorSchema.findByIdAndUpdate(
       { _id: id },
-      { name, premiseId },
+      { dlcEmployee, employeeId, visitId },
       { new: true }
     )
 
