@@ -13,7 +13,7 @@ interface Body {
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
-    const { id, name , premiseId} = req.body
+    const { id, name, premiseId } = req.body
 
     if (!id) {
       return res.status(400).json({ messsage: 'Bad request' })

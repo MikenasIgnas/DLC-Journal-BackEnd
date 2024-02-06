@@ -23,7 +23,7 @@ export default async (req: Request, res: Response) => {
       const params = getSearchFilters({ name })
 
       if (!isNonExistant(siteId)) {
-        params.siteId
+        params.siteId = siteId
       }
 
       const premises = await PremiseSchema.find(params).limit(parsedLimit).skip(skip)
