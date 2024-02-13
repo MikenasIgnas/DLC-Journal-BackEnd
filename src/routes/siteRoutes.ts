@@ -16,6 +16,7 @@ import editSite      from '../controllers/sitesControllers/editSite'
 import getPremise    from '../controllers/sitesControllers/getPremise'
 import getRack       from '../controllers/sitesControllers/getRack'
 import getSite       from '../controllers/sitesControllers/getSite'
+import getAllSiteData from '../controllers/sitesControllers/getAllSiteData'
 
 
 const router = Router()
@@ -24,6 +25,7 @@ router.post('/site', verifyToken, verifyAdmin, createSite)
 router.put('/site', verifyToken, verifyAdmin, editSite)
 router.delete('/site', verifyToken, verifyAdmin, deleteSite)
 router.get('/site', verifyToken, getSite)
+router.get('/fullSiteData', verifyToken, getAllSiteData)
 
 router.post('/premise', verifyToken, verifyAdmin, createPremise)
 router.put('/premise', verifyToken, verifyAdmin, editPremise)
