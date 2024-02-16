@@ -17,6 +17,7 @@ import editPermission        from '../controllers/companyControllers/editPermiss
 import getCompany            from '../controllers/companyControllers/getCompany'
 import getCompanyEmployee    from '../controllers/companyControllers/getCompanyEmployee'
 import getPermission         from '../controllers/companyControllers/getPermission'
+import getCompanyCount       from '../controllers/companyControllers/getCompanyCount'
 
 
 const router = Router()
@@ -30,6 +31,7 @@ router.post('/company', verifyToken, verifyAdmin, upload.single('photo'), create
 router.put('/company', verifyToken, verifyAdmin, upload.single('photo'), editCompany)
 router.delete('/company', verifyToken, verifyAdmin, deleteCompany)
 router.get('/company', verifyToken, getCompany)
+router.get('/count', verifyToken, getCompanyCount)
 
 router.post(
   '/companyEmployee',
