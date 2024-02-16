@@ -44,6 +44,9 @@ export default async (req: Request, res: Response) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const element: any = sites[index]
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const fullSite: any = {name: element.name, _id: element._id, premises: []}
+
         const premises = await PremiseSchema.find({ siteId: element._id })
 
         element.premises = premises
@@ -51,10 +54,12 @@ export default async (req: Request, res: Response) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const element: any = premises[index]
 
-          element.racks = await RackSchema.find({ premiseId: element._id })
+          const racks = await RackSchema.find({ premiseId: element._id })
+
+          fullSite.premises.push({name: element.name, _id: element._id, racks})
         }
 
-        fullSiteData.push(element)
+        fullSiteData.push(fullSite)
 
       }
 

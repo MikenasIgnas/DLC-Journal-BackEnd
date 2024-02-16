@@ -2,16 +2,16 @@ import {
   Request,
   Response,
 }                        from 'express'
-import { ObjectId }      from 'mongoose'
+// import { ObjectId }      from 'mongoose'
 
 import { getPagination } from '../../helpers.js'
 import { isNonExistant } from '../../typeChecks.js'
 import VisitorSchema     from '../../shemas/VisitorSchema.js'
 
 interface Params {
-  dlcEmployee?: ObjectId
-  employeeId?:  ObjectId
-  visitId?:     ObjectId
+  dlcEmployee?: string
+  employeeId?:  string
+  visitId?:     string
 }
 
 export default async (req: Request, res: Response) => {
@@ -28,15 +28,15 @@ export default async (req: Request, res: Response) => {
       const params: Params = {}
 
       if (!isNonExistant(dlcEmployee)) {
-        params.dlcEmployee
+        params.dlcEmployee = dlcEmployee as string
       }
 
       if (!isNonExistant(employeeId)) {
-        params.dlcEmployee
+        params.employeeId = employeeId as string
       }
 
       if (!isNonExistant(visitId)) {
-        params.dlcEmployee
+        params.visitId = visitId as string
       }
 
       const visitors = await VisitorSchema.find(params).limit(parsedLimit).skip(skip)

@@ -10,17 +10,17 @@ import VisitSchema           from '../../shemas/VisitSchema.js'
 
 
 interface Body {
-  carPlates?:         string[]
-  companyId:          ObjectId
-  endDate?:           Date
-  guests?:            Guest[]
-  permissions:        ObjectId[]
-  siteId:             ObjectId
-  racks?:             ObjectId[]
-  scheduledVisitTime: Date
-  startDate?:         Date
-  statusId:           ObjectId
-  visitPurpose:       ObjectId[]
+  carPlates?:          string[]
+  companyId:           ObjectId
+  endDate?:            Date
+  guests?:             Guest[]
+  permissions:         ObjectId[]
+  siteId:              ObjectId
+  racks?:              ObjectId[]
+  scheduledVisitTime?: Date
+  startDate?:          Date
+  statusId:            ObjectId
+  visitPurpose:        ObjectId[]
 }
 
 
