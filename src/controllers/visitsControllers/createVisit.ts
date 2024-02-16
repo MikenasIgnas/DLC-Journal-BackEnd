@@ -57,10 +57,16 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ messsage: 'Company does not exist' })
     }
 
+    const latestVisit = await VisitSchema.findOne({}, {}, { sort: { 'date': -1 } })
+
+    const id = latestVisit?.id ? ++latestVisit.id : 1
+
+
     const instance = new VisitSchema({
       carPlates,
       companyId,
       guests,
+      id,
       permissions,
       racks,
       scheduledVisitTime,
