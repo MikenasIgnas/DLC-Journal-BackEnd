@@ -36,7 +36,7 @@ router.get('/company', verifyToken, getCompany)
 
 
 router.post('/document', verifyToken, verifyAdmin, upload.single('file'), uploadDocument)
-router.get('/document', verifyToken, verifyAdmin, upload.single('file'), getDocument)
+router.get('/document', verifyToken, verifyAdmin, getDocument)
 router.delete('/document', verifyToken, verifyAdmin, deleteDocument)
 
 router.post(

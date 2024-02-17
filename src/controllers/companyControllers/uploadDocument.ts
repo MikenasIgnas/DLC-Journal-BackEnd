@@ -13,9 +13,7 @@ export default async (req: Request, res: Response) => {
 
     if (id) {
       const company = await CompanySchema.findByIdAndUpdate({ _id: id },
-        {
-          $push: { document: documentPath },
-        },
+        { $push: { document: documentPath } },
         { new: true })
 
       return res.status(200).json(company)

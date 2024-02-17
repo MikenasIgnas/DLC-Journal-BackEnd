@@ -4,11 +4,11 @@ import {
 }                        from 'express'
 
 export default async (req: Request, res: Response) => {
-  const { fileName } = req.query
+  const { filepath } = req.query
   try {
 
-    if (typeof fileName === 'string') {
-      res.download(fileName)
+    if (typeof filepath === 'string') {
+      res.download(filepath)
     }
 
   } catch (error) {

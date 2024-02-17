@@ -1,9 +1,10 @@
 import {
   Request,
   Response,
-}           from 'express'
-import PremiseSchema from '../shemas/PremiseSchema'
-import RackSchema from '../shemas/RackSchema'
+}                     from 'express'
+
+import PremiseSchema  from '../shemas/PremiseSchema'
+import RackSchema     from '../shemas/RackSchema'
 
 
 export default async (req: Request, res: Response) => {
@@ -33,7 +34,6 @@ export default async (req: Request, res: Response) => {
 
     res.status(200).send(csvString)
   } catch (error) {
-    console.error(error)
     res.status(500).json({ message: 'Internal Server Error' })
   }
 }
