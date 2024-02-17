@@ -4,24 +4,20 @@ import {
 }                        from 'express'
 
 import { getPagination } from '../../helpers.js'
+import { NameAndId }     from '../../types.js'
 import getSearchFilters  from '../../utility/getSearchFilters.js'
+import PremiseSchema     from '../../shemas/PremiseSchema.js'
+import RackSchema        from '../../shemas/RackSchema.js'
 import SiteSchema        from '../../shemas/SiteSchema.js'
-import PremiseSchema from '../../shemas/PremiseSchema.js'
-import RackSchema from '../../shemas/RackSchema.js'
 
-
-interface FullSiteData {
-  name: string
-  _id:  string
-  premises?: {
-    _id: string
-    name: string
-    racks?: {
-      name: string
-      _id:  string
-    }[]
-  }[]
+interface PremiseWithRacks extends NameAndId {
+  racks?: NameAndId[]
 }
+
+interface SiteWithPremises extends NameAndId {
+  premises?: PremiseWithRacks[]
+}
+
 
 export default async (req: Request, res: Response) => {
   try {
@@ -36,31 +32,30 @@ export default async (req: Request, res: Response) => {
 
       const params = getSearchFilters({ name })
 
-      const fullSiteData: FullSiteData[] = []
+      const fullSiteData: SiteWithPremises[] = []
 
       const sites = await SiteSchema.find(params).limit(parsedLimit).skip(skip)
 
       for (let index = 0; index < sites.length; index++) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const element: any = sites[index]
+        const element: SiteWithPremises = sites[index]
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fullSite: any = {name: element.name, _id: element._id, premises: []}
+        const fullSite: SiteWithPremises = { name: element.name, _id: element._id, premises: [] }
 
         const premises = await PremiseSchema.find({ siteId: element._id })
 
-        element.premises = premises
+        element.premises = [...premises]
+
         for (let index = 0; index < premises.length; index++) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const element: any = premises[index]
+          const element = premises[index]
 
           const racks = await RackSchema.find({ premiseId: element._id })
 
-          fullSite.premises.push({name: element.name, _id: element._id, racks})
+          if (fullSite.premises) {
+            fullSite.premises.push({ name: element.name, _id: element._id, racks })
+          }
         }
 
         fullSiteData.push(fullSite)
-
       }
 
       return res.status(200).json(fullSiteData)

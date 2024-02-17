@@ -1,4 +1,5 @@
 import { Request }  from 'express'
+import { Types }    from 'mongoose'
 import { ParsedQs } from 'qs'
 
 export type RequestQuery = string | ParsedQs | string[] | ParsedQs[] | undefined
@@ -21,6 +22,11 @@ export type Employees = {
   phoneNr?:       string
   birthday?:      string
   notes?:         string
+}
+
+export interface NameAndId {
+  _id:  Types.ObjectId
+  name: string
 }
 
 export type VisitStatus = 'success' | 'processing' | 'error' | 'default' | 'warning' | undefined
