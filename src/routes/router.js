@@ -13,7 +13,6 @@ import {
   getTotalAreasCount,
   deleteVisit,
   changedUsername,
-  addDeletionData,
   deleteHistoryItem,
   latestHistoryItem,
   updateHistoryItem,
@@ -24,38 +23,10 @@ import {
   deletePhoto,
   postLastestAndCurrentPhotos,
   postLatestPhotos,
-  uploadPhoto,
-  getCompanies,
-  getCompaniesSites,
-  getSingleCompany,
-  getSingleCompaniesEmployees,
   postVisitDetails,
   getVisits,
   getSingleVisit,
   getCollocations,
-  addCompany,
-  addEmployee,
-  getClientsEmployees,
-  getClientsEmployeesCompanyName,
-  uploadCompanysPhoto,
-  deleteCompany,
-  uploadCliesntEmployeesPhoto,
-  updateClientsEmployeesPhoto,
-  deleteClientsEmployee,
-  updateClientsEmployee,
-  updateCompaniesData,
-  addSubClient,
-  deleteCompaniesSubClient,
-  getSubClients,
-  addSubClientsEmployee,
-  getSubClientsEmployees,
-  deleteSubClientsEmployee,
-  getAllMainCompanies,
-  addMainCompanyAsSubClient,
-  changeSubClientToMainClient,
-  getSingleSubClient,
-  // getAllHistoryData,
-  getAllClientsEmployees,
   getSingleClientsCollocations,
   getSpecificDateReport,
   totalVisitsEntries,
@@ -95,15 +66,10 @@ const router = Router()
 router.post('/postChecklistData', verifyToken, postFilledChecklistData)
 router.post('/updateFilledChecklistData', verifyToken, updateFilledChecklistData)
 router.post('/changedUsername/:id', verifyToken, changedUsername)
-router.post('/addDeletionDate/:id', verifyToken, addDeletionData)
 router.post('/updateHistoryItem/:id', verifyToken, updateHistoryItem)
 router.post('/postPhotos', verifyToken, postPhotos)
 router.post('/postLastestAndCurrentPhotos', verifyToken, postLastestAndCurrentPhotos)
 router.post('/postLatestPhotos', verifyToken, postLatestPhotos)
-router.post('/uploadPhoto', uploadPhoto)
-router.post('/uploadCompanysPhoto', uploadCompanysPhoto)
-router.post('/uploadCliesntEmployeesPhoto', uploadCliesntEmployeesPhoto)
-router.post('/updateClientsEmployeesPhoto', updateClientsEmployeesPhoto)
 router.post('/postVisitDetails', verifyToken, postVisitDetails)
 
 router.get('/startVisit', verifyToken, startVisit)
@@ -128,35 +94,12 @@ router.get('/latestPhotos', verifyToken, latestPhotos)
 router.get('/deletePhoto/:photoId', verifyToken, deletePhoto)
 // router.get('/getAllHistoryData', verifyToken, getAllHistoryData)
 
-router.get('/getCompanies', verifyToken, getCompanies)
-router.get('/getCompaniesSites', verifyToken, getCompaniesSites)
 
-router.get('/getSingleCompany', verifyToken, getSingleCompany)
-router.get('/getSingleCompaniesEmployees', verifyToken, getSingleCompaniesEmployees)
 router.get('/getVisits', verifyToken, getVisits)
 router.get('/getSingleVisit', verifyToken, getSingleVisit)
 router.get('/getCollocations', verifyToken, getCollocations)
 router.get('/getSingleClientsCollocations', verifyToken, getSingleClientsCollocations)
-router.get('/getClientsEmployee', verifyToken, getClientsEmployees)
-router.get('/getClientsEmployeesCompanyName/:id', verifyToken, getClientsEmployeesCompanyName)
-router.get('/getAllClientsEmployees', verifyToken, getAllClientsEmployees)
-router.get('/deleteCompany', verifyToken, deleteCompany)
-router.get('/deleteClientsEmployee', verifyToken, deleteClientsEmployee)
-router.get('/deleteCompaniesSubClient', verifyToken, deleteCompaniesSubClient)
-router.get('/getSubClients', verifyToken, getSubClients)
-router.get('/getSingleSubClient', verifyToken, getSingleSubClient)
-router.get('/getSubClientsEmployees', verifyToken, getSubClientsEmployees)
-router.get('/deleteSubClientsEmployee', verifyToken, deleteSubClientsEmployee)
-router.get('/getAllMainCompanies', verifyToken, getAllMainCompanies)
 
-router.post('/addCompany', verifyToken, addCompany)
-router.post('/addEmployee', verifyToken, addEmployee)
-router.post('/updateClientsEmployee', verifyToken, updateClientsEmployee)
-router.post('/updateCompaniesData', verifyToken, updateCompaniesData)
-router.post('/addSubClient', verifyToken, addSubClient)
-router.post('/addSubClientsEmployee', verifyToken, addSubClientsEmployee)
-router.post('/addMainCompanyAsSubClient', verifyToken, addMainCompanyAsSubClient)
-router.get('/changeSubClientToMainClient', verifyToken, changeSubClientToMainClient)
 router.get('/getSpecificDateReport', verifyToken, getSpecificDateReport)
 router.get('/totalVisitsEntries', verifyToken, totalVisitsEntries)
 router.get('/deleteVisitor', verifyToken, deleteVisitor)

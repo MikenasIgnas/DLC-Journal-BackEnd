@@ -2,7 +2,7 @@ import { Request }        from 'express'
 import jwt                from 'jsonwebtoken'
 
 import { DecodedToken }   from './controllers/authControllers/types'
-import { requestQuery }   from './types'
+import { RequestQuery }   from './types'
 
 
 export const getCurrentDate = () => {
@@ -22,7 +22,7 @@ export const getCurrentTime  = () => {
 }
 
 
-export const getPagination = (page?: requestQuery, limit?: requestQuery) => {
+export const getPagination = (page?: RequestQuery, limit?: RequestQuery) => {
   const parsedLimit = typeof limit === 'string' ? parseInt(limit) : undefined
 
   const skip = typeof page === 'string' && typeof limit === 'string' ?

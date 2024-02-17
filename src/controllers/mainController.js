@@ -1,8 +1,5 @@
 import { createTransport }   from 'nodemailer'
-import { diskStorage }       from 'multer'
 import { MongoClient }       from 'mongodb'
-import { unlink }            from 'fs'
-import multer                from 'multer'
 import UserSchema            from '../shemas/UserSchema.js'
 import { findOneAndUpdate }  from '../shemas/FilledChecklistData'
 import {
@@ -128,17 +125,6 @@ export async function changedUsername (req, res) {
     { $set: { userName: username } }
   )
   return sendRes(res, false, 'changeUsernameInHistoryElements', changeUsernameInHistoryElements)
-}
-
-export async function addDeletionData (req, res) {
-  const archivedUsers = client.db('ChecklistDB').collection('archivedusers')
-  const { id } = req.params
-  const dateDeleted = req.body.dateDeleted
-  const updateUsersStatus = await archivedUsers.findOneAndUpdate(
-    { id: Number(id) },
-    { $set: { dateDeleted } }
-  )
-  return sendRes(res, false, 'updateUsersStatus', updateUsersStatus)
 }
 
 export async function deleteHistoryItem (req, res) {
@@ -276,91 +262,6 @@ export async function deletePhoto (req, res) {
   const { photoId } = req.params
   await photos.findOneAndDelete({ photoId })
   res.send({ success: true })
-}
-
-export async function uploadPhoto (req, res) {
-
-  const storage = diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, ('C:/Users/Public/Desktop/DLC-Checklist-main/DLC-Checklist-BackEnd/uploads'))
-    },
-    filename: function (req, file, cb) {
-      cb(null, 'asdasdasd.jpeg')
-    },
-  })
-  const upload = multer({ storage: storage }).single('file')
-
-  upload(req, res, function (err) {
-    if (err) {
-      // Kažkada buvo?
-      // return handleError(err, res)
-    }
-    res.json({ 'status': 'completed' })
-  })
-}
-
-export async function uploadCompanysPhoto (req, res) {
-  const companyIdCounterCollection = client.db('ChecklistDB').collection('companiesIdCounter')
-  const companiesCollection = client.db('ChecklistDB').collection('companies')
-  const companyIdCounter = await companyIdCounterCollection.findOne({ id: 'companyId' })
-  const companyName = req.query.companyName.replace(/\s+/g, '')
-  const filePath = '/var/www/html/CompanyLogos'
-  const companyId = Number(req.query.companyId)
-  const fileName = `${companyName}Logo${companyId ? companyId : companyIdCounter.seq - 1}.jpeg`
-
-  const storage = diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, (filePath))
-    },
-    filename: function (req, file, cb) {
-      cb(null, fileName)
-    },
-  })
-
-  const upload = multer({ storage: storage }).single('file')
-
-  await companiesCollection.findOneAndUpdate(
-    { id: companyId ? companyId : companyIdCounter.seq - 1 },
-    { $set: { 'companyInfo.companyPhoto': `${fileName}` },
-    })
-
-  upload(req, res, function (err) {
-    if (err) {
-      // Kažkada buvo?
-      // return handleError(err, res)
-    }
-    res.json({ 'status': 'completed' })
-  })
-}
-
-export async function getCompanies (req, res) {
-  const companiesCollection = client.db('ChecklistDB').collection('companies')
-  const companies = await companiesCollection.find().toArray()
-  sendRes(res, false, 'Companies', companies)
-}
-
-export async function getCompaniesSites (req, res) {
-  const CompanySitesTableCollection = client.db('ChecklistDB').collection('CompanySitesTable')
-  const companiesSites = await CompanySitesTableCollection.find().toArray()
-  sendRes(res, false, 'CompanySitesTable', companiesSites)
-}
-
-export async function getSingleCompany (req, res) {
-  const companyId = req.query.companyId
-  const companiesCollection = client.db('ChecklistDB').collection('companies')
-  const singleCompany = await companiesCollection.findOne({ id: Number(companyId) })
-  sendRes(res, false, 'singleCompany', singleCompany)
-}
-
-export async function getSingleCompaniesEmployees (req, res) {
-  const companyId = req.query.companyId
-  const companyEmployeesCollection = client.db('ChecklistDB').collection('companyEmployees')
-
-  const companiesEmployees = await companyEmployeesCollection.find({
-    companyId: Number(companyId),
-  }).toArray()
-
-  sendRes(res, false, 'companiesEmployees', companiesEmployees)
 }
 
 export async function postVisitDetails (req, res) {
@@ -510,400 +411,6 @@ export async function getSingleClientsCollocations (req, res) {
   }).toArray()
   sendRes(res, false, 'collocations', collocations)
 }
-
-export async function addCompany (req, res) {
-  const companies = client.db('ChecklistDB').collection('companies')
-  const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter')
-  companiesIdCounter.findOneAndUpdate(
-    { id: 'companyId' },
-    { '$inc': { 'seq': 1 } },
-    { new: true, upsert: true },
-    async (err, cd) => {
-      let seqId
-      if (!cd || !cd.value.seq) {
-        seqId = 1
-      }
-      else {
-        seqId = cd.value.seq
-      }
-      const companyData = {
-        companyInfo: req.body,
-        id:          seqId,
-      }
-      await companies.insertOne(companyData)
-    }
-  )
-  return sendRes(res, false, 'all good', null)
-}
-
-export async function addEmployee (req, res) {
-  const companyEmployees = client.db('ChecklistDB').collection('companyEmployees')
-  const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
-  employeeIdCounter.findOneAndUpdate(
-    { id: 'employeeId' },
-    { '$inc': { 'seq': 1 } },
-    { new: true, upsert: true },
-    async (err, cd) => {
-      let seqId
-      if (!cd || !cd.value.seq) {
-        seqId = 1
-      }
-      else {
-        seqId = cd.value.seq
-      }
-      req.body.employeeId = seqId
-      await companyEmployees.insertOne(req.body)
-    }
-  )
-  return sendRes(res, false, 'all good', null)
-}
-
-export async function getClientsEmployees (req, res) {
-  const companyEmployees = client.db('ChecklistDB').collection('companyEmployees')
-  const companyId = Number(req.query.companyId)
-  const employeeId = Number(req.query.employeeId)
-  const employee = await companyEmployees.findOne({ companyId: companyId, employeeId: employeeId })
-  return sendRes(res, false, 'all good', employee)
-}
-
-export async function getClientsEmployeesCompanyName (req, res) {
-  const companies = client.db('ChecklistDB').collection('companies')
-  const { id } = req.params
-  const companyName = await companies.findOne({ id })
-  return sendRes(res, false, 'all good', companyName.companyInfo.companyName)
-}
-
-export async function deleteCompany (req, res) {
-  const company = client.db('ChecklistDB').collection('companies')
-  const companyEmployees = client.db('ChecklistDB').collection('companyEmployees')
-  const companiesEmployeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
-  const clientsEmployees = await companyEmployees.find().toArray()
-
-  const companyId = Number(req.query.companyId)
-  const companyData = await company.findOneAndDelete({ id: companyId })
-  if (!companyData.value) {
-    return res.status(404).send({ success: false, message: 'Company not found' })
-  }
-
-  const deletedEmployees = await companyEmployees.deleteMany({ companyId: companyId })
-  const numDocumentsDeleted = deletedEmployees.deletedCount
-  const companyName = companyData.value.companyInfo.companyName.replace(/\s+/g, '')
-  // eslint-disable-next-line max-len
-  const companyLogofilePath = `/var/www/html/CompanyLogos/${companyName}Logo${companyId}.jpeg`
-
-  unlink(companyLogofilePath, (err) => {
-    if (err) {
-      console.error('Error deleting company logo file:', err)
-    }
-  })
-
-  for (let i = 1; i <= numDocumentsDeleted; i++) {
-    // eslint-disable-next-line max-len
-    for (let i = Number(clientsEmployees[0].employeeId); i <= Number(clientsEmployees[clientsEmployees.length - 1].employeeId); i++) {
-      // eslint-disable-next-line max-len
-      const companyEmployeePhotoFilePath = `/var/www/html/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${i}.jpeg`
-      unlink(companyEmployeePhotoFilePath, (err) => {
-        if (err) {
-          console.error('Error deleting file:', err)
-        }
-      })
-    }
-  }
-
-  await company.updateMany(
-    { parentCompanyId: companyId },
-    { $unset: { parentCompanyId: '' } }
-  )
-
-  companiesEmployeesIdCounter.findOneAndUpdate(
-    { id: 'employeeId' },
-    { $inc: { seq: -numDocumentsDeleted } },
-    { new: true, upsert: true },
-    async (err, cd) => {
-      // ?????
-      let seqId
-      if (!cd || !cd.value.seq) {
-        seqId = 1
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        seqId = cd.value.seq
-      }
-    }
-  )
-
-  res.send({ success: true })
-}
-
-export async function uploadCliesntEmployeesPhoto (req, res) {
-  const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
-  const employeeId = await employeeIdCounter.findOne({ id: 'employeeId' })
-  const clientsEmployeesCollection = client.db('ChecklistDB').collection('companyEmployees')
-  const companyName = req.query.companyName.replace(/\s+/g, '')
-  const companyId = req.query.companyId
-  const fileName = `${companyName}companyId${companyId}employeeId${employeeId.seq - 1}.jpeg`
-  const storage = diskStorage({
-    destination: function (req, file, cb) {
-      cb(
-        null,
-        ('/var/www/html/ClientsEmployeesPhotos')
-      )
-    },
-    filename: function (req, file, cb) {
-      cb(null, fileName)
-    },
-  })
-  const upload = multer({ storage: storage }).single('file')
-  await clientsEmployeesCollection.findOneAndUpdate({ employeeId: Number(employeeId.seq - 1) }, {
-    $set: {
-      employeePhoto: `${fileName}`,
-    },
-  })
-
-  upload(req, res, function (err) {
-    if (err) {
-      // Kažkada buvo?
-      // return handleError(err, res)
-    }
-    res.json({ 'status': 'completed' })
-  })
-}
-export async function updateClientsEmployeesPhoto (req, res) {
-  const clientsEmployeesCollection = client.db('ChecklistDB').collection('companyEmployees')
-  const companyName = req.query.companyName.replace(/\s+/g, '')
-  const companyId = req.query.companyId
-  const employeeId = req.query.employeeId
-  const fileName = `${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
-  const storage = diskStorage({
-    destination: function (req, file, cb) {
-      cb(
-        null,
-        ('/var/www/html/ClientsEmployeesPhotos')
-      )
-    },
-    filename: function (req, file, cb) {
-      cb(null, fileName)
-    },
-  })
-  const upload = multer({ storage: storage }).single('file')
-  await clientsEmployeesCollection.findOneAndUpdate({
-    companyId:  Number(companyId),
-    employeeId: Number(employeeId),
-  }, {
-    $set: { employeePhoto: `${fileName}` },
-  })
-
-  upload(req, res, function (err) {
-    if (err) {
-      // Kažkada buvo?
-      // return handleError(err, res)
-    }
-    res.json({ 'status': 'completed' })
-  })
-}
-export async function deleteClientsEmployee (req, res) {
-  const clientsEmployees = client.db('ChecklistDB').collection('companyEmployees')
-  const employeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
-  const companyId = Number(req.query.companyId)
-  const employeeId = Number(req.query.employeeId)
-  const companyName = req.query.companyName.split(' ').join('')
-  await clientsEmployees.findOneAndDelete({ companyId, employeeId })
-  // eslint-disable-next-line max-len
-  const filePath = `/var/www/html/ClientsEmployeesPhotos/${companyName}companyId${companyId}employeeId${employeeId}.jpeg`
-  unlink(filePath, (err) => {
-    if (err) {
-      console.error('Error deleting file:', err)
-    }
-  })
-  employeesIdCounter.findOneAndUpdate(
-    { id: 'employeeId' },
-    { $inc: { seq: -1 } },
-    { new: true, upsert: true },
-    async (err, cd) => {
-      // ??????
-      let seqId
-      if (!cd || !cd.value.seq) {
-        seqId = 1
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        seqId = cd.value.seq
-      }
-    }
-  )
-  res.send({ success: true })
-}
-export async function updateClientsEmployee (req, res) {
-  const clientsEmployees = client.db('ChecklistDB').collection('companyEmployees')
-  await clientsEmployees.findOneAndUpdate({
-    companyId:  req.body.companyId,
-    employeeId: req.body.employeeId,
-  }, {
-    $set: req.body,
-  })
-  return sendRes(res, false, 'all good', null)
-}
-export async function updateCompaniesData (req, res) {
-  const companiesCollenction = client.db('ChecklistDB').collection('companies')
-  await companiesCollenction.findOneAndUpdate({ id: Number(req.query.companyId) }, {
-    $set: {
-      'companyInfo.J13':         req.body.J13,
-      'companyInfo.T72':         req.body.T72,
-      'companyInfo.companyName': req.body.companyName,
-    },
-  })
-  return sendRes(res, false, 'all good', null)
-}
-export async function deleteCompaniesSubClient (req, res) {
-  const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter')
-  const companiesCollenction = client.db('ChecklistDB').collection('companies')
-  await companiesCollenction.findOneAndDelete({
-    id:              Number(req.query.subClientId),
-    parentCompanyId: Number(req.query.parentCompanyId),
-  })
-  companiesIdCounter.findOneAndUpdate(
-    { id: 'companyId' },
-    { $inc: { seq: -1 } },
-    { new: true, upsert: true },
-    async (err, cd) => {
-      let seqId
-      // ????
-      if (!cd || !cd.value.seq) {
-        seqId = 1
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        seqId = cd.value.seq
-      }
-    }
-  )
-  return sendRes(res, false, 'all good', null)
-}
-export async function addSubClient (req, res) {
-  const companies = client.db('ChecklistDB').collection('companies')
-  const companiesIdCounter = client.db('ChecklistDB').collection('companiesIdCounter')
-  companiesIdCounter.findOneAndUpdate(
-    { id: 'companyId' },
-    { '$inc': { 'seq': 1 } },
-    { new: true, upsert: true },
-    async (err, cd) => {
-      let seqId
-      if (!cd || !cd.value.seq) {
-        seqId = 1
-      }
-      else {
-        seqId = cd.value.seq
-      }
-      const companyData = {
-        parentCompanyId: Number(req.query.parentCompanyId),
-        companyInfo:     req.body,
-        id:              seqId,
-      }
-      await companies.insertOne(companyData)
-    }
-  )
-  return sendRes(res, false, 'all good', null)
-}
-export async function getSubClients (req, res) {
-  const companies = client.db('ChecklistDB').collection('companies')
-  const parentCompanyId = req.query.parentCompanyId
-  const subClient = await companies.find({ parentCompanyId: Number(parentCompanyId) }).toArray()
-  return sendRes(res, false, 'all good', subClient)
-}
-export async function getSingleSubClient (req, res) {
-  const companies = client.db('ChecklistDB').collection('companies')
-  const parentCompanyId = req.query.parentCompanyId
-  const subClientId = req.query.subClientId
-  const subClient = await companies.findOne({
-    parentCompanyId: Number(parentCompanyId),
-    id:              Number(subClientId),
-  })
-  return sendRes(res, false, 'all good', subClient)
-}
-export async function addSubClientsEmployee (req, res) {
-  const companyEmployees = client.db('ChecklistDB').collection('companyEmployees')
-  const employeeIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
-  employeeIdCounter.findOneAndUpdate(
-    { id: 'employeeId' },
-    { '$inc': { 'seq': 1 } },
-    { new: true, upsert: true },
-    async (err, cd) => {
-      let seqId
-      if (!cd || !cd.value.seq) {
-        seqId = 1
-      }
-      else {
-        seqId = cd.value.seq
-      }
-      req.body.employeeId = seqId
-      req.body.subClientId = req.query.subClientId
-      await companyEmployees.insertOne(req.body)
-    }
-  )
-  return sendRes(res, false, 'all good', null)
-}
-export async function getSubClientsEmployees (req, res) {
-  const companyEmployees = client.db('ChecklistDB').collection('companyEmployees')
-  const subClientEmployees = await companyEmployees.find({
-    subClientId: req.query.subClientId,
-  }).toArray()
-  return sendRes(res, false, 'all good', subClientEmployees)
-}
-export async function deleteSubClientsEmployee (req, res) {
-  const subClientsEMployees = client.db('ChecklistDB').collection('companyEmployees')
-  const employeesIdCounter = client.db('ChecklistDB').collection('employeeIdCounter')
-  const companyId = req.query.companyId
-  const employeeId = req.query.employeeId
-  await subClientsEMployees.findOneAndDelete({ companyId, employeeId })
-  employeesIdCounter.findOneAndUpdate(
-    { id: 'employeeId' },
-    { $inc: { seq: -1 } },
-    { new: true, upsert: true },
-    async (err, cd) => {
-      let seqId
-      //?????
-      if (!cd || !cd.value.seq) {
-        seqId = 1
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        seqId = cd.value.seq
-      }
-    }
-  )
-  res.send({ success: true })
-}
-export async function getAllMainCompanies (req, res) {
-  const companiesCollection = client.db('ChecklistDB').collection('companies')
-  const companies = await companiesCollection.find().toArray()
-  const companyId = req.query.companyId
-  const mainCompanies = companies.filter(item =>
-    !item.parentCompanyId
-  ).filter((el) => el.id !== Number(companyId))
-
-  return sendRes(res, false, 'all good', mainCompanies)
-}
-export async function addMainCompanyAsSubClient (req, res) {
-  const companiesCollection = client.db('ChecklistDB').collection('companies')
-  await companiesCollection.findOneAndUpdate({
-    id: Number(req.query.companyId),
-  }, {
-    $set: {
-      parentCompanyId: Number(req.query.parentCompanyId),
-      wasMainClient:   true,
-    },
-  })
-
-  return sendRes(res, false, 'all good', null)
-}
-export async function changeSubClientToMainClient (req, res) {
-  const companiesCollection = client.db('ChecklistDB').collection('companies')
-  await companiesCollection.findOneAndUpdate(
-    { id: Number(req.query.companyId) },
-    { $unset: { parentCompanyId: 1 }, $set: { wasMainClient: false } }
-  )
-  return sendRes(res, false, 'all good', null)
-}
-// kas čia per?
-// export async function getAllHistoryData(req, res) {
-//   return sendRes(res, false, 'totalHistoryData', totalHistoryData)
-// }
 export async function generateMonthlyPDFReport (req, res) {
   const today = new Date()
   const year = today.getFullYear()
@@ -971,12 +478,6 @@ export async function getSpecificDateReport (req, res) {
   }))
   const filterEmptyFilledData = filteredData.filter((el) => el.filledData.length > 0)
   return sendRes(res, false, 'totalHistoryData', filterEmptyFilledData)
-}
-export async function getAllClientsEmployees (req, res) {
-  const companies = client.db('ChecklistDB').collection('companyEmployees')
-  const companyId = req.query.companyId
-  const employees = await companies.find({ companyId: Number(companyId) }).toArray()
-  return sendRes(res, false, 'all good', employees)
 }
 export async function endVisit (req, res) {
   const visistsCollection = client.db('ChecklistDB').collection('visits')
@@ -1090,43 +591,27 @@ export async function removeCarPlates (req) {
   )
 }
 export async function updateVisitInformation (req, res) {
-  const visitId           = req.query.visitId
-  const visitsCollection  = client.db('ChecklistDB').collection('visits')
-  const existingVisit     = await visitsCollection.findOne({ id: Number(visitId) })
-
-  if (req.body.visitCollocation) {
-    const updateVisit = await visitsCollection.findOneAndUpdate({ id: Number(visitId) }, {
-      $set: {
-        visitCollocation: req.body.visitCollocation,
-      },
-    })
-    return sendRes(res, false, 'all good', updateVisit)
-  } else if (req.body.visitors) {
-    const updateVisit = await visitsCollection.findOneAndUpdate({ id: Number(visitId) }, {
-      $set: {
-        visitors: req.body.visitors.map((el, i) => ({
-          ...existingVisit.visitors[i],
-          selectedVisitor: req.body.visitors[i].selectedVisitor,
-          idType:          req.body.visitors[i].idType,
-        })),
-      },
-    })
-    return sendRes(res, false, 'all good', updateVisit)
-  } else {
-    const updateVisit = await visitsCollection.findOneAndUpdate({ id: Number(visitId) }, {
-      $set: {
-        startDate:    req.body.startDate,
-        startTime:    req.body.startTime,
-        endDate:      req.body.endDate,
-        endTime:      req.body.endTime,
-        dlcEmployees: req.body.dlcEmployees,
-        visitAddress: req.body.visitAddress,
-        visitPurpose: req.body.visitPurpose,
-
-      },
-    })
-    return sendRes(res, false, 'all good', updateVisit)
-  }
+  const visitId = req.query.visitId
+  const visitsCollection = client.db('ChecklistDB').collection('visits')
+  const existingVisit = await visitsCollection.findOne({ id: Number(visitId) })
+  const updateVisit = await visitsCollection.findOneAndUpdate({ id: Number(visitId) }, {
+    $set: {
+      visitCollocation: req.body.visitCollocation,
+      startDate:        req.body.startDate,
+      startTime:        req.body.startTime,
+      endDate:          req.body.endDate,
+      endTime:          req.body.endTime,
+      dlcEmployees:     req.body.dlcEmployees,
+      visitAddress:     req.body.visitAddress,
+      visitPurpose:     req.body.visitPurpose,
+      visitors:         req.body.visitors.map((el, i) => ({
+        ...existingVisit.visitors[i],
+        selectedVisitor: req.body.visitors[i].selectedVisitor,
+        idType:          req.body.visitors[i].idType,
+      })),
+    },
+  })
+  return sendRes(res, false, 'all good', updateVisit)
 }
 export async function addSignature (req, res) {
   const visitId = req.query.visitId

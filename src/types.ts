@@ -1,7 +1,7 @@
 import { Request }  from 'express'
 import { ParsedQs } from 'qs'
 
-export type requestQuery = string | ParsedQs | string[] | ParsedQs[] | undefined
+export type RequestQuery = string | ParsedQs | string[] | ParsedQs[] | undefined
 
 export interface TypedRequestBody<T> extends Request {
   body: T
@@ -127,4 +127,8 @@ export interface PremiseDutyDetails {
   duty:            string
   possibleProblem: string
   reaction:        string
+}
+
+export interface IncludesPhoto {
+  photo?: string
 }
