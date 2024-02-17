@@ -2,34 +2,35 @@ import {
   Request,
   Response,
 }                        from 'express'
-import { ObjectId }      from 'mongoose'
+import {
+  SortOrder,
+  Types,
+}                        from 'mongoose'
 
 import { getPagination } from '../../helpers.js'
+import { iSstring }      from '../../typeChecks.js'
 import VisitSchema       from '../../shemas/VisitSchema.js'
 
 interface Params {
-  carPlates?:          string
-  companyId?:          number
+  companyId?:          Types.ObjectId
   date?:               Date
+  descending?:         boolean
   endDate?:            Date
-  guests?:             string
   scheduledVisitTime?: Date
   startDate?:          Date
-  statusId?:           ObjectId
+  statusId?:           Types.ObjectId
 }
 
 
 export default async (req: Request, res: Response) => {
   try {
     const {
-      carPlates,
       companyId,
       date,
-      endDate,
-      guests,
+      descending,
       id,
-      page,
       limit,
+      page,
       scheduledVisitTime,
       startDate,
       statusId,
@@ -44,43 +45,34 @@ export default async (req: Request, res: Response) => {
 
       const params: Params = {}
 
-      if (carPlates) {
-        params.carPlates
+      if (companyId && iSstring(companyId)) {
+        params.companyId = new Types.ObjectId(companyId)
       }
 
-      if (companyId) {
-        params.companyId
+      if (date && iSstring(date)) {
+        params.date = new Date(date)
       }
 
-      if (date) {
-        params.date
+      if (scheduledVisitTime && iSstring(scheduledVisitTime)) {
+        params.scheduledVisitTime = new Date(scheduledVisitTime)
       }
 
-      if (date) {
-        params.date
+      if (startDate && iSstring(startDate)) {
+        params.startDate = new Date(startDate)
       }
 
-      if (endDate) {
-        params.endDate
+      if (statusId && iSstring(statusId)) {
+        params.statusId = new Types.ObjectId(statusId)
       }
 
-      if (guests) {
-        params.guests
+
+      let sort: SortOrder = 1
+      if (descending === 'true') {
+        sort = -1
       }
 
-      if (scheduledVisitTime) {
-        params.scheduledVisitTime
-      }
-
-      if (startDate) {
-        params.startDate
-      }
-
-      if (statusId) {
-        params.statusId
-      }
-
-      const visits = await VisitSchema.find(params).limit(parsedLimit).skip(skip)
+      const visits = await VisitSchema.find(params)
+        .limit(parsedLimit).skip(skip).sort({ date: sort })
 
       return res.status(200).json(visits)
     }
