@@ -27,6 +27,7 @@ import getVisitorIdType    from '../controllers/visitsControllers/getVisitorIdTy
 import getVisitPurpose     from '../controllers/visitsControllers/getVisitPurpose'
 import getVisitStatus      from '../controllers/visitsControllers/getVisitStatus'
 import startVisit          from '../controllers/visitsControllers/startVisit'
+import getVisitsCount      from '../controllers/visitsControllers/getVisitsCount'
 
 const router = Router()
 
@@ -54,6 +55,7 @@ router.post('/visit', verifyToken, createVisit)
 router.put('/visit', verifyToken, editVisit)
 router.delete('/visit', verifyToken, deleteVisit)
 router.get('/visit', verifyToken, getVisit)
+router.get('/visit/count', verifyToken, getVisitsCount)
 router.post('/start', verifyToken, startVisit)
 router.post('/end', verifyToken, endVisit)
 

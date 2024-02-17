@@ -15,6 +15,9 @@ interface Body {
   racks:               ObjectId[]
   scheduledVisitTime?: Date
   visitorIdType:       ObjectId
+  visitPurpose:        ObjectId[]
+  siteId:              ObjectId
+  statusId:            ObjectId
 }
 
 
@@ -30,6 +33,9 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       racks,
       scheduledVisitTime,
       visitorIdType,
+      visitPurpose,
+      siteId,
+      statusId,
     } = req.body
 
     let signature: string | undefined
@@ -62,6 +68,9 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
         scheduledVisitTime,
         signature,
         visitorIdType,
+        visitPurpose,
+        siteId,
+        statusId,
       },
       { new: true }
     )

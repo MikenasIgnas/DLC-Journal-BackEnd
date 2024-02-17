@@ -28,15 +28,15 @@ export default async (req: Request, res: Response) => {
       const params: Params = {}
 
       if (!isNonExistant(dlcEmployee)) {
-        params.dlcEmployee
+        params.dlcEmployee = dlcEmployee
       }
 
       if (!isNonExistant(employeeId)) {
-        params.dlcEmployee
+        params.employeeId = employeeId
       }
 
       if (!isNonExistant(visitId)) {
-        params.dlcEmployee
+        params.visitId = visitId
       }
 
       const visitors = await VisitorSchema.find(params).limit(parsedLimit).skip(skip)
