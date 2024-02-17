@@ -3,31 +3,32 @@ import { Router }          from 'express'
 import {
   verifyAdmin,
   verifyToken,
-}                          from '../middleware/middle'
-import { upload }          from '../utility/uploadPhoto'
-import createVisit         from '../controllers/visitsControllers/createVisit'
-import createVisitor       from '../controllers/visitsControllers/createVisitor'
-import createVisitorIdType from '../controllers/visitsControllers/createVisitorIdType'
-import createVisitPurpose  from '../controllers/visitsControllers/createVisitPurpose'
-import createVisitStatus   from '../controllers/visitsControllers/createVisitStatus'
-import deleteVisit         from '../controllers/visitsControllers/deleteVisit'
-import deleteVisitor       from '../controllers/visitsControllers/deleteVisitor'
-import deleteVisitorIdType from '../controllers/visitsControllers/deleteVisitorIdType'
-import deleteVisitPurpose  from '../controllers/visitsControllers/deleteVisitPurpose'
-import deleteVisitStatus   from '../controllers/visitsControllers/deleteVisitStatus'
-import editVisit           from '../controllers/visitsControllers/editVisit'
-import editVisitor         from '../controllers/visitsControllers/editVisitor'
-import editVisitorIdType   from '../controllers/visitsControllers/editVisitorIdType'
-import editVisitPurpose    from '../controllers/visitsControllers/editVisitPurpose'
-import editVisitStatus     from '../controllers/visitsControllers/editVisitStatus'
-import endVisit            from '../controllers/visitsControllers/endVisit'
-import getVisit            from '../controllers/visitsControllers/getVisit'
-import getVisitor          from '../controllers/visitsControllers/getVisitor'
-import getVisitorIdType    from '../controllers/visitsControllers/getVisitorIdType'
-import getVisitPurpose     from '../controllers/visitsControllers/getVisitPurpose'
-import getVisitStatus      from '../controllers/visitsControllers/getVisitStatus'
-import startVisit          from '../controllers/visitsControllers/startVisit'
-import getVisitsCount      from '../controllers/visitsControllers/getVisitsCount'
+}                           from '../middleware/middle'
+import { upload }           from '../utility/uploadPhoto'
+import createVisit          from '../controllers/visitsControllers/createVisit'
+import createVisitor        from '../controllers/visitsControllers/createVisitor'
+import createVisitorIdType  from '../controllers/visitsControllers/createVisitorIdType'
+import createVisitPurpose   from '../controllers/visitsControllers/createVisitPurpose'
+import createVisitStatus    from '../controllers/visitsControllers/createVisitStatus'
+import deleteVisit          from '../controllers/visitsControllers/deleteVisit'
+import deleteVisitor        from '../controllers/visitsControllers/deleteVisitor'
+import deleteVisitorIdType  from '../controllers/visitsControllers/deleteVisitorIdType'
+import deleteVisitPurpose   from '../controllers/visitsControllers/deleteVisitPurpose'
+import deleteVisitStatus    from '../controllers/visitsControllers/deleteVisitStatus'
+import editVisit            from '../controllers/visitsControllers/editVisit'
+import editVisitor          from '../controllers/visitsControllers/editVisitor'
+import editVisitorIdType    from '../controllers/visitsControllers/editVisitorIdType'
+import editVisitPurpose     from '../controllers/visitsControllers/editVisitPurpose'
+import editVisitStatus      from '../controllers/visitsControllers/editVisitStatus'
+import endVisit             from '../controllers/visitsControllers/endVisit'
+import getVisit             from '../controllers/visitsControllers/getVisit'
+import getVisitor           from '../controllers/visitsControllers/getVisitor'
+import getVisitorIdType     from '../controllers/visitsControllers/getVisitorIdType'
+import getVisitPurpose      from '../controllers/visitsControllers/getVisitPurpose'
+import getVisitsCount       from '../controllers/visitsControllers/getVisitsCount'
+import getVisitStatus       from '../controllers/visitsControllers/getVisitStatus'
+import removeVisitCarplates from '../controllers/visitsControllers/removeVisitCarplates'
+import startVisit           from '../controllers/visitsControllers/startVisit'
 
 const router = Router()
 
@@ -58,5 +59,7 @@ router.get('/visit', verifyToken, getVisit)
 router.get('/visit/count', verifyToken, getVisitsCount)
 router.post('/start', verifyToken, startVisit)
 router.post('/end', verifyToken, endVisit)
+
+router.patch('/carplate', verifyToken, removeVisitCarplates)
 
 export default router
