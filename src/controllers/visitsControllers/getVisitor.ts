@@ -2,16 +2,19 @@ import {
   Request,
   Response,
 }                        from 'express'
-import { ObjectId }      from 'mongoose'
+import { Types }         from 'mongoose'
 
 import { getPagination } from '../../helpers.js'
-import { isNonExistant } from '../../typeChecks.js'
+import {
+  iSstring,
+  isNonExistant,
+}                        from '../../typeChecks.js'
 import VisitorSchema     from '../../shemas/VisitorSchema.js'
 
 interface Params {
-  dlcEmployee?: ObjectId
-  employeeId?:  ObjectId
-  visitId?:     ObjectId
+  dlcEmployee?: Types.ObjectId
+  employeeId?:  Types.ObjectId
+  visitId?:     Types.ObjectId
 }
 
 export default async (req: Request, res: Response) => {
@@ -27,16 +30,16 @@ export default async (req: Request, res: Response) => {
 
       const params: Params = {}
 
-      if (!isNonExistant(dlcEmployee)) {
-        params.dlcEmployee = dlcEmployee
+      if (!isNonExistant(dlcEmployee) && iSstring(dlcEmployee)) {
+        params.dlcEmployee = new Types.ObjectId(dlcEmployee)
       }
 
-      if (!isNonExistant(employeeId)) {
-        params.employeeId = employeeId
+      if (!isNonExistant(employeeId) && iSstring(employeeId)) {
+        params.employeeId = new Types.ObjectId(employeeId)
       }
 
-      if (!isNonExistant(visitId)) {
-        params.visitId = visitId
+      if (!isNonExistant(visitId) && iSstring(visitId)) {
+        params.visitId = new Types.ObjectId(visitId)
       }
 
       const visitors = await VisitorSchema.find(params).limit(parsedLimit).skip(skip)
