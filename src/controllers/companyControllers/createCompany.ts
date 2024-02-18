@@ -8,7 +8,7 @@ interface CreateCompanyBody {
   description?: string
   isDisabled?:  boolean
   name:         string
-  companyCode:  number
+  companyCode?:  number
   parentId?:    ObjectId
   racks?:       ObjectId[]
 }
