@@ -42,10 +42,8 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       companyId &&
       permissions &&
       racks &&
-      racks.length > 0 &&
       statusId &&
       visitPurpose &&
-      visitPurpose.length > 0 &&
       siteId
     )) {
       return res.status(400).json({ messsage: 'Bad request' })
