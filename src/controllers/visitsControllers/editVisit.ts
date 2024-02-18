@@ -49,14 +49,14 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     }
 
     if (!id) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     if (companyId) {
       const companyExists = await CompanySchema.exists({ _id: companyId })
 
       if (!companyExists) {
-        return res.status(400).json({ messsage: 'Company does not exist' })
+        return res.status(400).json({ message: 'Company does not exist' })
       }
     }
 

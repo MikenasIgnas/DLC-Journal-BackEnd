@@ -26,7 +26,7 @@ export default async (req: TypedRequestBody<EditCompanyBody>, res: Response) => 
     }
 
     if (!id) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const company = await CompanySchema.findByIdAndUpdate(

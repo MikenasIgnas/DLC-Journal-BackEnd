@@ -21,7 +21,7 @@ export default async (req: TypedRequestBody<CreateCompanyBody>, res: Response) =
     const photo = req.file?.path
 
     if (!name) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const exists = await CompanySchema.exists({ name })

@@ -18,7 +18,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     } = req.body
 
     if (!carPlate && !visitId) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const instance = await VisitSchema.findByIdAndUpdate(

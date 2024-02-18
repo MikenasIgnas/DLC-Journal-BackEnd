@@ -15,7 +15,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const { employeeId, visitId } = req.body
 
     if (!(employeeId && visitId)) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const instance = new VisitorSchema({

@@ -15,7 +15,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const { name, siteId } = req.body
 
     if (!(name && siteId)) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const exists = await PremiseSchema.exists({ name })

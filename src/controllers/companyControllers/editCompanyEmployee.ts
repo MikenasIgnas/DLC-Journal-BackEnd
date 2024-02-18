@@ -44,13 +44,13 @@ export default async (req: TypedRequestBody<EditCompanyEmployeeBody>, res: Respo
     }
 
     if (!id) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const companyExists = await CompanySchema.exists({ _id: companyId })
 
     if (!companyExists) {
-      return res.status(400).json({ messsage: 'Company does not exist' })
+      return res.status(400).json({ message: 'Company does not exist' })
     }
 
     for (let index = 0; index < permissions.length; index++) {
@@ -59,7 +59,7 @@ export default async (req: TypedRequestBody<EditCompanyEmployeeBody>, res: Respo
       const exists = await PermissionSchema.exists({ _id: element })
 
       if (!exists) {
-        return res.status(400).json({ messsage: 'Permission does not exist' })
+        return res.status(400).json({ message: 'Permission does not exist' })
       }
     }
 

@@ -19,7 +19,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const signature = req.file?.path
 
     if (!id) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const rack = await VisitorSchema.findByIdAndUpdate(

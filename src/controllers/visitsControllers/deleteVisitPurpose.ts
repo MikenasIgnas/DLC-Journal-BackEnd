@@ -14,7 +14,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const { id } = req.body
 
     if (!id) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     await VisitPurposeSchema.findByIdAndDelete({ _id: id })

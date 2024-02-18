@@ -20,19 +20,19 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const { visitId, statusId } = req.body
 
     if (!visitId && !statusId) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const visitExists = await VisitSchema.exists({ _id: visitId})
 
     if (!visitExists) {
-      return res.status(400).json({ messsage: 'Visit does not exist' })
+      return res.status(400).json({ message: 'Visit does not exist' })
     }
 
     const statusExists = await visitStatusSchema.exists({ _id: statusId })
 
     if (!statusExists) {
-      return res.status(400).json({ messsage: 'Visit status does not exist' })
+      return res.status(400).json({ message: 'Visit status does not exist' })
     }
 
     const visit = await VisitSchema.findByIdAndUpdate(
