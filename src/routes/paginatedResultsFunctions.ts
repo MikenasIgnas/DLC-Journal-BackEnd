@@ -1,7 +1,7 @@
+/* eslint-disable max-len */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // fuck it, vistiek bus ištrinta
-
-const MongoClient =         require('mongodb').MongoClient
-require('dotenv').config()
+import { MongoClient }       from 'mongodb'
 const client =              new MongoClient(process.env.MONGO_PATH)
 
 const paginatedResults = (model: any, db: string, collection: any) => {
@@ -38,40 +38,40 @@ const paginatedResults = (model: any, db: string, collection: any) => {
         }
         const allDocuments = await dbCollection.find().toArray()
         const filteredDocuments = allDocuments.filter(filterFunction)
-        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } })
+        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } }).sort({ id: -1 })
       } else if (selectFilter !== undefined) {
         const filterFunction = (item: any) => {
           for (const key in item) {
             if (key === 'signature') {
               continue
             }
-            if(selectFilter === 'hasProblems'){
-              if(item.problemCount > 0){
+            if (selectFilter === 'hasProblems') {
+              if (item.problemCount > 0) {
                 return true
               }
             }
-            if(selectFilter === 'noProblems'){
-              if(item.problemCount <= 0){
+            if (selectFilter === 'noProblems') {
+              if (item.problemCount <= 0) {
                 return true
               }
             }
-            if(selectFilter === 'user'){
-              if(!item.isAdmin){
+            if (selectFilter === 'user') {
+              if (!item.isAdmin) {
                 return true
               }
             }
-            if(selectFilter === 'admin'){
-              if(item.isAdmin){
+            if (selectFilter === 'admin') {
+              if (item.isAdmin) {
                 return true
               }
             }
-            if(selectFilter === 'active'){
-              if(!item.isDisabled){
+            if (selectFilter === 'active') {
+              if (!item.isDisabled) {
                 return true
               }
             }
-            if(selectFilter === 'inactive'){
-              if(item.isDisabled){
+            if (selectFilter === 'inactive') {
+              if (item.isDisabled) {
                 return true
               }
             }
@@ -83,15 +83,15 @@ const paginatedResults = (model: any, db: string, collection: any) => {
         }
         const allDocuments = await dbCollection.find().toArray()
         const filteredDocuments = allDocuments.filter(filterFunction)
-        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } })
+        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } }).sort({ id: -1 })
 
-      }else if( tableSorter !== undefined){
-        if(tableSorter === 'asc'){
+      } else if ( tableSorter !== undefined) {
+        if (tableSorter === 'asc') {
           query = dbCollection.find().sort({id: 1})
-        }else{
+        } else {
           query = dbCollection.find().sort({id: -1})
         }
-      }else {
+      } else {
         query = dbCollection.find().sort({id: -1})
       }
       results.results = await query.skip(startIndex).limit(limit).toArray()
@@ -148,8 +148,8 @@ const paginatedVisitsResults = (model: any, collection: any) => {
           filterFunction(item, filterOption)
         )
 
-        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } })
-      }else if (selectFilter !== undefined) {
+        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } }).sort({ id: -1 })
+      } else if (selectFilter !== undefined) {
         const filterFunction = (item: any) => {
           for (const key in item) {
             if (key === 'signature') {
@@ -164,14 +164,14 @@ const paginatedVisitsResults = (model: any, collection: any) => {
 
         const allDocuments = await dbCollection.find().toArray()
         const filteredDocuments = allDocuments.filter(filterFunction)
-        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } })
-      }else if( tableSorter !== undefined){
-        if(tableSorter === 'asc'){
+        query = dbCollection.find({ _id: { $in: filteredDocuments.map((doc: any) => doc._id) } }).sort({ id: -1 })
+      } else if ( tableSorter !== undefined) {
+        if (tableSorter === 'asc') {
           query = dbCollection.find().sort({id: 1})
-        }else{
+        } else {
           query = dbCollection.find().sort({id: -1})
         }
-      }else {
+      } else {
         query = dbCollection.find().sort({id: -1})
       }
 

@@ -20,7 +20,7 @@ mongoose.connect(process.env.MONGO_PATH)
 const app = express()
 
 app.use(cors({
-  origin:      'http://localhost:3000',
+  origin:      process.env.CORS_ORIGIN,
   credentials: true,
   methods:     'GET,HEAD,PUT,PATCH,POST,DELETE',
 }))
@@ -28,7 +28,7 @@ app.use(cors({
 app.use(express.json())
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
-app.listen(4002)
+app.listen(process.env.APP_LISTEN_PORT)
 
 app.use('/', mainRouter)
 app.use('/auth', authRouter)
