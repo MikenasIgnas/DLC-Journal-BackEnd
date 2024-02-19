@@ -8,6 +8,7 @@ interface CreateCompanyBody {
   description?: string
   isDisabled?:  boolean
   name:         string
+  companyCode:  number
   parentId?:    ObjectId
   racks?:       ObjectId[]
 }
@@ -15,7 +16,7 @@ interface CreateCompanyBody {
 
 export default async (req: TypedRequestBody<CreateCompanyBody>, res: Response) => {
   try {
-    const { description, isDisabled, name, parentId, racks } = req.body
+    const { description, isDisabled, name, parentId, racks, companyCode } = req.body
 
     const photo = req.file?.path
 
@@ -34,6 +35,7 @@ export default async (req: TypedRequestBody<CreateCompanyBody>, res: Response) =
         name,
         photo,
         parentId,
+        companyCode,
         racks:       racks ? racks : [],
       })
 
