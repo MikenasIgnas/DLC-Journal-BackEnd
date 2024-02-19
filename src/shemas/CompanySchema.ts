@@ -11,6 +11,7 @@ const Company = new Schema({
   name:        { type: String, required: true },
   parentId:    { type: Types.ObjectId, required: false },
   racks:       [{ type: Types.ObjectId, required: true }],
+  companyCode: { type: Number, required: false },
 })
 
 export default model('Company', Company)

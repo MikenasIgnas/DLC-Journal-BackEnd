@@ -182,7 +182,6 @@ export default async (req: Request, res: Response) => {
       res.send(docBuffer)
     }
   } catch (error) {
-    console.log(error)
     res.status(500).json({ message: 'Unexpected error' })
   }
 }
