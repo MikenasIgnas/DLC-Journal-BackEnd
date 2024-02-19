@@ -18,6 +18,8 @@ interface Body {
   visitPurpose:        ObjectId[]
   siteId:              ObjectId
   statusId:            ObjectId
+  startDate:           Date,
+  endDate:             Date,
 }
 
 
@@ -36,6 +38,8 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       visitPurpose,
       siteId,
       statusId,
+      startDate,
+      endDate,
     } = req.body
 
     let signature: string | undefined
@@ -71,6 +75,8 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
         visitPurpose,
         siteId,
         statusId,
+        startDate,
+        endDate,
       },
       { new: true }
     )
