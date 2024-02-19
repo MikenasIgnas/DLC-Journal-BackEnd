@@ -28,6 +28,12 @@ export default async (req: TypedRequestBody<DeleteCompanyBody>, res: Response) =
       await CompanyEmployeeSchema.findByIdAndDelete(element._id)
     }
 
+    await CompanySchema.updateMany(
+      { parentId: id },
+      { $unset: { parentId: '' } },
+      { new: true }
+    )
+
     return res.status(200).json({ message: 'Delete success' })
   } catch (error) {
     return res.status(500).json({ message: 'Unexpected error' })
