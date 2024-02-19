@@ -5,10 +5,10 @@ import { TypedRequestBody } from '../../types.js'
 import CompanySchema        from '../../shemas/CompanySchema.js'
 
 interface EditCompanyBody {
+  companyCode?: number
   description?: string
   id:           ObjectId
   isDisabled?:  boolean
-  companyCode?: number
   name?:        string
   parentId?:    ObjectId | 'null'
   racks?:       ObjectId[]
@@ -17,7 +17,15 @@ interface EditCompanyBody {
 
 export default async (req: TypedRequestBody<EditCompanyBody>, res: Response) => {
   try {
-    const { description, id, isDisabled, parentId, name, racks, companyCode } = req.body
+    const {
+      companyCode,
+      description,
+      id,
+      isDisabled,
+      name,
+      parentId,
+      racks,
+    } = req.body
 
     let photo: string | undefined
 
@@ -27,6 +35,14 @@ export default async (req: TypedRequestBody<EditCompanyBody>, res: Response) => 
 
     if (!id) {
       return res.status(400).json({ message: 'Bad request' })
+    }
+
+    if (parentId && parentId !== 'null') {
+      const parentExists = await CompanySchema.exists({ _id: parentId })
+
+      if (!parentExists) {
+        return res.status(404).json({ message: 'Parent company does not exist' })
+      }
     }
 
     const company = await CompanySchema.findByIdAndUpdate(

@@ -30,9 +30,7 @@ export default async (req: TypedRequestBody<DeleteCompanyBody>, res: Response) =
 
     await CompanySchema.updateMany(
       { parentId: id },
-      {
-        $unset: { parentId: '' },
-      },
+      { $unset: { parentId: '' } },
       { new: true }
     )
 
