@@ -18,7 +18,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ message: 'Bad request' })
     }
 
-    const exists = await RackSchema.exists({ name })
+    const exists = await RackSchema.exists({ name, premiseId })
 
     if (exists) {
       return res.status(409).json({ message: 'Rack Already Exist.' })
