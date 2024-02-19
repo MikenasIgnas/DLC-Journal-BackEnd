@@ -6,14 +6,13 @@ import CompanyEmployeeSchema from '../../shemas/CompanyEmployeeSchema.js'
 import CompanySchema         from '../../shemas/CompanySchema.js'
 
 interface DeleteCompanyBody {
-  id:       ObjectId
-  parentId: ObjectId | 'null'
+  id: ObjectId
 }
 
 
 export default async (req: TypedRequestBody<DeleteCompanyBody>, res: Response) => {
   try {
-    const { id, parentId } = req.body
+    const { id } = req.body
 
     if (!id) {
       return res.status(400).json({ message: 'Bad request' })
@@ -32,8 +31,7 @@ export default async (req: TypedRequestBody<DeleteCompanyBody>, res: Response) =
     await CompanySchema.updateMany(
       { parentId: id },
       {
-        parentId: parentId !== 'null' ? parentId : undefined,
-        $unset:   parentId === 'null' ? { parentId: 1 } : {},
+        $unset: { parentId: '' },
       },
       { new: true }
     )
