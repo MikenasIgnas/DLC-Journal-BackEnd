@@ -28,7 +28,7 @@ app.use(cors({
 app.use(express.json())
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: true }))
-app.listen(process.env.APP_LISTEN_PORT)
+app.listen(process.env.SERVER_PORT)
 
 app.use('/', mainRouter)
 app.use('/auth', authRouter)
