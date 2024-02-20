@@ -31,7 +31,7 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
     const loggedInUser = await UserSchema.findById({ _id: loggedInUserId })
 
     if (isSecurity && isAdmin) {
-      return res.status(400).json({ messsage: 'Security cant be admin' })
+      return res.status(400).json({ message: 'Security cant be admin' })
     }
 
     if (!id) {

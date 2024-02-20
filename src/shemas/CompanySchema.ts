@@ -5,11 +5,12 @@ import {
 } from 'mongoose'
 
 const Company = new Schema({
+  companyCode: { type: Number, required: false },
   description: { type: String, required: false },
   isDisabled:  { type: Boolean, required: false },
-  photo:       { type: String },
   name:        { type: String, required: true },
   parentId:    { type: Types.ObjectId, required: false },
+  photo:       { type: String },
   racks:       [{ type: Types.ObjectId, required: true }],
   document:    [{ type: String, required: false }],
 })

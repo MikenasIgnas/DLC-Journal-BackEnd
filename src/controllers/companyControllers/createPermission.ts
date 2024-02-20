@@ -13,7 +13,7 @@ export default async (req: TypedRequestBody<CreatePermissionBody>, res: Response
     const { name } = req.body
 
     if (!name) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const exists = await PermissionSchema.exists({ name })

@@ -7,7 +7,7 @@ import PremiseSchema        from '../../shemas/PremiseSchema.js'
 interface Body {
   id:      ObjectId
   name?:   string
-  siteId?: number
+  siteId?: ObjectId
 }
 
 
@@ -16,7 +16,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const { id, name, siteId } = req.body
 
     if (!id) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const premise = await PremiseSchema.findByIdAndUpdate(

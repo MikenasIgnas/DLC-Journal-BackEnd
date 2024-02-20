@@ -7,7 +7,7 @@ import RackSchema           from '../../shemas/RackSchema.js'
 interface Body {
   id:         ObjectId
   name?:      string
-  premiseId?: number
+  premiseId?: ObjectId
 }
 
 
@@ -16,7 +16,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const { id, name, premiseId } = req.body
 
     if (!id) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const rack = await RackSchema.findByIdAndUpdate(

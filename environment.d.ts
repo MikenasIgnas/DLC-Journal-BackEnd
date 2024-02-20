@@ -3,6 +3,7 @@ declare global {
     interface ProcessEnv {
       MONGO_PATH:           string
       TOKEN_KEY:            string
+      IMG_PATH:             string
       SMTP_ADDRESS:         string
       SMTP_PORT:            number
       SENDER_ADDRESS:       string
