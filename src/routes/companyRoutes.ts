@@ -10,17 +10,17 @@ import createCompanyEmplyee  from '../controllers/companyControllers/createCompa
 import createPermission      from '../controllers/companyControllers/createPermission'
 import deleteCompany         from '../controllers/companyControllers/deleteCompany'
 import deleteCompanyEmployee from '../controllers/companyControllers/deleteCompanyEmployee'
+import deleteDocument        from '../controllers/companyControllers/deleteCompanyDocument'
 import deletePermission      from '../controllers/companyControllers/deletePermission'
 import editCompany           from '../controllers/companyControllers/editCompany'
 import editCompanyEmployee   from '../controllers/companyControllers/editCompanyEmployee'
 import editPermission        from '../controllers/companyControllers/editPermission'
 import getCompany            from '../controllers/companyControllers/getCompany'
-import getCompanyEmployee    from '../controllers/companyControllers/getCompanyEmployee'
-import getPermission         from '../controllers/companyControllers/getPermission'
-import uploadDocument        from '../controllers/companyControllers/uploadDocument'
-import getDocument           from '../controllers/companyControllers/getDocument'
-import deleteDocument        from '../controllers/companyControllers/deleteDocument'
 import getCompanyCount       from '../controllers/companyControllers/getCompanyCount'
+import getCompanyEmployee    from '../controllers/companyControllers/getCompanyEmployee'
+import getDocument           from '../controllers/companyControllers/getCompanyDocument'
+import getPermission         from '../controllers/companyControllers/getPermission'
+import uploadDocument        from '../controllers/companyControllers/uploadCompanyDocument'
 
 
 

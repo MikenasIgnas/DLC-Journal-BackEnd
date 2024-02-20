@@ -3,12 +3,13 @@ import {
   Response,
 }                     from 'express'
 
-import PremiseSchema  from '../shemas/PremiseSchema'
-import RackSchema     from '../shemas/RackSchema'
+import PremiseSchema  from '../../shemas/PremiseSchema'
+import RackSchema     from '../../shemas/RackSchema'
 
 
 export default async (req: Request, res: Response) => {
   const { premiseId } = req.body
+
   try {
     const premise = await PremiseSchema.findById(premiseId)
 
@@ -17,6 +18,7 @@ export default async (req: Request, res: Response) => {
     }
 
     const racks = await RackSchema.find({ premiseId: premise._id })
+
     if (!racks.length) {
       return res.status(404).json({ message: 'No racks found for the specified premise' })
     }

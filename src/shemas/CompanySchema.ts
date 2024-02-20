@@ -12,7 +12,6 @@ const Company = new Schema({
   parentId:    { type: Types.ObjectId, required: false },
   photo:       { type: String },
   racks:       [{ type: Types.ObjectId, required: true }],
-  document:    [{ type: String, required: false }],
 })
 
 export default model('Company', Company)

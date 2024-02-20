@@ -3,13 +3,14 @@ import {
   Response,
 }                     from 'express'
 
-import SiteSchema     from '../shemas/SiteSchema'
-import PremiseSchema  from '../shemas/PremiseSchema'
-import RackSchema     from '../shemas/RackSchema'
+import PremiseSchema  from '../../shemas/PremiseSchema'
+import RackSchema     from '../../shemas/RackSchema'
+import SiteSchema     from '../../shemas/SiteSchema'
 
 
 export default async (req: Request, res: Response) => {
   const { siteId } = req.body
+
   try {
     const site = await SiteSchema.findById(siteId)
 
@@ -18,11 +19,14 @@ export default async (req: Request, res: Response) => {
     }
 
     const premises = await PremiseSchema.find({ siteId: site._id })
+
     let csvData: string[][] = []
 
     for (const premise of premises) {
       const racks = await RackSchema.find({ premiseId: premise._id })
+
       const rackNames = racks.map(rack => rack.name)
+
       csvData.push([premise.name, ...rackNames])
     }
 
@@ -32,10 +36,12 @@ export default async (req: Request, res: Response) => {
       while (column.length < maxRacks) {
         column.push('')
       }
+
       return column
     })
 
     const siteNameRow = [site.name].concat(Array(maxRacks - 1).fill(''))
+
     csvData.unshift(siteNameRow)
 
     const csvRows = csvData[0].map((_, colIndex) => csvData.map(row => row[colIndex]))
