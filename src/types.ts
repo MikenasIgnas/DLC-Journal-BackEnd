@@ -1,4 +1,5 @@
 import { Request }  from 'express'
+import { Types }    from 'mongoose'
 import { ParsedQs } from 'qs'
 
 export type RequestQuery = string | ParsedQs | string[] | ParsedQs[] | undefined
@@ -7,6 +8,10 @@ export interface TypedRequestBody<T> extends Request {
   body: T
 }
 
+export interface NameAndId {
+  _id:  Types.ObjectId
+  name: string
+}
 
 export type Employees = {
   _id:            string
