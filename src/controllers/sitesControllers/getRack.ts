@@ -23,7 +23,7 @@ export default async (req: Request, res: Response) => {
       const params = getSearchFilters({ name })
 
       if (!isNonExistant(premiseId)) {
-        params.premiseId
+        params.premiseId = premiseId
       }
 
       const racks = await RackSchema.find(params).limit(parsedLimit).skip(skip)

@@ -7,7 +7,7 @@ import PremiseSchema        from '../../shemas/PremiseSchema.js'
 interface Body {
   id:      ObjectId
   name?:   string
-  siteId?: number
+  siteId?: ObjectId
 }
 
 
