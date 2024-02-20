@@ -21,6 +21,7 @@ import getCompanyEmployee    from '../controllers/companyControllers/getCompanyE
 import getDocument           from '../controllers/companyControllers/getCompanyDocument'
 import getPermission         from '../controllers/companyControllers/getPermission'
 import uploadDocument        from '../controllers/companyControllers/uploadCompanyDocument'
+import getAllCompanyDocuments from '../controllers/companyControllers/getAllCompanyDocuments'
 
 
 
@@ -40,6 +41,7 @@ router.get('/company/count', verifyToken, getCompanyCount)
 
 router.post('/document', verifyToken, verifyAdmin, upload.single('file'), uploadDocument)
 router.get('/document', verifyToken, verifyAdmin, getDocument)
+router.get('/getAllDocuments', verifyToken, verifyAdmin, getAllCompanyDocuments)
 router.delete('/document', verifyToken, verifyAdmin, deleteDocument)
 
 router.post(
