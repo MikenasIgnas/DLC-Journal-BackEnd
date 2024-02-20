@@ -10,14 +10,18 @@ import createCompanyEmplyee  from '../controllers/companyControllers/createCompa
 import createPermission      from '../controllers/companyControllers/createPermission'
 import deleteCompany         from '../controllers/companyControllers/deleteCompany'
 import deleteCompanyEmployee from '../controllers/companyControllers/deleteCompanyEmployee'
+import deleteDocument        from '../controllers/companyControllers/deleteCompanyDocument'
 import deletePermission      from '../controllers/companyControllers/deletePermission'
 import editCompany           from '../controllers/companyControllers/editCompany'
 import editCompanyEmployee   from '../controllers/companyControllers/editCompanyEmployee'
 import editPermission        from '../controllers/companyControllers/editPermission'
 import getCompany            from '../controllers/companyControllers/getCompany'
-import getCompanyEmployee    from '../controllers/companyControllers/getCompanyEmployee'
-import getPermission         from '../controllers/companyControllers/getPermission'
 import getCompanyCount       from '../controllers/companyControllers/getCompanyCount'
+import getCompanyEmployee    from '../controllers/companyControllers/getCompanyEmployee'
+import getDocument           from '../controllers/companyControllers/getCompanyDocument'
+import getPermission         from '../controllers/companyControllers/getPermission'
+import uploadDocument        from '../controllers/companyControllers/uploadCompanyDocument'
+
 
 
 const router = Router()
@@ -32,6 +36,11 @@ router.put('/company', verifyToken, verifyAdmin, upload.single('photo'), editCom
 router.delete('/company', verifyToken, verifyAdmin, deleteCompany)
 router.get('/company', verifyToken, getCompany)
 router.get('/company/count', verifyToken, getCompanyCount)
+
+
+router.post('/document', verifyToken, verifyAdmin, upload.single('file'), uploadDocument)
+router.get('/document', verifyToken, verifyAdmin, getDocument)
+router.delete('/document', verifyToken, verifyAdmin, deleteDocument)
 
 router.post(
   '/companyEmployee',

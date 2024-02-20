@@ -47,12 +47,12 @@ import {
   deleteCollocation,
 }                                     from '../controllers/mainController'
 import { verifyToken  }               from '../middleware/middle'
-import allCollocationsCsvController   from '../controllers/allCollocationsCsvController'
 import checklistPdfController         from '../controllers/checklistPdfController'
 import FilledChecklistData            from '../shemas/FilledChecklistData'
 import multipleVisitPdfController     from '../controllers/multipleVisitPdfController'
-import singleCollocationCsvController from '../controllers/singleCollocationCsvController'
+import premiseCsvController           from '../controllers/sitesControllers/premiseCsvController'
 import singleVisitPdfController       from '../controllers/singleVisitPdfController'
+import siteCsvController              from '../controllers/sitesControllers/siteCsvController'
 import VisitsData                     from '../shemas/VisitsSchema'
 
 import {
@@ -119,8 +119,8 @@ router.get('/deleteSignature', verifyToken, deleteSignature)
 
 router.get('/generatePdf', verifyToken, singleVisitPdfController)
 router.get('/generateMultipleVisitPdf', verifyToken, multipleVisitPdfController)
-router.post('/generateAllCollocationsCSV', verifyToken, allCollocationsCsvController)
-router.post('/generateSingleCollocationCSV', verifyToken, singleCollocationCsvController)
+router.post('/generateAllCollocationsCSV', verifyToken, siteCsvController)
+router.post('/generateSingleCollocationCSV', verifyToken, premiseCsvController)
 
 router.get('/generateMultipleChecklistHistoryPdf',verifyToken, checklistPdfController)
 
