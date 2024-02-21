@@ -17,8 +17,9 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
     const { companyId } = req.body
 
-    const documentPath = req.file?.path
-    const documentName = req.file?.originalname
+    const documentPath    = req.file?.path
+    const documentName    = req.file?.originalname
+    const documentFormat  = documentName?.split('.').pop()
 
     if (companyId) {
       const company = await CompanySchema.exists({ _id: companyId })
@@ -29,8 +30,9 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
 
       const instance = new CompanyDocumentSchema({
         companyId,
-        path: documentPath,
-        name: `${documentName}-${getCurrentDateTime()}`,
+        path:   documentPath,
+        name:   `${documentName}-${getCurrentDateTime()}`,
+        format: documentFormat,
 
       })
 
