@@ -2,11 +2,14 @@
 import { Response }          from 'express'
 
 import { TypedRequestBody }  from '../../types.js'
+
+import { getCurrentDateTime } from '../../helpers.js'
+
 import CompanyDocumentSchema from '../../shemas/CompanyDocumentSchema.js'
 import CompanySchema         from '../../shemas/CompanySchema.js'
 
 interface Body {
-  companyId: number
+  companyId:  number
 }
 
 
@@ -15,6 +18,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const { companyId } = req.body
 
     const documentPath = req.file?.path
+    const documentName = req.file?.originalname
 
     if (companyId) {
       const company = await CompanySchema.exists({ _id: companyId })
@@ -26,6 +30,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       const instance = new CompanyDocumentSchema({
         companyId,
         path: documentPath,
+        name: `${documentName}-${getCurrentDateTime()}`,
 
       })
 
