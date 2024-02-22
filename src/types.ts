@@ -8,6 +8,10 @@ export interface TypedRequestBody<T> extends Request {
   body: T
 }
 
+export interface NameAndId {
+  _id:  Types.ObjectId
+  name: string
+}
 
 export type Employees = {
   _id:            string

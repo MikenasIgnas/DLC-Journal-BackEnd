@@ -3,7 +3,7 @@ import { Router }    from 'express'
 import {
   verifyAdmin,
   verifyToken,
-}                    from '../middleware/middle'
+}                      from '../middleware/middle'
 import createPremise   from '../controllers/sitesControllers/createPremise'
 import createRack      from '../controllers/sitesControllers/createRack'
 import createSite      from '../controllers/sitesControllers/createSite'

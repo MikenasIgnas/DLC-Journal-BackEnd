@@ -22,17 +22,17 @@ export default async (req: TypedRequestBody<CreateUserBody>, res: Response) => {
     const { email, password, name, isAdmin, isSecurity, username } = req.body
 
     if (!(email && password && name && username)) {
-      return res.status(400).json({ messsage: 'All fields required' })
+      return res.status(400).json({ message: 'All fields required' })
     }
 
     if (isSecurity && isAdmin) {
-      return res.status(400).json({ messsage: 'Security cant be admin' })
+      return res.status(400).json({ message: 'Security cant be admin' })
     }
 
     const isValid = emailvalidator.validate(email)
 
     if (!isValid) {
-      return res.status(400).json({ messsage: 'Invalid email' })
+      return res.status(400).json({ message: 'Invalid email' })
     }
 
     const usernameEmail = await UserSchema.exists({ email: username })

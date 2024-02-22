@@ -16,7 +16,7 @@ export default async (req: TypedRequestBody<EditPermissionBody>, res: Response) 
     const { id, name } = req.body
 
     if (!id || !name) {
-      return res.status(400).json({ messsage: 'Bad request' })
+      return res.status(400).json({ message: 'Bad request' })
     }
 
     const permisison = await PermissionSchema.findByIdAndUpdate(

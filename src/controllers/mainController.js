@@ -308,16 +308,24 @@ export async function postVisitDetails (req, res) {
     const sendEmail = () => {
       return new Promise((resolve, reject) => {
         const transporter = createTransport({
-          service: 'gmail',
-          auth:    {
-            user: 'mikenasignas@gmail.com',
-            pass: 'czwj jdyw xdyn qphs',
+          // eslint-disable-next-line no-undef
+          host:   process.env.SMTP_ADDRESS,
+          // eslint-disable-next-line no-undef
+          port:   process.env.SMTP_PORT,
+          secure: false,
+          auth:   {
+            user: '',
+            pass: '',
           },
         })
 
         const mail_configs = {
-          from: 'mikenasignas@gmail.com',
-          to:   'ignas.mikenas@datalogistics.lt',
+          // eslint-disable-next-line no-undef
+          from: process.env.SENDER_ADDRESS,
+          // eslint-disable-next-line no-undef
+          to:   process.env.RECIPIENT_ADDRESS,
+          // eslint-disable-next-line no-undef
+          cc:   [process.env.CARBON_COPY_ADDRESS],
           subject:
             `${req.body.visitingClient}  ${req.body.creationDate} ${req.body.creationTime}`,
           attachments: [{
@@ -545,7 +553,7 @@ export async function updateClientsGests (req, res) {
   const visitsCollection = client.db('ChecklistDB').collection('visits')
   const result = visitsCollection.findOneAndUpdate(
     { id: Number(visitId) },
-    { $push: { 'clientsGuests': req.body.value } },
+    { $push: { 'clientsGuests': req.body } },
     { returnDocument: 'after' }
   )
   return sendRes(res, false, 'all good', result.value)
