@@ -10,17 +10,25 @@ export const getCurrentDate = () => {
   const year = currentdate.getFullYear()
   const month = (currentdate.getMonth() + 1).toString().padStart(2, '0')
   const day = currentdate.getDate().toString().padStart(2, '0')
-
   const formattedDate = `${year}-${month}-${day}`
+
   return formattedDate
 }
 
 export const getCurrentTime  = () => {
   const currentdate = new Date()
   const currentTime = currentdate.getHours() + ':' + currentdate.getMinutes()
+
   return currentTime.padStart(2, '0')
 }
 
+export const getCurrentDateTime = () => {
+  const currentdate =  getCurrentDate()
+  const currentTime = getCurrentTime()
+  const dateTime = `${currentdate} ${currentTime}`
+
+  return dateTime
+}
 
 export const getPagination = (page?: RequestQuery, limit?: RequestQuery) => {
   const parsedLimit = typeof limit === 'string' ? parseInt(limit) : undefined
