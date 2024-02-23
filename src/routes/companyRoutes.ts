@@ -19,10 +19,10 @@ import getCompany               from '../controllers/companyControllers/getCompa
 import getCompanyCount          from '../controllers/companyControllers/getCompanyCount'
 import getCompanyDocuments      from '../controllers/companyControllers/getCompanyDocuments'
 import getCompanyEmployee       from '../controllers/companyControllers/getCompanyEmployee'
+import getCompanyEmployeeCount  from '../controllers/companyControllers/getCompanyEmployeeCount'
 import getDocumentFile          from '../controllers/companyControllers/getCompanyDocumentFile'
 import getPermission            from '../controllers/companyControllers/getPermission'
 import uploadDocument           from '../controllers/companyControllers/uploadCompanyDocument'
-import getCompanyEmployeeCount  from '../controllers/companyControllers/getCompanyEmployeeCount'
 
 
 

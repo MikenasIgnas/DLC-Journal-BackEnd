@@ -7,8 +7,8 @@ import { getPagination }              from '../../helpers.js'
 import { isNonExistant }              from '../../typeChecks.js'
 import CompanyEmployeeSchema          from '../../shemas/CompanyEmployeeSchema.js'
 import getArrayPhotos                 from '../../utility/getArrayPhotos.js'
-import getCompanyEmployeeFilterParams from './getCompanyEmployeeFilterParams.js'
 import getSinglePhoto                 from '../../utility/getSinglePhoto.js'
+import getCompanyEmployeeFilterParams from './getCompanyEmployeeFilterParams.js'
 
 
 export default async (req: Request, res: Response) => {
@@ -41,14 +41,6 @@ export default async (req: Request, res: Response) => {
 
       if (!isNonExistant(companyId)) {
         params.companyId = companyId
-      }
-
-      if (search) {
-        params.$or = [
-          { name: { $regex: search, $options: 'i' } },
-          { lastname: { $regex: search, $options: 'i' } },
-          { occupation: { $regex: search, $options: 'i' } },
-        ]
       }
 
       employees = await CompanyEmployeeSchema.find(params).limit(parsedLimit).skip(skip)
