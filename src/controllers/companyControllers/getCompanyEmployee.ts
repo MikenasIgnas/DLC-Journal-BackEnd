@@ -1,29 +1,25 @@
 import {
   Request,
   Response,
-}                            from 'express'
+}                                     from 'express'
 
-import { getPagination }     from '../../helpers.js'
-import { isNonExistant }     from '../../typeChecks.js'
-import CompanyEmployeeSchema from '../../shemas/CompanyEmployeeSchema.js'
-import getArrayPhotos        from '../../utility/getArrayPhotos.js'
-import getSearchFilters      from '../../utility/getSearchFilters.js'
-import getSinglePhoto        from '../../utility/getSinglePhoto.js'
+import { getPagination }              from '../../helpers.js'
+import { isNonExistant }              from '../../typeChecks.js'
+import CompanyEmployeeSchema          from '../../shemas/CompanyEmployeeSchema.js'
+import getArrayPhotos                 from '../../utility/getArrayPhotos.js'
+import getCompanyEmployeeFilterParams from './getCompanyEmployeeFilterParams.js'
+import getSinglePhoto                 from '../../utility/getSinglePhoto.js'
 
 
 export default async (req: Request, res: Response) => {
   try {
     const {
       companyId,
-      email,
       id,
       isDisabled,
-      lastname,
       limit,
-      name,
-      occupation,
       page,
-      phone,
+      search,
     } = req.query
 
     if (id) {
@@ -35,13 +31,9 @@ export default async (req: Request, res: Response) => {
     } else {
       const { parsedLimit, skip } = getPagination(page, limit)
 
-      const params = getSearchFilters({
-        name,
-        email,
-        lastname,
-        occupation,
-        phone,
-      })
+      let employees = undefined
+
+      const params = getCompanyEmployeeFilterParams({ search, companyId, isDisabled })
 
       if (!isNonExistant(isDisabled)) {
         params.isDisabled = isDisabled
@@ -51,7 +43,15 @@ export default async (req: Request, res: Response) => {
         params.companyId = companyId
       }
 
-      const employees = await CompanyEmployeeSchema.find(params).limit(parsedLimit).skip(skip)
+      if (search) {
+        params.$or = [
+          { name: { $regex: search, $options: 'i' } },
+          { lastname: { $regex: search, $options: 'i' } },
+          { occupation: { $regex: search, $options: 'i' } },
+        ]
+      }
+
+      employees = await CompanyEmployeeSchema.find(params).limit(parsedLimit).skip(skip)
 
       getArrayPhotos(employees)
 
