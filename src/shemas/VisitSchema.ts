@@ -16,7 +16,6 @@ const Visit = new Schema({
     company: { type: String, required: true },
   }],
   id:                 { type: Number, required: true },
-  permissions:        [{ type: Types.ObjectId }],
   racks:              [{ type: Types.ObjectId }],
   scheduledVisitTime: { type: Date },
   siteId:             { type: Types.ObjectId },

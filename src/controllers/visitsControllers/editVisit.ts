@@ -11,7 +11,6 @@ interface Body {
   date:                Date
   guests?:             string[]
   id:                  ObjectId
-  permissions:         ObjectId[]
   racks:               ObjectId[]
   scheduledVisitTime?: Date
   visitorIdType:       ObjectId
@@ -31,7 +30,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       date,
       guests,
       id,
-      permissions,
       racks,
       scheduledVisitTime,
       visitorIdType,
@@ -67,7 +65,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
         companyId,
         date,
         guests,
-        permissions,
         racks,
         scheduledVisitTime,
         signature,

@@ -3,7 +3,10 @@ import autoTable             from 'jspdf-autotable'
 import fs                    from 'fs'
 import jsPDF                 from 'jspdf'
 
-import { parseDateToString } from '../../helpers'
+import {
+  parseDateTimeToString,
+  parseDateToString,
+}                            from '../../helpers'
 import CompanyEmployeeSchema from '../../shemas/CompanyEmployeeSchema'
 import CompanySchema         from '../../shemas/CompanySchema'
 import PermissionSchema      from '../../shemas/PermissionSchema'
@@ -23,10 +26,11 @@ interface ExtendedJsPDF extends jsPDF {
 interface Params {
   visitId:    Types.ObjectId
   signatures: { signature: string, visitorId: number }[]
+  startDate:  Date
 }
 
 
-export default async ({ visitId, signatures }: Params) => {
+export default async ({ visitId, signatures, startDate }: Params) => {
   const visit = await VisitSchema.findById(visitId)
 
   if (!visit) {
@@ -132,7 +136,7 @@ export default async ({ visitId, signatures }: Params) => {
 
   doc.setFontSize(10)
   doc.text(
-    `Data: ${visit.date}`,
+    `Data: ${parseDateTimeToString(startDate)}`,
     doc.internal.pageSize.width / 2,
     35,
     { align: 'center' }

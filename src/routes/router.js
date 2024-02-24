@@ -51,7 +51,6 @@ import checklistPdfController         from '../controllers/checklistPdfControlle
 import FilledChecklistData            from '../shemas/FilledChecklistData'
 import multipleVisitPdfController     from '../controllers/multipleVisitPdfController'
 import premiseCsvController           from '../controllers/sitesControllers/premiseCsvController'
-import singleVisitPdfController       from '../controllers/singleVisitPdfController'
 import siteCsvController              from '../controllers/sitesControllers/siteCsvController'
 import VisitsData                     from '../shemas/VisitsSchema'
 
@@ -117,7 +116,6 @@ router.post('/addCollocation', verifyToken, addCollocation)
 router.post('/deleteCollocation', verifyToken, deleteCollocation)
 router.get('/deleteSignature', verifyToken, deleteSignature)
 
-router.get('/generatePdf', verifyToken, singleVisitPdfController)
 router.get('/generateMultipleVisitPdf', verifyToken, multipleVisitPdfController)
 router.post('/generateAllCollocationsCSV', verifyToken, siteCsvController)
 router.post('/generateSingleCollocationCSV', verifyToken, premiseCsvController)

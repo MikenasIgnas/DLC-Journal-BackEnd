@@ -14,7 +14,6 @@ interface Body {
   companyId:           ObjectId
   endDate?:            Date
   guests?:             Guest[]
-  permissions:         ObjectId[]
   siteId:              ObjectId
   racks?:              ObjectId[]
   scheduledVisitTime?: Date
@@ -30,7 +29,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       carPlates,
       companyId,
       guests,
-      permissions,
       racks,
       scheduledVisitTime,
       siteId,
@@ -40,7 +38,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
 
     if (!(
       companyId &&
-      permissions &&
       racks &&
       statusId &&
       visitPurpose &&
@@ -65,7 +62,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       companyId,
       guests,
       id,
-      permissions,
       racks,
       scheduledVisitTime,
       statusId,

@@ -38,14 +38,16 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ messsage: 'Visit status does not exist' })
     }
 
-    const documentPath = await generateVisitPdf({ signatures, visitId })
+    const startDate = new Date()
+
+    const documentPath = await generateVisitPdf({ signatures, startDate, visitId })
 
     const visit = await VisitSchema.findByIdAndUpdate(
       { _id: visitId },
       {
         dlcEmlpyee,
         documentPath,
-        startDate: Date.now(),
+        startDate,
         statusId,
       },
       { new: true }
