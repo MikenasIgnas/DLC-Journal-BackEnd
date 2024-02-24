@@ -268,7 +268,6 @@ export default async ({ visitId, signatures }: Params) => {
     if (err) {
       throw new Error('error save file')
     }
-    console.log('The file was saved!')
   })
 
   return documentPath

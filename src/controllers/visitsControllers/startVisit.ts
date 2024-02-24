@@ -53,6 +53,10 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
 
     return res.status(201).json(visit)
   } catch (error) {
-    return res.status(500).json({ message: 'Unexpected error' })
+    if (error instanceof Error) {
+      return res.status(500).json({ message: error.message })
+    } else {
+      return res.status(500).json({ message: 'Unexpected error' })
+    }
   }
 }
