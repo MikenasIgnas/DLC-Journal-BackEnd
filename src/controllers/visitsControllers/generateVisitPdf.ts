@@ -10,6 +10,7 @@ import PermissionSchema      from '../../shemas/PermissionSchema'
 import PremiseSchema         from '../../shemas/PremiseSchema'
 import RackSchema            from '../../shemas/RackSchema'
 import SiteSchema            from '../../shemas/SiteSchema'
+import VisitorIdTypeSchema   from '../../shemas/VisitorIdTypeSchema'
 import VisitorSchema         from '../../shemas/VisitorSchema'
 import VisitSchema           from '../../shemas/VisitSchema'
 
@@ -58,8 +59,10 @@ export default async ({ visitId, signatures }: Params) => {
 
       const permissions: string[] = []
 
-      for (let index = 0; index < visit.permissions.length; index++) {
-        const element = visit.permissions[index]
+      const idType = await VisitorIdTypeSchema.findById(visitorIdType)
+
+      for (let index = 0; index < visit.visitPurpose.length; index++) {
+        const element = visit.visitPurpose[index]
 
         const employeeHasPermission = employee?.permissions.includes(element)
 
@@ -79,7 +82,7 @@ export default async ({ visitId, signatures }: Params) => {
         occupation: employee?.occupation,
         phone:      employee?.phone,
         email:      employee?.email,
-        idType:     visitorIdType as string,
+        idType:     idType?.name,
         permissions,
         signature,
       }
@@ -94,13 +97,13 @@ export default async ({ visitId, signatures }: Params) => {
     const rack = await RackSchema.findById(element)
 
     if (rack) {
-      if (visitRacks[String(rack.premiseId)]) {
-        visitRacks[String(rack.premiseId)].push(rack.name)
-      } else {
-        const premise = await PremiseSchema.findById(rack.premiseId)
+      const premise = await PremiseSchema.findById(rack.premiseId)
 
-        if (premise) {
-          visitRacks[String(rack.premiseId)] = [rack.name]
+      if (premise) {
+        if (visitRacks[premise.name]) {
+          visitRacks[premise.name].push(rack.name)
+        } else {
+          visitRacks[premise.name] = [rack.name]
         }
       }
     }
