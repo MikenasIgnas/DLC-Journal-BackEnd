@@ -1,15 +1,18 @@
 import { Response }          from 'express'
-import { ObjectId }          from 'mongoose'
+import { Types }             from 'mongoose'
 
 import { getLoggedInUserId } from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
 import VisitSchema           from '../../shemas/VisitSchema.js'
 import visitStatusSchema     from '../../shemas/visitStatusSchema.js'
 
+import generateVisitPdf      from './generateVisitPdf.js'
+
 
 interface Body {
-  visitId:  ObjectId
-  statusId: ObjectId
+  signatures: { signature: string, visitorId: number }[]
+  statusId:   Types.ObjectId
+  visitId:    Types.ObjectId
 }
 
 
@@ -17,13 +20,13 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
     const dlcEmlpyee = await getLoggedInUserId(req)
 
-    const { visitId, statusId } = req.body
+    const { visitId, signatures, statusId } = req.body
 
     if (!visitId && !statusId) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
-    const visitExists = await VisitSchema.exists({ _id: visitId})
+    const visitExists = await VisitSchema.exists({ _id: visitId })
 
     if (!visitExists) {
       return res.status(400).json({ messsage: 'Visit does not exist' })
@@ -35,12 +38,15 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ messsage: 'Visit status does not exist' })
     }
 
+    const documentPath = await generateVisitPdf({ signatures, visitId })
+
     const visit = await VisitSchema.findByIdAndUpdate(
       { _id: visitId },
       {
         dlcEmlpyee,
-        statusId,
+        documentPath,
         startDate: Date.now(),
+        statusId,
       },
       { new: true }
     )

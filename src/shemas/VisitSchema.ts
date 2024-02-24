@@ -5,12 +5,16 @@ import {
 } from 'mongoose'
 
 const Visit = new Schema({
-  carPlates:          [{ type: String }],
-  companyId:          { type: Types.ObjectId, required: true },
-  date:               { type: Date, default: Date.now },
-  dlcEmlpyee:         { type: Types.ObjectId },
-  endDate:            { type: Date },
-  guests:             [{ type: { name: String, company: String } }],
+  carPlates:    [{ type: String }],
+  companyId:    { type: Types.ObjectId, required: true },
+  date:         { type: Date, default: Date.now },
+  dlcEmlpyee:   { type: Types.ObjectId },
+  documentPath: { type: String },
+  endDate:      { type: Date },
+  guests:       [{
+    name:    { type: String, required: true },
+    company: { type: String, required: true },
+  }],
   id:                 { type: Number, required: true },
   permissions:        [{ type: Types.ObjectId }],
   racks:              [{ type: Types.ObjectId }],

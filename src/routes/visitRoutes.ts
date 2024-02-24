@@ -24,6 +24,7 @@ import endVisit             from '../controllers/visitsControllers/endVisit'
 import getVisit             from '../controllers/visitsControllers/getVisit'
 import getVisitor           from '../controllers/visitsControllers/getVisitor'
 import getVisitorIdType     from '../controllers/visitsControllers/getVisitorIdType'
+import getVisitPdf          from '../controllers/visitsControllers/getVisitPdf'
 import getVisitPurpose      from '../controllers/visitsControllers/getVisitPurpose'
 import getVisitsCount       from '../controllers/visitsControllers/getVisitsCount'
 import getVisitStatus       from '../controllers/visitsControllers/getVisitStatus'
@@ -59,6 +60,7 @@ router.get('/visit', verifyToken, getVisit)
 router.get('/visit/count', verifyToken, getVisitsCount)
 router.post('/start', verifyToken, startVisit)
 router.post('/end', verifyToken, endVisit)
+router.get('/pdf', verifyToken, getVisitPdf)
 
 router.patch('/carplate', verifyToken, removeVisitCarplates)
 
