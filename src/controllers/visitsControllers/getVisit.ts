@@ -33,7 +33,7 @@ export default async (req: Request, res: Response) => {
 
       return res.status(200).json(visit)
     } else if (id) {
-      const visit = await VisitSchema.find({ id })
+      const visit = await VisitSchema.findOne({ id })
 
       return res.status(200).json(visit)
     } else {
