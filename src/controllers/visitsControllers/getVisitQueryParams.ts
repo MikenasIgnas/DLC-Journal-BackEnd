@@ -21,7 +21,7 @@ interface QueryParams {
   endDate?:      Date
   racks?:        Includes
   siteId?:       Types.ObjectId
-  startDate?:    { $lt: Date, $gt: Date }
+  startDate?:    { $lt?: Date, $gt?: Date }
   statusId?:     Types.ObjectId
   visitPurpose?: Includes
   $or?: [
@@ -129,8 +129,20 @@ export default async ({ search, siteId, startFrom, startTo, statusId }: Params) 
     params.siteId = new Types.ObjectId(siteId)
   }
 
-  if (startFrom && iSstring(startFrom) && startTo && iSstring(startTo)) {
-    params.startDate = { $lt: new Date(startTo), $gt: new Date(startFrom) }
+  if (startTo || startFrom) {
+    params.startDate = {}
+
+    if (iSstring(startTo)) {
+      params.startDate = {
+        $lt: new Date(startTo),
+      }
+    }
+
+    if (iSstring(startFrom)) {
+      params.startDate = {
+        $gt: new Date(startFrom),
+      }
+    }
   }
 
   if (statusId && iSstring(statusId)) {
