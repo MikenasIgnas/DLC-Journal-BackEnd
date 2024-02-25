@@ -78,3 +78,17 @@ export const getLoggedInUserId = async (req: Request) => {
     return decoded?.userId
   }
 }
+
+export const calculateTimeDifference = (startDate: Date | undefined, endDate: Date | undefined) => {
+  if (startDate && endDate) {
+    const startDateTime   = new Date(`${startDate}`)
+    const endDateTime     = new Date(`${endDate}`)
+    const timeDifference  = Number(endDateTime) - Number(startDateTime)
+    const hours           = Math.floor(timeDifference / (1000 * 60 * 60))
+    const minutes         = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60))
+    const result          = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+    return result
+  } else {
+    return
+  }
+}

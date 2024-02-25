@@ -29,6 +29,7 @@ import getVisitsCount       from '../controllers/visitsControllers/getVisitsCoun
 import getVisitStatus       from '../controllers/visitsControllers/getVisitStatus'
 import removeVisitCarplates from '../controllers/visitsControllers/removeVisitCarplates'
 import startVisit           from '../controllers/visitsControllers/startVisit'
+import generateVisitsReport from '../controllers/generateVisitsReport'
 
 const router = Router()
 
@@ -60,6 +61,7 @@ router.get('/visit/count', verifyToken, getVisitsCount)
 router.post('/start', verifyToken, startVisit)
 router.post('/end', verifyToken, endVisit)
 router.get('/pdf', verifyToken, getVisitPdf)
+router.get('/visit/report', verifyToken, generateVisitsReport)
 
 router.patch('/carplate', verifyToken, removeVisitCarplates)
 
