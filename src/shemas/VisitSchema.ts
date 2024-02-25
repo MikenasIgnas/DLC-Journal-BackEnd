@@ -8,7 +8,7 @@ const Visit = new Schema({
   carPlates:    [{ type: String }],
   companyId:    { type: Types.ObjectId, required: true },
   date:         { type: Date, default: Date.now },
-  dlcEmlpyee:   { type: Types.ObjectId },
+  dlcEmployee:  { type: Types.ObjectId },
   documentPath: { type: String },
   endDate:      { type: Date },
   guests:       [{

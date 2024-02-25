@@ -3,6 +3,7 @@ import { Types }             from 'mongoose'
 
 import { getLoggedInUserId } from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
+import VisitorSchema         from '../../shemas/VisitorSchema.js'
 import VisitSchema           from '../../shemas/VisitSchema.js'
 import visitStatusSchema     from '../../shemas/visitStatusSchema.js'
 
@@ -18,7 +19,7 @@ interface Body {
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
-    const dlcEmlpyee = await getLoggedInUserId(req)
+    const dlcEmployee = await getLoggedInUserId(req)
 
     const { visitId, signatures, statusId } = req.body
 
@@ -42,10 +43,18 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
 
     const documentPath = await generateVisitPdf({ signatures, startDate, visitId })
 
+    if (documentPath) {
+      for (let index = 0; index < signatures.length; index++) {
+        const id = signatures[index].visitorId
+
+        await VisitorSchema.findByIdAndUpdate(id, { signed: true })
+      }
+    }
+
     const visit = await VisitSchema.findByIdAndUpdate(
       { _id: visitId },
       {
-        dlcEmlpyee,
+        dlcEmployee,
         documentPath,
         startDate,
         statusId,

@@ -4,7 +4,6 @@ import {
   verifyAdmin,
   verifyToken,
 }                           from '../middleware/middle'
-import { upload }           from '../utility/uploadPhoto'
 import createVisit          from '../controllers/visitsControllers/createVisit'
 import createVisitor        from '../controllers/visitsControllers/createVisitor'
 import createVisitorIdType  from '../controllers/visitsControllers/createVisitorIdType'
@@ -49,7 +48,7 @@ router.delete('/visitPurpose', verifyToken, verifyAdmin, deleteVisitPurpose)
 router.get('/visitPurpose', verifyToken, getVisitPurpose)
 
 router.post('/visitor', verifyToken, createVisitor)
-router.put('/visitor', verifyToken, upload.single('signature'), editVisitor)
+router.put('/visitor', verifyToken, editVisitor)
 router.delete('/visitor', verifyToken, deleteVisitor)
 router.get('/visitor', verifyToken, getVisitor)
 

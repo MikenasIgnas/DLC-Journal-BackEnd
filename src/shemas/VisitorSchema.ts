@@ -6,8 +6,8 @@ import {
 
 const Visitor = new Schema({
   visitorIdType: { type: Types.ObjectId },
-  signature:     { type: String },
   employeeId:    { type: Types.ObjectId, required: true },
+  signed:        { type: Boolean, required: true, default: false },
   visitId:       { type: Types.ObjectId, required: true },
 })
 

@@ -16,15 +16,13 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
     const { id, employeeId, visitId, visitorIdType } = req.body
 
-    const signature = req.file?.path
-
     if (!id) {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
     const rack = await VisitorSchema.findByIdAndUpdate(
       { _id: id },
-      { employeeId, signature, visitId, visitorIdType },
+      { employeeId, visitId, visitorIdType },
       { new: true }
     )
 
