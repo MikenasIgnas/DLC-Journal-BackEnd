@@ -1,9 +1,14 @@
-import { Types }          from 'mongoose'
+import { Types }             from 'mongoose'
 
-import CompanySchema      from '../../shemas/CompanySchema'
-import RackSchema         from '../../shemas/RackSchema'
-import VisitPurposeSchema from '../../shemas/VisitPurposeSchema'
-import UserSchema         from '../../shemas/UserSchema'
+import { iSstring }          from '../../typeChecks'
+import { RequestQuery }      from '../../types'
+import CompanyEmployeeSchema from '../../shemas/CompanyEmployeeSchema'
+import CompanySchema         from '../../shemas/CompanySchema'
+import getSearchFilters      from '../../utility/getSearchFilters'
+import RackSchema            from '../../shemas/RackSchema'
+import UserSchema            from '../../shemas/UserSchema'
+import VisitorSchema         from '../../shemas/VisitorSchema'
+import VisitPurposeSchema    from '../../shemas/VisitPurposeSchema'
 
 interface Includes {
   $in: Types.ObjectId[]
@@ -22,6 +27,7 @@ interface QueryParams {
   $or?: [
     { companyId: { $in: Types.ObjectId[] } },
     { dlcEmployee: { $in: Types.ObjectId[] } },
+    { _id: { $in: Types.ObjectId[] } },
     { racks: { $in: Types.ObjectId[] } },
     { visitPurpose: { $in: Types.ObjectId[] } },
     { carPlates: { $regex: string, $options: 'i' } },
@@ -37,11 +43,11 @@ interface QueryParams {
 }
 
 interface Params {
-  search?:    string
-  siteId?:    string
-  statusId?:  string
-  startFrom?: string
-  startTo?:   string
+  search?:    RequestQuery
+  siteId?:    RequestQuery
+  statusId?:  RequestQuery
+  startFrom?: RequestQuery
+  startTo?:   RequestQuery
 }
 
 
@@ -77,9 +83,34 @@ export default async ({ search, siteId, startFrom, startTo, statusId }: Params) 
 
     const dlcEmployeeIds = dlcEmployees.map(el => el._id)
 
+    const companyEmployeesParams = getSearchFilters({
+      name:       search,
+      email:      search,
+      lastname:   search,
+      occupation: search,
+      phone:      search,
+    })
+
+    const companyEmployess = await CompanyEmployeeSchema.find(companyEmployeesParams)
+
+    const companyEmployeesIds = companyEmployess.map(({ _id }) => _id)
+
+    const visitors = await VisitorSchema.find({ employeeId: { $in: companyEmployeesIds }})
+
+    const visitIds: Types.ObjectId[] = []
+
+    for (let index = 0; index < visitors.length; index++) {
+      const visitId = visitors[index].visitId as Types.ObjectId
+
+      if (!visitIds.includes(visitId)) {
+        visitIds.push(visitId)
+      }
+    }
+
     params.$or = [
       { companyId: { $in: companyIds } },
       { dlcEmployee: { $in: dlcEmployeeIds } },
+      { _id: { $in: visitIds } },
       { racks: { $in: rackIds } },
       { visitPurpose: { $in: visitPuroseIds } },
       { carPlates: { $regex: String(search), $options: 'i' } },
@@ -94,15 +125,15 @@ export default async ({ search, siteId, startFrom, startTo, statusId }: Params) 
     ]
   }
 
-  if (siteId) {
+  if (siteId && iSstring(siteId)) {
     params.siteId = new Types.ObjectId(siteId)
   }
 
-  if (startFrom && startTo) {
+  if (startFrom && iSstring(startFrom) && startTo && iSstring(startTo)) {
     params.startDate = { $lt: new Date(startTo), $gt: new Date(startFrom) }
   }
 
-  if (statusId) {
+  if (statusId && iSstring(statusId)) {
     params.statusId = new Types.ObjectId(statusId)
   }
 

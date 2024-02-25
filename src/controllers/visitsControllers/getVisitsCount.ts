@@ -19,11 +19,11 @@ export default async (req: Request, res: Response) => {
     } = req.query
 
     const params = await getVisitQueryParams({
-      search:    String(search),
-      siteId:    String(siteId),
-      statusId:  String(statusId),
-      startFrom: String(startFrom),
-      startTo:   String(startTo),
+      search,
+      siteId,
+      statusId,
+      startFrom,
+      startTo,
     })
 
     const visits = await VisitSchema.find(params).countDocuments()

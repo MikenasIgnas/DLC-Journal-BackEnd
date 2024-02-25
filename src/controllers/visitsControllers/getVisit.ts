@@ -35,11 +35,11 @@ export default async (req: Request, res: Response) => {
       const { parsedLimit, skip } = getPagination(page, limit)
 
       const params = await getVisitQueryParams({
-        search:    String(search),
-        siteId:    String(siteId),
-        statusId:  String(statusId),
-        startFrom: String(startFrom),
-        startTo:   String(startTo),
+        search,
+        siteId,
+        statusId,
+        startFrom,
+        startTo,
       })
 
       let sort: SortOrder = 1
