@@ -18,6 +18,7 @@ export default async (req: Request, res: Response) => {
     const {
       descending,
       id,
+      _id,
       limit,
       page,
       search,
@@ -27,8 +28,12 @@ export default async (req: Request, res: Response) => {
       statusId,
     } = req.query
 
-    if (id) {
-      const visit = await VisitSchema.findById({ _id: id })
+    if (_id) {
+      const visit = await VisitSchema.findById(_id)
+
+      return res.status(200).json(visit)
+    } else if (id) {
+      const visit = await VisitSchema.find({ id })
 
       return res.status(200).json(visit)
     } else {
