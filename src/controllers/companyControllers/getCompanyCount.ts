@@ -1,14 +1,23 @@
 import {
   Request,
   Response,
-}                         from 'express'
+}                       from 'express'
 
-import CompanySchema      from '../../shemas/CompanySchema'
+import CompanySchema    from '../../shemas/CompanySchema'
+import getSearchFilters from '../../utility/getSearchFilters'
 
 
 export default async (req: Request, res: Response) => {
+  const { name, parentId } = req.query
+
   try {
-    const companies = await CompanySchema.count()
+    const params = getSearchFilters({ name })
+
+    if (parentId) {
+      params.parentId = parentId
+    }
+
+    const companies = await CompanySchema.find(params).count()
 
     return res.status(200).json(companies)
   } catch (error) {
