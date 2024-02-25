@@ -1,38 +1,64 @@
 import {
   Request,
   Response,
-}                        from 'express'
+}                         from 'express'
 import {
   SortOrder,
   Types,
-}                        from 'mongoose'
+}                         from 'mongoose'
 
-import { getPagination } from '../../helpers.js'
-import { iSstring }      from '../../typeChecks.js'
-import VisitSchema       from '../../shemas/VisitSchema.js'
+import { getPagination }  from '../../helpers.js'
+import { iSstring }       from '../../typeChecks.js'
+import CompanySchema      from '../../shemas/CompanySchema.js'
+import RackSchema         from '../../shemas/RackSchema.js'
+import UserSchema         from '../../shemas/UserSchema.js'
+import VisitPurposeSchema from '../../shemas/VisitPurposeSchema.js'
+import VisitSchema        from '../../shemas/VisitSchema.js'
+
+
+interface Includes {
+  $in: Types.ObjectId[]
+}
 
 interface Params {
-  companyId?:          Types.ObjectId
-  date?:               Date
-  descending?:         boolean
-  endDate?:            Date
-  scheduledVisitTime?: Date
-  startDate?:          Date
-  statusId?:           Types.ObjectId
+  companyId?:    Includes
+  descending?:   boolean
+  dlcEmployee?:  Includes
+  endDate?:      Date
+  racks?:        Includes
+  siteId?:       Types.ObjectId
+  startDate?:    { $lt: Date, $gt: Date }
+  statusId?:     Types.ObjectId
+  visitPurpose?: Includes
+  $or?: [
+    { companyId: { $in: Types.ObjectId[] } },
+    { dlcEmployee: { $in: Types.ObjectId[] } },
+    { racks: { $in: Types.ObjectId[] } },
+    { visitPurpose: { $in: Types.ObjectId[] } },
+    { carPlates: { $regex: string, $options: 'i' } },
+    { guests: {
+      $elemMatch: {
+        $or: [
+          { name: { $regex: string, $options: 'i' } },
+          { company: { $regex: string, $options: 'i' }},
+        ],
+      },
+    }}
+  ]
 }
 
 
 export default async (req: Request, res: Response) => {
   try {
     const {
-      companyId,
-      date,
       descending,
       id,
       limit,
       page,
-      scheduledVisitTime,
-      startDate,
+      search,
+      siteId,
+      startFrom,
+      startTo,
       statusId,
     } = req.query
 
@@ -45,28 +71,66 @@ export default async (req: Request, res: Response) => {
 
       const params: Params = {}
 
-      if (companyId && iSstring(companyId)) {
-        params.companyId = new Types.ObjectId(companyId)
+      if (search) {
+        const companies = await CompanySchema.find({
+          $or: [{ name: { $regex: search, $options: 'i' } }],
+        })
+
+        const companyIds = companies.map(el => el._id)
+
+        const racks = await RackSchema.find({
+          $or: [{ name: { $regex: search, $options: 'i' } }],
+        })
+
+        const rackIds = racks.map(el => el._id)
+
+        const visitPurposes = await VisitPurposeSchema.find({
+          $or: [{ name: { $regex: search, $options: 'i' } }],
+        })
+
+        const visitPuroseIds = visitPurposes.map(el => el._id)
+
+        const dlcEmployees = await UserSchema.find({
+          $or: [
+            { name: { $regex: search, $options: 'i' } },
+            { email: { $regex: search, $options: 'i' } },
+            { username: { $regex: search, $options: 'i' } },
+          ],
+        })
+
+        const dlcEmployeeIds = dlcEmployees.map(el => el._id)
+
+        params.$or = [
+          { companyId: { $in: companyIds } },
+          { dlcEmployee: { $in: dlcEmployeeIds } },
+          { racks: { $in: rackIds } },
+          { visitPurpose: { $in: visitPuroseIds } },
+          { carPlates: { $regex: String(search), $options: 'i' } },
+          { guests: {
+            $elemMatch: {
+              $or: [
+                { name: { $regex: String(search), $options: 'i' } },
+                { company: { $regex: String(search), $options: 'i' }},
+              ],
+            },
+          }},
+        ]
       }
 
-      if (date && iSstring(date)) {
-        params.date = new Date(date)
+      if (siteId && iSstring(siteId)) {
+        params.siteId = new Types.ObjectId(siteId)
       }
 
-      if (scheduledVisitTime && iSstring(scheduledVisitTime)) {
-        params.scheduledVisitTime = new Date(scheduledVisitTime)
-      }
-
-      if (startDate && iSstring(startDate)) {
-        params.startDate = new Date(startDate)
+      if (startFrom && iSstring(startFrom) && startTo && iSstring(startTo)) {
+        params.startDate = { $lt: new Date(startTo), $gt: new Date(startFrom) }
       }
 
       if (statusId && iSstring(statusId)) {
         params.statusId = new Types.ObjectId(statusId)
       }
 
-
       let sort: SortOrder = 1
+
       if (descending === 'true') {
         sort = -1
       }
