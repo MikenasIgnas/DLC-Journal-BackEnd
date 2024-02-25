@@ -87,6 +87,7 @@ export const calculateTimeDifference = (startDate: Date | undefined, endDate: Da
     const hours           = Math.floor(timeDifference / (1000 * 60 * 60))
     const minutes         = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60))
     const result          = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+
     return result
   } else {
     return

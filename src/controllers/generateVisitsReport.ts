@@ -2,15 +2,16 @@
 import {
   Request,
   Response,
-}                             from 'express'
+}                                   from 'express'
 
-import CompanyEmployeeSchema  from '../shemas/CompanyEmployeeSchema'
-import CompanySchema          from '../shemas/CompanySchema'
-import SiteSchema             from '../shemas/SiteSchema'
-import VisitPurposeSchema     from '../shemas/VisitPurposeSchema'
-import VisitSchema            from '../shemas/VisitSchema'
-import VisitorSchema          from '../shemas/VisitorSchema'
-import { calculateTimeDifference } from '../helpers'
+import { calculateTimeDifference }  from '../helpers'
+
+import CompanyEmployeeSchema        from '../shemas/CompanyEmployeeSchema'
+import CompanySchema                from '../shemas/CompanySchema'
+import SiteSchema                   from '../shemas/SiteSchema'
+import VisitPurposeSchema           from '../shemas/VisitPurposeSchema'
+import VisitSchema                  from '../shemas/VisitSchema'
+import VisitorSchema                from '../shemas/VisitorSchema'
 
 export default async (req: Request, res: Response) => {
   const startDate = new Date(req.query.dateFrom as string)
@@ -44,7 +45,8 @@ export default async (req: Request, res: Response) => {
       const site            = await SiteSchema.findById(visit.siteId)
       const visitPurposes   = await Promise.all(visit.visitPurpose.map(purposeId => VisitPurposeSchema.findById(purposeId)))
       const purposesString  = visitPurposes.map(purpose => purpose?.name).join(', ')
-      const timeSpent = calculateTimeDifference(visit.startDate, visit.endDate)
+      const timeSpent       = calculateTimeDifference(visit.startDate, visit.endDate)
+
       const visitInfo = await Promise.all(visitors.map(async visitor => {
         const employee = await CompanyEmployeeSchema.findById(visitor.employeeId)
         return `${visit.id}, ${visit.date.toISOString()}, ${company?.name}, ${employee?.name} ${employee?.lastname}, ${purposesString}, ${site?.name}, ${timeSpent}`
@@ -52,11 +54,13 @@ export default async (req: Request, res: Response) => {
 
       return visitInfo.join('\n')
     })
+
     const csvRows     = (await Promise.all(csvRowsPromises)).join('\n')
-    const footer = `Viso vizitų: ${filteredVisits.length}`
-    const BOM = '\uFEFF'
-    const csvContent = BOM + csvHeaders + csvRows + '\n' + footer
-    const csvBuffer = Buffer.from(csvContent, 'utf-8')
+    const footer      = `Viso vizitų: ${filteredVisits.length}`
+    const BOM         = '\uFEFF'
+    const csvContent  = BOM + csvHeaders + csvRows + '\n' + footer
+    const csvBuffer   = Buffer.from(csvContent, 'utf-8')
+
     res.setHeader('Content-Type', 'text/csv; charset=utf-8')
     res.setHeader('Content-Disposition', 'attachment; filename="visit.csv"')
 
