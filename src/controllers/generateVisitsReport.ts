@@ -4,8 +4,10 @@ import {
   Response,
 }                                   from 'express'
 
-import { calculateTimeDifference, parseDateToString }  from '../helpers'
-
+import {
+  calculateTimeDifference,
+  parseDateToString,
+}                                   from '../helpers'
 import CompanyEmployeeSchema        from '../shemas/CompanyEmployeeSchema'
 import CompanySchema                from '../shemas/CompanySchema'
 import SiteSchema                   from '../shemas/SiteSchema'
@@ -27,7 +29,7 @@ export default async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'No visits found in the specified date range' })
     }
 
-    const visitsGrouped     = await Promise.all(visits.map(async (visit) => {
+    const visitsGrouped = await Promise.all(visits.map(async (visit) => {
       const visitors        = await VisitorSchema.find({ visitId: visit._id })
       const company         = await CompanySchema.findById(visit.companyId)
       const site            = await SiteSchema.findById(visit.siteId)
@@ -36,15 +38,14 @@ export default async (req: Request, res: Response) => {
       const timeSpent       = calculateTimeDifference(visit.startDate, visit.endDate)
       const visitDate       = parseDateToString(visit.startDate)
 
-      const visitorNames = visitors.map( async visitor => {
+      const visitorNames = await Promise.all(visitors.map( async visitor => {
         const employee = await CompanyEmployeeSchema.findById(visitor.employeeId)
 
         return employee ? `${employee.name} ${employee.lastname}` : ''
-      })
+      }).join(' '))
 
-      const visitorNamesString = (await Promise.all(visitorNames)).join(' ')
 
-      return `${visit.id}, ${visitDate}, ${company?.name}, ${visitorNamesString}, ${purposesString}, ${site?.name}, ${timeSpent}`
+      return `${visit.id}, ${visitDate}, ${company?.name}, ${visitorNames}, ${purposesString}, ${site?.name}, ${timeSpent}`
     }))
 
     const csvHeaders  = 'Visito Id, Vizito data, Įmonė, Įmonės darbuotojai, Vizito tikslas, Adresas, Užtrukta\n'

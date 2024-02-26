@@ -20,6 +20,7 @@ import editVisitorIdType    from '../controllers/visitsControllers/editVisitorId
 import editVisitPurpose     from '../controllers/visitsControllers/editVisitPurpose'
 import editVisitStatus      from '../controllers/visitsControllers/editVisitStatus'
 import endVisit             from '../controllers/visitsControllers/endVisit'
+import generateVisitsReport from '../controllers/generateVisitsReport'
 import getVisit             from '../controllers/visitsControllers/getVisit'
 import getVisitor           from '../controllers/visitsControllers/getVisitor'
 import getVisitorIdType     from '../controllers/visitsControllers/getVisitorIdType'
@@ -29,7 +30,6 @@ import getVisitsCount       from '../controllers/visitsControllers/getVisitsCoun
 import getVisitStatus       from '../controllers/visitsControllers/getVisitStatus'
 import removeVisitCarplates from '../controllers/visitsControllers/removeVisitCarplates'
 import startVisit           from '../controllers/visitsControllers/startVisit'
-import generateVisitsReport from '../controllers/generateVisitsReport'
 
 const router = Router()
 
