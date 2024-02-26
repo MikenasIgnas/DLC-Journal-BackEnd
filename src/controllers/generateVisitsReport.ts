@@ -4,7 +4,7 @@ import {
   Response,
 }                                   from 'express'
 
-import { calculateTimeDifference }  from '../helpers'
+import { calculateTimeDifference, parseDateToString }  from '../helpers'
 
 import CompanyEmployeeSchema        from '../shemas/CompanyEmployeeSchema'
 import CompanySchema                from '../shemas/CompanySchema'
@@ -18,51 +18,44 @@ export default async (req: Request, res: Response) => {
   const endDate   = new Date(req.query.dateTo as string)
 
   try {
-    const visits = await VisitSchema.find()
-
-    if (!visits || visits.length === 0) {
-      return res.status(404).json({ message: 'No visits found' })
-    }
-
-    const filteredVisits = visits.filter(item => {
-      if (item.endDate) {
-        const itemEndDate = new Date(item.endDate)
-
-        return itemEndDate >= startDate && itemEndDate <= endDate
-      }
-      return false
+    const visits = await VisitSchema.find({
+      startDate: { $lte: endDate },
+      endDate:   { $gte: startDate },
     })
 
-    if (filteredVisits.length === 0) {
+    if (!visits || visits.length === 0) {
       return res.status(404).json({ message: 'No visits found in the specified date range' })
     }
 
-    const csvHeaders = 'Visito Id, Vizito data, Įmonė, Įmonės darbuotojai, Vizito tikslas, Adresas, Užtrukta\n'
-
-    const csvRowsPromises = filteredVisits.map(async visit => {
+    const visitsGrouped     = await Promise.all(visits.map(async (visit) => {
       const visitors        = await VisitorSchema.find({ visitId: visit._id })
       const company         = await CompanySchema.findById(visit.companyId)
       const site            = await SiteSchema.findById(visit.siteId)
       const visitPurposes   = await Promise.all(visit.visitPurpose.map(purposeId => VisitPurposeSchema.findById(purposeId)))
-      const purposesString  = visitPurposes.map(purpose => purpose?.name).join(', ')
+      const purposesString  = visitPurposes.map(purpose => purpose?.name).join(' ')
       const timeSpent       = calculateTimeDifference(visit.startDate, visit.endDate)
+      const visitDate       = parseDateToString(visit.startDate)
 
-      const visitInfo = await Promise.all(visitors.map(async visitor => {
+      const visitorNames = visitors.map( async visitor => {
         const employee = await CompanyEmployeeSchema.findById(visitor.employeeId)
-        return `${visit.id}, ${visit.date.toISOString()}, ${company?.name}, ${employee?.name} ${employee?.lastname}, ${purposesString}, ${site?.name}, ${timeSpent}`
-      }))
 
-      return visitInfo.join('\n')
-    })
+        return employee ? `${employee.name} ${employee.lastname}` : ''
+      })
 
-    const csvRows     = (await Promise.all(csvRowsPromises)).join('\n')
-    const footer      = `Viso vizitų: ${filteredVisits.length}`
+      const visitorNamesString = (await Promise.all(visitorNames)).join(' ')
+
+      return `${visit.id}, ${visitDate}, ${company?.name}, ${visitorNamesString}, ${purposesString}, ${site?.name}, ${timeSpent}`
+    }))
+
+    const csvHeaders  = 'Visito Id, Vizito data, Įmonė, Įmonės darbuotojai, Vizito tikslas, Adresas, Užtrukta\n'
+    const csvRows     = visitsGrouped.join('\n')
+    const footer      = `Viso vizitų: ${visits.length}`
     const BOM         = '\uFEFF'
     const csvContent  = BOM + csvHeaders + csvRows + '\n' + footer
     const csvBuffer   = Buffer.from(csvContent, 'utf-8')
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8')
-    res.setHeader('Content-Disposition', 'attachment; filename="visit.csv"')
+    res.setHeader('Content-Disposition', 'attachment; filename="visits.csv"')
 
     res.status(200).send(csvBuffer)
   } catch (error) {
