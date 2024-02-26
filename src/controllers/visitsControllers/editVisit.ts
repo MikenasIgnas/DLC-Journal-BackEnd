@@ -1,14 +1,18 @@
-import { Response }          from 'express'
-import { ObjectId }          from 'mongoose'
+import { Response }           from 'express'
+import { ObjectId }           from 'mongoose'
 
-import { Guest, TypedRequestBody }  from '../../types.js'
-import CompanySchema         from '../../shemas/CompanySchema.js'
-import VisitSchema           from '../../shemas/VisitSchema.js'
+import {
+  Guest,
+  TypedRequestBody,
+}                             from '../../types.js'
 
-import sendVisitsEmail       from './sendVisitsEmail.js'
-import SiteSchema from '../../shemas/SiteSchema.js'
-import CompanyEmployeeSchema from '../../shemas/CompanyEmployeeSchema.js'
-import VisitorSchema from '../../shemas/VisitorSchema.js'
+import CompanyEmployeeSchema  from '../../shemas/CompanyEmployeeSchema.js'
+import CompanySchema          from '../../shemas/CompanySchema.js'
+import SiteSchema             from '../../shemas/SiteSchema.js'
+import VisitSchema            from '../../shemas/VisitSchema.js'
+import VisitorSchema          from '../../shemas/VisitorSchema.js'
+
+import sendVisitsEmail        from './sendVisitsEmail.js'
 
 interface Body {
   carPlates?:          string[]
@@ -24,7 +28,7 @@ interface Body {
   statusId:            ObjectId
   startDate:           Date,
   endDate:             Date,
-  sendEmail:           boolean
+  sendEmail?:          boolean
 }
 
 
@@ -96,7 +100,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       const employeeIds       = visitors.map(visitor => visitor.employeeId)
       const companyEmployees  = await CompanyEmployeeSchema.find({ _id: { $in: employeeIds } })
 
-      sendVisitsEmail({companyName, companyEmployees, scheduledVisitTime, guests, carPlates })
+      sendVisitsEmail({ companyName, companyEmployees, scheduledVisitTime, guests, carPlates })
     }
     return res.status(201).json(instance)
   } catch (error) {
