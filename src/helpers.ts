@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Request }        from 'express'
 import jwt                from 'jsonwebtoken'
 

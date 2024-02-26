@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { createTransport }            from 'nodemailer'
 
 import { convertUTCtoLocalDateTime }  from '../../helpers'
@@ -13,6 +12,7 @@ interface EmailBody {
     carPlates:          string[] | undefined
 }
 
+// eslint-disable-next-line max-len
 export default async ({ companyName, companyEmployees, scheduledVisitTime, guests, carPlates }: EmailBody) => {
   const imagePath         = 'src/Images/signatureLogo.png'
   const convertedDateTime = convertUTCtoLocalDateTime(scheduledVisitTime)
@@ -66,7 +66,7 @@ export default async ({ companyName, companyEmployees, scheduledVisitTime, guest
                       <p style="font-size: 10px">Pagarbiai,</p>
                       <p style="font-size: 10px">Monitoringo centras</p>
                       <p style="font-size: 10px">
-                        UAB Duomenų logistikos centras  |  A. Juozapavičiaus g. 13  |  LT-09311 Vilnius
+                    UAB Duomenų logistikos centras  |  A. Juozapavičiaus g. 13  |  LT-09311 Vilnius
                       </p>
                       <p style="font-size: 10px">Mob. +370 618 44 445;  +370 674 44 455 |</p>
                       <p style="font-size: 10px">El.paštas noc@datalogistics.lt</p>
@@ -79,7 +79,6 @@ export default async ({ companyName, companyEmployees, scheduledVisitTime, guest
 
       transporter.sendMail(mail_configs, function (error) {
         if (error) {
-          console.log(error)
           return reject({ message: 'An error has occurred' })
         }
         return resolve({ message: 'Email sent successfully' })

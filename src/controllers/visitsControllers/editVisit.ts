@@ -5,7 +5,6 @@ import {
   Guest,
   TypedRequestBody,
 }                             from '../../types.js'
-
 import CompanyEmployeeSchema  from '../../shemas/CompanyEmployeeSchema.js'
 import CompanySchema          from '../../shemas/CompanySchema.js'
 import SiteSchema             from '../../shemas/SiteSchema.js'
@@ -51,7 +50,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       sendEmail,
     } = req.body
 
-
     let signature: string | undefined
 
     if (req.file) {
@@ -69,7 +67,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
         return res.status(400).json({ messsage: 'Company does not exist' })
       }
     }
-
 
     const instance = await VisitSchema.findByIdAndUpdate(
       { _id: id },
@@ -96,11 +93,17 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     if (sendEmail && site?.name === 'T72') {
       const company           = await CompanySchema.findById(companyId)
       const companyName       = company?.name
-      const visitors          = await VisitorSchema.find({visitId: id})
+      const visitors          = await VisitorSchema.find({ visitId: id })
       const employeeIds       = visitors.map(visitor => visitor.employeeId)
       const companyEmployees  = await CompanyEmployeeSchema.find({ _id: { $in: employeeIds } })
 
-      sendVisitsEmail({ companyName, companyEmployees, scheduledVisitTime, guests, carPlates })
+      await sendVisitsEmail({
+        companyName,
+        companyEmployees,
+        scheduledVisitTime,
+        guests,
+        carPlates,
+      })
     }
     return res.status(201).json(instance)
   } catch (error) {
