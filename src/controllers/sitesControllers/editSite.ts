@@ -5,14 +5,15 @@ import { TypedRequestBody } from '../../types.js'
 import SiteSchema           from '../../shemas/SiteSchema.js'
 
 interface EditCompanyBody {
-  id:    ObjectId
-  name?: string
+  id:         ObjectId
+  name?:      string
+  isRemote?:  boolean
 }
 
 
 export default async (req: TypedRequestBody<EditCompanyBody>, res: Response) => {
   try {
-    const { id, name } = req.body
+    const { id, name, isRemote } = req.body
 
     if (!id) {
       return res.status(400).json({ message: 'Bad request' })
@@ -20,7 +21,7 @@ export default async (req: TypedRequestBody<EditCompanyBody>, res: Response) => 
 
     const site = await SiteSchema.findByIdAndUpdate(
       { _id: id },
-      { name },
+      { name, isRemote },
       { new: true }
     )
 
