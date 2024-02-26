@@ -1,19 +1,18 @@
-/* eslint-disable max-len */
 import {
   Request,
   Response,
-}                                   from 'express'
+}                             from 'express'
 
 import {
   calculateTimeDifference,
   parseDateToString,
-}                                   from '../helpers'
-import CompanyEmployeeSchema        from '../shemas/CompanyEmployeeSchema'
-import CompanySchema                from '../shemas/CompanySchema'
-import SiteSchema                   from '../shemas/SiteSchema'
-import VisitPurposeSchema           from '../shemas/VisitPurposeSchema'
-import VisitSchema                  from '../shemas/VisitSchema'
-import VisitorSchema                from '../shemas/VisitorSchema'
+}                             from '../helpers'
+import CompanyEmployeeSchema  from '../shemas/CompanyEmployeeSchema'
+import CompanySchema          from '../shemas/CompanySchema'
+import SiteSchema             from '../shemas/SiteSchema'
+import VisitPurposeSchema     from '../shemas/VisitPurposeSchema'
+import VisitSchema            from '../shemas/VisitSchema'
+import VisitorSchema          from '../shemas/VisitorSchema'
 
 export default async (req: Request, res: Response) => {
   const startDate = new Date(req.query.dateFrom as string)
@@ -21,8 +20,10 @@ export default async (req: Request, res: Response) => {
 
   try {
     const visits = await VisitSchema.find({
-      startDate: { $lte: endDate },
-      endDate:   { $gte: startDate },
+      $and: [
+        { startDate: { $lte: endDate } },
+        { endDate: { $gte: startDate } },
+      ],
     })
 
     if (!visits || visits.length === 0) {
@@ -33,21 +34,32 @@ export default async (req: Request, res: Response) => {
       const visitors        = await VisitorSchema.find({ visitId: visit._id })
       const company         = await CompanySchema.findById(visit.companyId)
       const site            = await SiteSchema.findById(visit.siteId)
-      const visitPurposes   = await Promise.all(visit.visitPurpose.map(purposeId => VisitPurposeSchema.findById(purposeId)))
+      const visitPurposes   = await Promise.all(visit.visitPurpose.map(purposeId =>
+        VisitPurposeSchema.findById(purposeId)))
+
       const purposesString  = visitPurposes.map(purpose => purpose?.name).join(' ')
       const timeSpent       = calculateTimeDifference(visit.startDate, visit.endDate)
       const visitDate       = parseDateToString(visit.startDate)
 
-      const visitorNames = await Promise.all(visitors.map( async visitor => {
+      const visitorNamesArray = await Promise.all(visitors.map(async visitor => {
         const employee = await CompanyEmployeeSchema.findById(visitor.employeeId)
-
         return employee ? `${employee.name} ${employee.lastname}` : ''
-      }).join(' '))
+      }))
 
+      const visitorNames = visitorNamesArray.join(' ')
 
-      return `${visit.id}, ${visitDate}, ${company?.name}, ${visitorNames}, ${purposesString}, ${site?.name}, ${timeSpent}`
+      let result = ''
+      result += `${visit.id},`
+      result += `${visitDate},`
+      result += `${company?.name},`
+      result += `${visitorNames},`
+      result += `${purposesString},`
+      result += `${site?.name},`
+      result += `${timeSpent}`
+      return result
     }))
 
+    // eslint-disable-next-line max-len
     const csvHeaders  = 'Visito Id, Vizito data, Įmonė, Įmonės darbuotojai, Vizito tikslas, Adresas, Užtrukta\n'
     const csvRows     = visitsGrouped.join('\n')
     const footer      = `Viso vizitų: ${visits.length}`
