@@ -14,18 +14,18 @@ export interface NameAndId {
 }
 
 export type Employees = {
-  _id:            string
-  companyId:      number | undefined
-  name:           string
-  lastName:       string
-  occupation:     string
-  employeeId:     number | undefined
-  permissions:    string[]
-  employeePhoto?: string
-  email?:         string
-  phoneNr?:       string
-  birthday?:      string
-  notes?:         string
+  _id:          Types.ObjectId
+  name:         string
+  birthday:     Date
+  isDisabled?:  boolean
+  lastname:     string
+  occupation:   string
+  phone:        string
+  email:        string
+  companyId:    Types.ObjectId
+  photo?:       string
+  permissions:  Types.ObjectId[]
+  note?:        string
 }
 
 export interface NameAndId {
@@ -48,7 +48,7 @@ export type VisitorsType = {
 
 export interface Guest {
   name:     string
-  comapany: string
+  company:  string
 }
 
 export type ClientsGuestsType = {
