@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { createTransport }            from 'nodemailer'
 
 import { convertUTCtoLocalDateTime }  from '../../helpers'
@@ -12,12 +13,11 @@ interface EmailBody {
     carPlates:          string[] | undefined
 }
 
-// eslint-disable-next-line max-len
 export default async ({ companyName, companyEmployees, scheduledVisitTime, guests, carPlates }: EmailBody) => {
   const imagePath         = 'src/Images/signatureLogo.png'
   const convertedDateTime = convertUTCtoLocalDateTime(scheduledVisitTime)
 
-  const sendEmail = () => {
+  const sendEmail = (mailAddress: string) => {
     return new Promise((resolve, reject) => {
       const transporter = createTransport({
         host:   process.env.SMTP_ADDRESS,
@@ -30,13 +30,8 @@ export default async ({ companyName, companyEmployees, scheduledVisitTime, guest
       })
 
       const mail_configs = {
-        from:     process.env.SENDER_ADDRESS,
-        to:       process.env.RECIPIENT_ADDRESS,
-        cc:       [process.env.CARBON_COPY_ADDRESS],
-        envelope: {
-          from: process.env.SENDER_ADDRESS,
-          to:   [process.env.CARBON_COPY_ADDRESS],
-        },
+        from: process.env.SENDER_ADDRESS,
+        to:   mailAddress,
         subject:
                 `${companyName}  ${convertedDateTime}`,
         attachments: [{
@@ -70,7 +65,7 @@ export default async ({ companyName, companyEmployees, scheduledVisitTime, guest
                       <p style="font-size: 10px">Pagarbiai,</p>
                       <p style="font-size: 10px">Monitoringo centras</p>
                       <p style="font-size: 10px">
-                    UAB Duomenų logistikos centras  |  A. Juozapavičiaus g. 13  |  LT-09311 Vilnius
+                        UAB Duomenų logistikos centras  |  A. Juozapavičiaus g. 13  |  LT-09311 Vilnius
                       </p>
                       <p style="font-size: 10px">Mob. +370 618 44 445;  +370 674 44 455 |</p>
                       <p style="font-size: 10px">El.paštas noc@datalogistics.lt</p>
@@ -83,11 +78,13 @@ export default async ({ companyName, companyEmployees, scheduledVisitTime, guest
 
       transporter.sendMail(mail_configs, function (error) {
         if (error) {
+          console.log(error)
           return reject({ message: 'An error has occurred' })
         }
         return resolve({ message: 'Email sent successfully' })
       })
     })
   }
-  sendEmail()
+  sendEmail(process.env.RECIPIENT_ADDRESS)
+  sendEmail(process.env.CARBON_COPY_ADDRESS)
 }
