@@ -4,13 +4,14 @@ import { TypedRequestBody } from '../../types.js'
 import SiteSchema           from '../../shemas/SiteSchema.js'
 
 interface Body {
-  name: string
+  name:     string
+  isRemote: boolean
 }
 
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
-    const { name } = req.body
+    const { name, isRemote } = req.body
 
     if (!name) {
       return res.status(400).json({ message: 'Bad request' })
@@ -23,6 +24,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     } else {
       const instance = new SiteSchema({
         name,
+        isRemote,
       })
 
       await instance.save()

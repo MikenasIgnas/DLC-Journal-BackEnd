@@ -90,7 +90,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
 
     const site = await SiteSchema.findById(siteId)
 
-    if (sendEmail && site?.name === 'T72') {
+    if (sendEmail && site?.isRemote) {
       const company           = await CompanySchema.findById(companyId)
       const companyName       = company?.name
       const visitors          = await VisitorSchema.find({ visitId: id })
