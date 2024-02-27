@@ -30,9 +30,13 @@ export default async ({ companyName, companyEmployees, scheduledVisitTime, guest
       })
 
       const mail_configs = {
-        from: process.env.SENDER_ADDRESS,
-        to:   process.env.RECIPIENT_ADDRESS,
-        cc:   [process.env.CARBON_COPY_ADDRESS],
+        from:     process.env.SENDER_ADDRESS,
+        to:       process.env.RECIPIENT_ADDRESS,
+        cc:       [process.env.CARBON_COPY_ADDRESS],
+        envelope: {
+          from: process.env.SENDER_ADDRESS,
+          to:   [process.env.CARBON_COPY_ADDRESS],
+        },
         subject:
                 `${companyName}  ${convertedDateTime}`,
         attachments: [{
