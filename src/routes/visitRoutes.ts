@@ -20,6 +20,7 @@ import editVisitorIdType    from '../controllers/visitsControllers/editVisitorId
 import editVisitPurpose     from '../controllers/visitsControllers/editVisitPurpose'
 import editVisitStatus      from '../controllers/visitsControllers/editVisitStatus'
 import endVisit             from '../controllers/visitsControllers/endVisit'
+import generateVisitsReport from '../controllers/generateVisitsReport'
 import getVisit             from '../controllers/visitsControllers/getVisit'
 import getVisitor           from '../controllers/visitsControllers/getVisitor'
 import getVisitorIdType     from '../controllers/visitsControllers/getVisitorIdType'
@@ -60,6 +61,7 @@ router.get('/visit/count', verifyToken, getVisitsCount)
 router.post('/start', verifyToken, startVisit)
 router.post('/end', verifyToken, endVisit)
 router.get('/pdf', verifyToken, getVisitPdf)
+router.get('/visit/report', verifyToken, generateVisitsReport)
 
 router.patch('/carplate', verifyToken, removeVisitCarplates)
 
