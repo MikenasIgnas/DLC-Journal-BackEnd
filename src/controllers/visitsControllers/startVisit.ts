@@ -9,7 +9,6 @@ import visitStatusSchema     from '../../shemas/visitStatusSchema.js'
 
 import generateVisitPdf      from './generateVisitPdf.js'
 
-
 interface Body {
   signatures: { signature: string, visitorId: number }[]
   statusId:   Types.ObjectId
@@ -27,10 +26,14 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
-    const visitExists = await VisitSchema.exists({ _id: visitId })
+    let visit = await VisitSchema.findById(visitId)
 
-    if (!visitExists) {
+    if (!visit) {
       return res.status(400).json({ messsage: 'Visit does not exist' })
+    }
+
+    if (visit.statusId === statusId) {
+      return res.status(400).json({ messsage: 'Visit already started' })
     }
 
     const statusExists = await visitStatusSchema.exists({ _id: statusId })
@@ -51,7 +54,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       }
     }
 
-    const visit = await VisitSchema.findByIdAndUpdate(
+    visit = await VisitSchema.findByIdAndUpdate(
       { _id: visitId },
       {
         dlcEmployee,

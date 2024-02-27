@@ -17,17 +17,17 @@ interface Body {
   carPlates?:          string[]
   companyId:           ObjectId
   date:                Date
+  endDate:             Date,
   guests?:             Guest[]
   id:                  ObjectId
   racks:               ObjectId[]
   scheduledVisitTime?: Date
+  sendEmail?:          boolean
+  siteId:              ObjectId
+  startDate:           Date,
+  statusId:            ObjectId
   visitorIdType:       ObjectId
   visitPurpose:        ObjectId[]
-  siteId:              ObjectId
-  statusId:            ObjectId
-  startDate:           Date,
-  endDate:             Date,
-  sendEmail?:          boolean
 }
 
 
@@ -37,24 +37,18 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       carPlates,
       companyId,
       date,
+      endDate,
       guests,
       id,
       racks,
       scheduledVisitTime,
+      sendEmail,
+      siteId,
+      startDate,
+      statusId,
       visitorIdType,
       visitPurpose,
-      siteId,
-      statusId,
-      startDate,
-      endDate,
-      sendEmail,
     } = req.body
-
-    let signature: string | undefined
-
-    if (req.file) {
-      signature = req.file?.path
-    }
 
     if (!id) {
       return res.status(400).json({ messsage: 'Bad request' })
@@ -74,16 +68,15 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
         carPlates,
         companyId,
         date,
+        endDate,
         guests,
         racks,
         scheduledVisitTime,
-        signature,
+        siteId,
+        startDate,
+        statusId,
         visitorIdType,
         visitPurpose,
-        siteId,
-        statusId,
-        startDate,
-        endDate,
       },
       { new: true }
     )

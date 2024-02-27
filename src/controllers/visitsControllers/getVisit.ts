@@ -12,13 +12,12 @@ import VisitSchema         from '../../shemas/VisitSchema.js'
 import getVisitQueryParams from './getVisitQueryParams.js'
 
 
-
 export default async (req: Request, res: Response) => {
   try {
     const {
+      _id,
       descending,
       id,
-      _id,
       limit,
       page,
       search,
@@ -42,9 +41,9 @@ export default async (req: Request, res: Response) => {
       const params = await getVisitQueryParams({
         search,
         siteId,
-        statusId,
         startFrom,
         startTo,
+        statusId,
       })
 
       let sort: SortOrder = 1

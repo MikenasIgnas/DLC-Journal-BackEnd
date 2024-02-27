@@ -5,8 +5,8 @@ import { TypedRequestBody } from '../../types.js'
 import VisitorSchema        from '../../shemas/VisitorSchema.js'
 
 interface Body {
-  id:            ObjectId
   employeeId?:   ObjectId
+  id:            ObjectId
   visitId?:      ObjectId
   visitorIdType: ObjectId
 }

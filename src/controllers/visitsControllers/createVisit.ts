@@ -56,7 +56,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
 
     const id = latestVisit?.id ? ++latestVisit.id : 1
 
-
     const instance = new VisitSchema({
       carPlates,
       companyId,

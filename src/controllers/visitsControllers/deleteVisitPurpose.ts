@@ -17,7 +17,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
-    await VisitPurposeSchema.findByIdAndDelete({ _id: id })
+    await VisitPurposeSchema.findByIdAndDelete(id)
     return res.status(200).json({ message: 'Delete success' })
   } catch (error) {
     return res.status(500).json({ message: 'Unexpected error' })
