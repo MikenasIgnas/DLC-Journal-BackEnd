@@ -1,30 +1,28 @@
 import { Response }         from 'express'
 
 import { TypedRequestBody } from '../../types.js'
-import SiteSchema           from '../../shemas/SiteSchema.js'
+import VisitorIdTypeSchema  from '../../shemas/VisitorIdTypeSchema.js'
 
 interface Body {
-  name:     string
-  isRemote: boolean
+  name: string
 }
 
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
-    const { name, isRemote } = req.body
+    const { name } = req.body
 
     if (!name) {
-      return res.status(400).json({ message: 'Bad request' })
+      return res.status(400).json({ messsage: 'Bad request' })
     }
 
-    const exists = await SiteSchema.exists({ name })
+    const exists = await VisitorIdTypeSchema.exists({ name })
 
     if (exists) {
-      return res.status(409).json({ message: 'Site Already Exist.' })
+      return res.status(409).json({ message: 'Visitor Id Type Already Exist.' })
     } else {
-      const instance = new SiteSchema({
+      const instance = new VisitorIdTypeSchema({
         name,
-        isRemote,
       })
 
       await instance.save()

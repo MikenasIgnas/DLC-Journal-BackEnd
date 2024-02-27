@@ -3,10 +3,11 @@ import {
   Response,
 }                     from 'express'
 
+import ExcelJS        from 'exceljs'
+import CompanySchema  from '../../shemas/CompanySchema'
 import PremiseSchema  from '../../shemas/PremiseSchema'
 import RackSchema     from '../../shemas/RackSchema'
 import SiteSchema     from '../../shemas/SiteSchema'
-
 
 export default async (req: Request, res: Response) => {
   const { siteId } = req.body
@@ -19,40 +20,34 @@ export default async (req: Request, res: Response) => {
     }
 
     const premises = await PremiseSchema.find({ siteId: site._id })
-
-    let csvData: string[][] = []
+    const workbook = new ExcelJS.Workbook()
 
     for (const premise of premises) {
-      const racks = await RackSchema.find({ premiseId: premise._id })
+      const racks     = await RackSchema.find({ premiseId: premise._id })
+      const racksIds  = racks.map(rack => rack._id)
+      const companies = await CompanySchema.find({ racks: { $in: racksIds } })
+      const sheet     = workbook.addWorksheet(premise.name)
 
-      const rackNames = racks.map(rack => rack.name)
+      sheet.addRow([premise.name, 'Spinta', 'Įmonė'])
 
-      csvData.push([premise.name, ...rackNames])
+      racks.forEach(rack => {
+        const companyNames = companies
+          .filter(company => company.racks.some(companyRack =>
+            companyRack.toString() === rack._id.toString()))
+          .map(company => company.name)
+          .join(', ')
+
+        sheet.addRow([' ', rack.name, companyNames])
+      })
     }
-
-    const maxRacks = Math.max(...csvData.map(column => column.length))
-
-    csvData = csvData.map(column => {
-      while (column.length < maxRacks) {
-        column.push('')
-      }
-
-      return column
-    })
-
-    const siteNameRow = [site.name].concat(Array(maxRacks - 1).fill(''))
-
-    csvData.unshift(siteNameRow)
-
-    const csvRows = csvData[0].map((_, colIndex) => csvData.map(row => row[colIndex]))
-
-    const csvString = csvRows.map(row => row.join(',')).join('\n')
 
     res.setHeader('Content-Type', 'text/csv')
     res.setHeader('Content-Disposition', 'attachment; filename=site-premise-racks.csv')
 
-    res.status(200).send(csvString)
+    await workbook.xlsx.write(res)
+    res.status(200).end()
   } catch (error) {
+    console.error(error)
     res.status(500).json({ message: 'Internal Server Error' })
   }
 }

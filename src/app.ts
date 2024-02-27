@@ -8,6 +8,7 @@ import companyRoutes from './routes/companyRoutes'
 import mainRouter    from './routes/router'
 import siteRoutes    from './routes/siteRoutes'
 import usersRouter   from './routes/userRoutes'
+import visitRouter   from './routes/visitRoutes'
 
 
 mongoose.connect(process.env.MONGO_PATH)
@@ -33,5 +34,6 @@ app.listen(process.env.SERVER_PORT)
 app.use('/', mainRouter)
 app.use('/auth', authRouter)
 app.use('/company', companyRoutes)
-app.use('/user', usersRouter)
 app.use('/site', siteRoutes)
+app.use('/user', usersRouter)
+app.use('/visit', visitRouter)
