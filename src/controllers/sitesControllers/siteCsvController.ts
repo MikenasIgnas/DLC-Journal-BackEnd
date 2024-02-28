@@ -47,7 +47,6 @@ export default async (req: Request, res: Response) => {
     await workbook.xlsx.write(res)
     res.status(200).end()
   } catch (error) {
-    console.error(error)
     res.status(500).json({ message: 'Internal Server Error' })
   }
 }

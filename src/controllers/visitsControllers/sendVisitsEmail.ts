@@ -78,7 +78,6 @@ export default async ({ companyName, companyEmployees, scheduledVisitTime, guest
 
       transporter.sendMail(mail_configs, function (error) {
         if (error) {
-          console.log(error)
           return reject({ message: 'An error has occurred' })
         }
         return resolve({ message: 'Email sent successfully' })

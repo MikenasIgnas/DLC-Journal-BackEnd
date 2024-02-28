@@ -44,7 +44,6 @@ export default async (req: Request, res: Response) => {
     res.setHeader('Content-Disposition', `attachment; filename=${premise.name}-racks.csv`)
     res.status(200).send(csvBuffer)
   } catch (error) {
-    console.error(error)
     res.status(500).json({ message: 'Internal Server Error' })
   }
 }
