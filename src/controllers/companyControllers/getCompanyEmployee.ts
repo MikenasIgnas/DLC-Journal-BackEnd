@@ -24,9 +24,16 @@ export default async (req: Request, res: Response) => {
 
     if (id) {
       const employee = await CompanyEmployeeSchema.findById({ _id: id })
+      if (!employee) {
+        return res.status(404).json({ message: 'Company not found' })
+      }
+      try {
+        const photo = await getSinglePhoto(employee)
+        employee.photo = photo
 
-      getSinglePhoto(employee)
-
+      } catch (error) {
+        employee.photo = ''
+      }
       return res.status(200).json(employee)
     } else {
       const { parsedLimit, skip } = getPagination(page, limit)
@@ -37,9 +44,11 @@ export default async (req: Request, res: Response) => {
 
       employees = await CompanyEmployeeSchema.find(params).limit(parsedLimit).skip(skip)
 
-      getArrayPhotos(employees)
+      employees = employees.map((el) => el.toObject())
 
-      return res.status(200).json(employees)
+      const employeesFull = await getArrayPhotos(employees)
+
+      return res.status(200).json(employeesFull)
     }
   } catch (error) {
     return res.status(500).json({ message: 'Unexpected error' })
