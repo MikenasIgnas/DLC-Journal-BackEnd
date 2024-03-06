@@ -6,7 +6,7 @@ import {
 import jwt                   from 'jsonwebtoken'
 
 import { DecodedToken }      from '../controllers/authControllers/types'
-import { getLoggedInUserId } from '../helpers'
+import { getUserId }         from '../helpers'
 import UserSchema            from '../shemas/UserSchema'
 
 
@@ -30,7 +30,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 }
 
 export const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  const id = await getLoggedInUserId(req)
+  const id = await getUserId(req)
   const user = await UserSchema.findById({ _id: id })
   if (user && user.isAdmin) {
     next()
@@ -40,7 +40,7 @@ export const verifyAdmin = async (req: Request, res: Response, next: NextFunctio
 }
 
 export const verifyNonSecurity = async (req: Request, res: Response, next: NextFunction) => {
-  const id = await getLoggedInUserId(req)
+  const id = await getUserId(req)
 
   const user = await UserSchema.findById({ _id: id })
 

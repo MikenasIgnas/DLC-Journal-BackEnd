@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { createTransport }            from 'nodemailer'
 
-import { convertUTCtoLocalDateTime }  from '../../helpers'
+import { convertUTCtoLocalTime }      from '../../helpers'
 import { Guest }                      from '../../types'
 
 interface EmailBody {
@@ -15,7 +15,7 @@ interface EmailBody {
 
 export default async ({ companyName, companyEmployees, scheduledVisitTime, guests, carPlates }: EmailBody) => {
   const imagePath         = 'src/Images/signatureLogo.png'
-  const convertedDateTime = convertUTCtoLocalDateTime(scheduledVisitTime)
+  const convertedDateTime = convertUTCtoLocalTime(scheduledVisitTime)
 
   const sendEmail = (mailAddress: string) => {
     return new Promise((resolve, reject) => {

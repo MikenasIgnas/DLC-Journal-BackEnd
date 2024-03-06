@@ -1,7 +1,7 @@
 import { Response }          from 'express'
 import { Types }             from 'mongoose'
 
-import { getLoggedInUserId } from '../../helpers.js'
+import { getUserId }         from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
 import VisitorSchema         from '../../shemas/VisitorSchema.js'
 import VisitSchema           from '../../shemas/VisitSchema.js'
@@ -18,7 +18,7 @@ interface Body {
 
 export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
-    const dlcEmployee = await getLoggedInUserId(req)
+    const dlcEmployee = await getUserId(req)
 
     const { visitId, signatures, statusId } = req.body
 

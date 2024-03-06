@@ -36,7 +36,7 @@ export default async (req: TypedRequestBody<LoginBody>, res: Response) => {
           const token = jwt.sign(
             payload,
             process.env.TOKEN_KEY,
-            { expiresIn: '8h', algorithm: 'HS256' }
+            { expiresIn: '10m', algorithm: 'HS256' }
           )
 
           res.status(200).json({

@@ -1,7 +1,7 @@
 import bcrypt                from 'bcrypt'
 import { Response }          from 'express'
 
-import { getLoggedInUserId } from '../../helpers.js'
+import { getUserId }         from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
 import UserSchema            from '../../shemas/UserSchema.js'
 
@@ -16,7 +16,7 @@ export default async (req: TypedRequestBody<ChangePasswordBody>, res: Response) 
   try {
     const { password, repeatPassword, oldPassword } = req.body
 
-    const id = await getLoggedInUserId(req)
+    const id = await getUserId(req)
 
     if (!password || !repeatPassword || !oldPassword) {
       return res.status(500).json({ message: 'Visi laukai privalomi' })

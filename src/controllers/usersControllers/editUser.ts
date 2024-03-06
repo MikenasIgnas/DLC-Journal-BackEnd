@@ -1,6 +1,6 @@
 import { Response }          from 'express'
 
-import { getLoggedInUserId } from '../../helpers.js'
+import { getUserId }         from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
 import UserSchema            from '../../shemas/UserSchema.js'
 
@@ -26,7 +26,7 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
   try {
     const { id, name, email, username, isAdmin, isSecurity } = req.body
 
-    const loggedInUserId = await getLoggedInUserId(req)
+    const loggedInUserId = await getUserId(req)
 
     const loggedInUser = await UserSchema.findById({ _id: loggedInUserId })
 
@@ -46,7 +46,7 @@ export default async (req: TypedRequestBody<EditUserBody>, res: Response) => {
         } else if (isSecurity) {
           updatedFields.isAdmin = false
           updatedFields.isSecurity = isSecurity
-        }else if (!isAdmin && !isSecurity){
+        } else if (!isAdmin && !isSecurity) {
           updatedFields.isAdmin = false
           updatedFields.isSecurity = false
         }
