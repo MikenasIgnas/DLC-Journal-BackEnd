@@ -8,6 +8,7 @@ declare global {
       SMTP_PORT:            number
       SENDER_ADDRESS:       string
       RECIPIENT_ADDRESS:    string
+      RECOVERY_TOKEN_KEY:   string
       CARBON_COPY_ADDRESS:  string
       CORS_ORIGIN:          string
       SERVER_PORT:          string
