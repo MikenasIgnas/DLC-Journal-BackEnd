@@ -1,10 +1,7 @@
 import { Response }          from 'express'
 import { ObjectId }          from 'mongoose'
 
-import {
-  Guest,
-  TypedRequestBody,
-}                            from '../../types.js'
+import { TypedRequestBody }  from '../../types.js'
 import CompanySchema         from '../../shemas/CompanySchema.js'
 import VisitSchema           from '../../shemas/VisitSchema.js'
 
@@ -13,7 +10,6 @@ interface Body {
   carPlates?:          string[]
   companyId:           ObjectId
   endDate?:            Date
-  guests?:             Guest[]
   siteId:              ObjectId
   racks?:              ObjectId[]
   scheduledVisitTime?: Date
@@ -28,7 +24,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const {
       carPlates,
       companyId,
-      guests,
       racks,
       scheduledVisitTime,
       siteId,
@@ -59,7 +54,6 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
     const instance = new VisitSchema({
       carPlates,
       companyId,
-      guests,
       id,
       racks,
       scheduledVisitTime,
