@@ -9,7 +9,7 @@ interface EmailBody {
 export default async ({ email, token }: EmailBody) => {
   const imagePath = 'src/Images/signatureLogo.png'
 
-  const urlPath = 'yourPath.com'
+  const urlPath = process.env.PASSWORD_RECOVERY_PAGE_PATH
 
   return new Promise((resolve, reject) => {
     const transporter = createTransport({
@@ -41,8 +41,7 @@ export default async ({ email, token }: EmailBody) => {
             <div style="font-family: Helvetica,Arial,sans-serif;overflow:auto;line-height:2">
               <div style="margin:50px auto;width:70%;padding:20px 0">
                 <p style="font-size:1.1em">Sveiki, </p>
-                <p>Slaptažodžio atkūrimo <a href=${urlPath}?token=${token}">nuoroda</a></p>
-                <p>Kodas galioja 10 minučių</p>
+                <div>Slaptažodžio atkūrimo ${urlPath}?token=${token} nuoroda</div>
                 </div>
               <div style="margin:50px auto;width:70%;padding:20px 0">
                 <img src="cid:unique@nodemailer.com"/>
