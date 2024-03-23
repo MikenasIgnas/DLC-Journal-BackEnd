@@ -5,7 +5,6 @@ import {
 }                            from 'express'
 import jwt                   from 'jsonwebtoken'
 
-import { DecodedToken }      from '../controllers/authControllers/types'
 import { getLoggedInUserId } from '../helpers'
 import UserSchema            from '../shemas/UserSchema'
 
@@ -16,13 +15,13 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     return res.status(401).json({ message: 'No token provided' })
   } else if (typeof token === 'string') {
     try {
-      const decoded = jwt.verify(token, process.env.TOKEN_KEY) as DecodedToken
+      try {
+        jwt.verify(token, process.env.TOKEN_KEY)
 
-      if (decoded.exp < Date.now() / 80000) {
-        return res.status(401).json({ message: 'No token provided' })
+        next()
+      } catch (error) {
+        return res.status(401).json({ message: 'Token expired' })
       }
-
-      next()
     } catch (err) {
       return res.status(401).json({ message: 'Unauthorized' })
     }

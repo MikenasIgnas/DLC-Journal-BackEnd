@@ -94,19 +94,19 @@ export const calculateTimeDifference = (startDate: Date | undefined, endDate: Da
   }
 }
 
-export const convertUTCtoLocalDateTime = (utcTimestamp: Date | undefined) => {
+export const convertUTCtoLocalTime = (utcTimestamp: Date | undefined) => {
   if (utcTimestamp) {
-    const dateObject = new Date(utcTimestamp)
+    const date = new Date(utcTimestamp)
 
-    const year = dateObject.toLocaleString('en-US', { year: 'numeric' })
-    const month = dateObject.toLocaleString('en-US', { month: '2-digit' })
-    const day = dateObject.toLocaleString('en-US', { day: '2-digit' })
+    const year  = date.toLocaleString('en-US', { year: 'numeric' })
+    const month = date.toLocaleString('en-US', { month: '2-digit' })
+    const day   = date.toLocaleString('en-US', { day: '2-digit' })
 
-    const hour = dateObject.toLocaleString('en-US', { hour: '2-digit', hour12: false })
-    const minute = dateObject.toLocaleString('en-US', { minute: '2-digit' })
+    const hours   = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
 
-    const localDateTimeString = `${year}-${month}-${day} ${hour}:${minute}`
-    return localDateTimeString
+    const dateTimeString = `${year} ${month} ${day}, ${hours}:${minutes}`
+
+    return dateTimeString
   }
-  return
 }
