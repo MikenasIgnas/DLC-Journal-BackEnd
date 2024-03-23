@@ -19,23 +19,17 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ message: 'Bad request' })
     }
 
-    const emailExists   = await UserSchema.exists({ email: email })
+    const user = await UserSchema.findOne({ email: email })
 
-    if (!emailExists) {
-      return res.status(400).json({ message: 'User with that email does not exist' })
-    } else {
-      const user = await UserSchema.findOne({ email: email })
+    const token = jwt.sign(
+      { userId: user?._id },
+      process.env.RECOVERY_TOKEN_KEY,
+      { expiresIn: '10m', algorithm: 'HS256' }
+    )
 
-      const token = jwt.sign(
-        { userId: user?._id },
-        process.env.RECOVERY_TOKEN_KEY,
-        { expiresIn: '10m', algorithm: 'HS256' }
-      )
+    sendPasswordRecoveryEmail({ email, token })
 
-      sendPasswordRecoveryEmail({ email, token })
-
-      res.status(200).json({ message: 'Recovery email sent' })
-    }
+    res.status(200).json({ message: 'Recovery email sent' })
   } catch (error) {
     return res.status(500).json({ message: 'Unexpected error' })
   }

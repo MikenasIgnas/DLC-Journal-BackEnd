@@ -41,7 +41,9 @@ export default async ({ email, token }: EmailBody) => {
             <div style="font-family: Helvetica,Arial,sans-serif;overflow:auto;line-height:2">
               <div style="margin:50px auto;width:70%;padding:20px 0">
                 <p style="font-size:1.1em">Sveiki, </p>
-                <div>Slaptažodžio atkūrimo ${urlPath}?token=${token} nuoroda</div>
+                <div>Atkurti slaptažodį galite su šia 
+                <a href="${urlPath}?token=${token}">nuoroda</a>
+                </div>
                 </div>
               <div style="margin:50px auto;width:70%;padding:20px 0">
                 <img src="cid:unique@nodemailer.com"/>
