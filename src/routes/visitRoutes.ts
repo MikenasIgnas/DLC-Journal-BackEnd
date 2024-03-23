@@ -4,7 +4,7 @@ import {
   verifyAdmin,
   verifyToken,
 }                           from '../middleware/middle'
-import createGuest             from '../controllers/visitsControllers/createGuest'
+import createGuest          from '../controllers/visitsControllers/createGuest'
 import createVisit          from '../controllers/visitsControllers/createVisit'
 import createVisitor        from '../controllers/visitsControllers/createVisitor'
 import createVisitorIdType  from '../controllers/visitsControllers/createVisitorIdType'

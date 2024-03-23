@@ -2,7 +2,7 @@ import { Response }         from 'express'
 import { ObjectId }         from 'mongoose'
 
 import { TypedRequestBody } from '../../types.js'
-import GuestSchema          from '../../shemas/GuestSchema.js'
+import VisitGuestSchema     from '../../shemas/VisitGuestSchema.js'
 
 interface Body {
   company:      string
@@ -19,7 +19,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       return res.status(400).json({ messsage: 'Bad request' })
     }
 
-    const instance = new GuestSchema({
+    const instance = new VisitGuestSchema({
       company,
       name,
       visitId,

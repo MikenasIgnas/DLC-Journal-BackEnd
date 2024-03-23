@@ -3,12 +3,12 @@ import { Types }             from 'mongoose'
 
 import { getLoggedInUserId } from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
+import VisitGuestSchema      from '../../shemas/VisitGuestSchema.js'
 import VisitorSchema         from '../../shemas/VisitorSchema.js'
 import VisitSchema           from '../../shemas/VisitSchema.js'
 import visitStatusSchema     from '../../shemas/visitStatusSchema.js'
 
 import generateVisitPdf      from './generateVisitPdf.js'
-import GuestSchema           from '../../shemas/GuestSchema.js'
 
 interface Body {
   guestSignatures: { signature: string, id: Types.ObjectId }[]
@@ -57,7 +57,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
       for (let index = 0; index < guestSignatures.length; index++) {
         const id = guestSignatures[index].id
 
-        await GuestSchema.findByIdAndUpdate(id, { signed: true })
+        await VisitGuestSchema.findByIdAndUpdate(id, { signed: true })
       }
     }
 

@@ -9,11 +9,11 @@ import {
 }                            from '../../helpers'
 import CompanyEmployeeSchema from '../../shemas/CompanyEmployeeSchema'
 import CompanySchema         from '../../shemas/CompanySchema'
-import GuestSchema           from '../../shemas/GuestSchema'
 import PermissionSchema      from '../../shemas/PermissionSchema'
 import PremiseSchema         from '../../shemas/PremiseSchema'
 import RackSchema            from '../../shemas/RackSchema'
 import SiteSchema            from '../../shemas/SiteSchema'
+import VisitGuestSchema      from '../../shemas/VisitGuestSchema'
 import VisitorIdTypeSchema   from '../../shemas/VisitorIdTypeSchema'
 import VisitorSchema         from '../../shemas/VisitorSchema'
 import VisitSchema           from '../../shemas/VisitSchema'
@@ -25,10 +25,10 @@ interface ExtendedJsPDF extends jsPDF {
 }
 
 interface Params {
-  visitId:          Types.ObjectId
-  signatures:       { signature: string, visitorId: number }[]
   guestSignatures:  { signature: string, id: Types.ObjectId }[]
+  signatures:       { signature: string, visitorId: number }[]
   startDate:        Date
+  visitId:          Types.ObjectId
 }
 
 
@@ -52,7 +52,7 @@ export default async ({ visitId, signatures, guestSignatures, startDate }: Param
   }
 
   const visitors  = await VisitorSchema.find({ visitId })
-  const guests    = await GuestSchema.find({ visitId })
+  const guests    = await VisitGuestSchema.find({ visitId })
 
   if (!visitors || visitors.length === 0) {
     throw new Error('No visitors found')
@@ -83,31 +83,31 @@ export default async ({ visitId, signatures, guestSignatures, startDate }: Param
       }
 
       return {
-        name:       employee?.name,
-        lastname:   employee?.lastname,
         birthday:   parseDateToString(employee?.birthday),
-        occupation: employee?.occupation,
-        phone:      employee?.phone,
         email:      employee?.email,
         idType:     idType?.name,
+        lastname:   employee?.lastname,
+        name:       employee?.name,
+        occupation: employee?.occupation,
         permissions,
+        phone:      employee?.phone,
         signature,
       }
     })
   )
 
   const visitGuests = await Promise.all(guests.map(
-    async ({ id, guestIdType }) => {
-      const signature = guestSignatures.find(el => el.id === id)?.signature
+    async ({ id, idType }) => {
+      const signature   = guestSignatures.find(el => el.id === id)?.signature
 
-      const idType    = await VisitorIdTypeSchema.findById(guestIdType)
+      const guestIdType = await VisitorIdTypeSchema.findById(idType)
 
-      const guest     = await GuestSchema.findById(id)
+      const guest       = await VisitGuestSchema.findById(id)
 
       return {
-        name:    guest?.name,
         company: guest?.company,
-        idType:  idType?.name,
+        idType:  guestIdType?.name,
+        name:    guest?.name,
         signature,
       }
     })

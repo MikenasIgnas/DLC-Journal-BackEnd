@@ -4,7 +4,7 @@ import {
 }                          from 'express'
 
 import { getPagination }   from '../../helpers.js'
-import GuestSchema         from '../../shemas/GuestSchema.js'
+import VisitGuestSchema    from '../../shemas/VisitGuestSchema.js'
 
 
 export default async (req: Request, res: Response) => {
@@ -12,13 +12,13 @@ export default async (req: Request, res: Response) => {
     const { _id, visitId, page, limit } = req.query
 
     if (_id) {
-      const guest = await GuestSchema.findById(_id)
+      const guest = await VisitGuestSchema.findById(_id)
 
       return res.status(200).json(guest)
     } else {
       const { parsedLimit, skip } = getPagination(page, limit)
 
-      const guests = await GuestSchema.find({ visitId }).limit(parsedLimit).skip(skip)
+      const guests = await VisitGuestSchema.find({ visitId }).limit(parsedLimit).skip(skip)
 
       return res.status(200).json(guests)
     }
