@@ -3,6 +3,7 @@ import { Types }             from 'mongoose'
 
 import { getLoggedInUserId } from '../../helpers.js'
 import { TypedRequestBody }  from '../../types.js'
+import VisitGuestSchema      from '../../shemas/VisitGuestSchema.js'
 import VisitorSchema         from '../../shemas/VisitorSchema.js'
 import VisitSchema           from '../../shemas/VisitSchema.js'
 import visitStatusSchema     from '../../shemas/visitStatusSchema.js'
@@ -10,9 +11,10 @@ import visitStatusSchema     from '../../shemas/visitStatusSchema.js'
 import generateVisitPdf      from './generateVisitPdf.js'
 
 interface Body {
-  signatures: { signature: string, visitorId: number }[]
-  statusId:   Types.ObjectId
-  visitId:    Types.ObjectId
+  guestSignatures: { signature: string, id: Types.ObjectId }[]
+  signatures:      { signature: string, visitorId: number }[]
+  statusId:        Types.ObjectId
+  visitId:         Types.ObjectId
 }
 
 
@@ -20,7 +22,7 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
   try {
     const dlcEmployee = await getLoggedInUserId(req)
 
-    const { visitId, signatures, statusId } = req.body
+    const { visitId, signatures, statusId, guestSignatures } = req.body
 
     if (!visitId && !statusId) {
       return res.status(400).json({ messsage: 'Bad request' })
@@ -44,13 +46,18 @@ export default async (req: TypedRequestBody<Body>, res: Response) => {
 
     const startDate = new Date()
 
-    const documentPath = await generateVisitPdf({ signatures, startDate, visitId })
-
+    const documentPath = await generateVisitPdf({ signatures, guestSignatures, startDate, visitId })
     if (documentPath) {
       for (let index = 0; index < signatures.length; index++) {
         const id = signatures[index].visitorId
 
         await VisitorSchema.findByIdAndUpdate(id, { signed: true })
+      }
+
+      for (let index = 0; index < guestSignatures.length; index++) {
+        const id = guestSignatures[index].id
+
+        await VisitGuestSchema.findByIdAndUpdate(id, { signed: true })
       }
     }
 

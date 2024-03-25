@@ -13,6 +13,7 @@ import PermissionSchema      from '../../shemas/PermissionSchema'
 import PremiseSchema         from '../../shemas/PremiseSchema'
 import RackSchema            from '../../shemas/RackSchema'
 import SiteSchema            from '../../shemas/SiteSchema'
+import VisitGuestSchema      from '../../shemas/VisitGuestSchema'
 import VisitorIdTypeSchema   from '../../shemas/VisitorIdTypeSchema'
 import VisitorSchema         from '../../shemas/VisitorSchema'
 import VisitSchema           from '../../shemas/VisitSchema'
@@ -24,13 +25,14 @@ interface ExtendedJsPDF extends jsPDF {
 }
 
 interface Params {
-  visitId:    Types.ObjectId
-  signatures: { signature: string, visitorId: number }[]
-  startDate:  Date
+  guestSignatures:  { signature: string, id: Types.ObjectId }[]
+  signatures:       { signature: string, visitorId: number }[]
+  startDate:        Date
+  visitId:          Types.ObjectId
 }
 
 
-export default async ({ visitId, signatures, startDate }: Params) => {
+export default async ({ visitId, signatures, guestSignatures, startDate }: Params) => {
   const visit = await VisitSchema.findById(visitId)
 
   if (!visit) {
@@ -49,7 +51,8 @@ export default async ({ visitId, signatures, startDate }: Params) => {
     throw new Error('Could not find company')
   }
 
-  const visitors = await VisitorSchema.find({ visitId })
+  const visitors  = await VisitorSchema.find({ visitId })
+  const guests    = await VisitGuestSchema.find({ visitId })
 
   if (!visitors || visitors.length === 0) {
     throw new Error('No visitors found')
@@ -80,14 +83,31 @@ export default async ({ visitId, signatures, startDate }: Params) => {
       }
 
       return {
-        name:       employee?.name,
-        lastname:   employee?.lastname,
         birthday:   parseDateToString(employee?.birthday),
-        occupation: employee?.occupation,
-        phone:      employee?.phone,
         email:      employee?.email,
         idType:     idType?.name,
+        lastname:   employee?.lastname,
+        name:       employee?.name,
+        occupation: employee?.occupation,
         permissions,
+        phone:      employee?.phone,
+        signature,
+      }
+    })
+  )
+
+  const visitGuests = await Promise.all(guests.map(
+    async ({ id, idType }) => {
+      const signature   = guestSignatures.find(el => el.id === id)?.signature
+
+      const guestIdType = await VisitorIdTypeSchema.findById(idType)
+
+      const guest       = await VisitGuestSchema.findById(id)
+
+      return {
+        company: guest?.company,
+        idType:  guestIdType?.name,
+        name:    guest?.name,
         signature,
       }
     })
@@ -223,7 +243,6 @@ export default async ({ visitId, signatures, startDate }: Params) => {
       doc.setFontSize(10)
       doc.text('Kolokacijos', 15, firstTableEnd + 10)
       doc.setFontSize(originalFontSize)
-
       autoTable(doc, {
         head: [
           ['Patalpa', 'Spinta'],
@@ -242,7 +261,7 @@ export default async ({ visitId, signatures, startDate }: Params) => {
     }
   }
 
-  if (visit.guests && visit.guests.length > 0) {
+  if (guests && guests.length > 0) {
     const secondTableEnd = doc?.lastAutoTable?.finalY
     if (secondTableEnd) {
       doc.setFontSize(10)
@@ -250,16 +269,37 @@ export default async ({ visitId, signatures, startDate }: Params) => {
       doc.setFontSize(originalFontSize)
       autoTable(doc, {
         head: [
-          ['Varads/Pavardė', 'Įmonė'],
+          ['Varads/Pavardė', 'Įmonė', 'Dokumentas', 'Parašas'],
         ],
-        body: visit.guests.map((el) => [
-          el.name,
-          el.company!,
+        bodyStyles: {
+          minCellHeight: 20,
+        },
+        body: visitGuests.map((el) => [
+          el.name || '',
+          el.company || '',
+          el.idType || '',
+          el?.signature || null,
         ]),
         columns: [
           { header: 'Vardas/Pavardė', dataKey: 'name' },
           { header: 'Įmonė', dataKey: 'company' },
+          { header: 'Dokumentas', dataKey: 'idType' },
+          { header: 'Parašas', dataKey: 'signature' },
         ],
+        didParseCell: (data) => {
+          if (data.row.section === 'body' && data.column.dataKey === 'signature') {
+            data.cell.text = ['']
+            data.cell.minWidth = 200
+          }
+        },
+        didDrawCell: (data) => {
+          if (data.row.section === 'body' && data.column.dataKey === 'signature') {
+            const { raw, x, y } = data.cell
+            if (typeof raw === 'string') {
+              doc.addImage(raw, 'PNG', x , y, 15, 15)
+            }
+          }
+        },
         startY: secondTableEnd + 15,
         styles: { font: 'Arial' },
       })

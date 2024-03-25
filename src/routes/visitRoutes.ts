@@ -4,16 +4,19 @@ import {
   verifyAdmin,
   verifyToken,
 }                           from '../middleware/middle'
+import createGuest          from '../controllers/visitsControllers/createGuest'
 import createVisit          from '../controllers/visitsControllers/createVisit'
 import createVisitor        from '../controllers/visitsControllers/createVisitor'
 import createVisitorIdType  from '../controllers/visitsControllers/createVisitorIdType'
 import createVisitPurpose   from '../controllers/visitsControllers/createVisitPurpose'
 import createVisitStatus    from '../controllers/visitsControllers/createVisitStatus'
+import deleteGuest          from '../controllers/visitsControllers/deleteGuest'
 import deleteVisit          from '../controllers/visitsControllers/deleteVisit'
 import deleteVisitor        from '../controllers/visitsControllers/deleteVisitor'
 import deleteVisitorIdType  from '../controllers/visitsControllers/deleteVisitorIdType'
 import deleteVisitPurpose   from '../controllers/visitsControllers/deleteVisitPurpose'
 import deleteVisitStatus    from '../controllers/visitsControllers/deleteVisitStatus'
+import editGuests           from '../controllers/visitsControllers/editGuests'
 import editVisit            from '../controllers/visitsControllers/editVisit'
 import editVisitor          from '../controllers/visitsControllers/editVisitor'
 import editVisitorIdType    from '../controllers/visitsControllers/editVisitorIdType'
@@ -21,6 +24,7 @@ import editVisitPurpose     from '../controllers/visitsControllers/editVisitPurp
 import editVisitStatus      from '../controllers/visitsControllers/editVisitStatus'
 import endVisit             from '../controllers/visitsControllers/endVisit'
 import generateVisitsReport from '../controllers/generateVisitsReport'
+import getGuests            from '../controllers/visitsControllers/getGuests'
 import getVisit             from '../controllers/visitsControllers/getVisit'
 import getVisitor           from '../controllers/visitsControllers/getVisitor'
 import getVisitorIdType     from '../controllers/visitsControllers/getVisitorIdType'
@@ -62,6 +66,11 @@ router.post('/start', verifyToken, startVisit)
 router.post('/end', verifyToken, endVisit)
 router.get('/pdf', verifyToken, getVisitPdf)
 router.get('/visit/report', verifyToken, generateVisitsReport)
+
+router.post('/guests', verifyToken, verifyAdmin, createGuest)
+router.put('/guests', verifyToken, verifyAdmin, editGuests)
+router.delete('/guests', verifyToken, verifyAdmin, deleteGuest)
+router.get('/guests', verifyToken, verifyAdmin, getGuests)
 
 router.patch('/carplate', verifyToken, removeVisitCarplates)
 
