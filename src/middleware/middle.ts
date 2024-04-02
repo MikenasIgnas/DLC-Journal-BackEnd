@@ -24,7 +24,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
       next()
     } catch (err) {
-      return res.status(401).json({ message: 'Unauthorized' })
+      return res.status(401).json({ message: 'Unauthorized verify token' })
     }
   }
 }
@@ -35,7 +35,7 @@ export const verifyAdmin = async (req: Request, res: Response, next: NextFunctio
   if (user && user.isAdmin) {
     next()
   } else {
-    return res.status(401).json({ message: 'Unauthorized' })
+    return res.status(401).json({ message: 'Unauthorized admin' })
   }
 }
 
@@ -47,6 +47,6 @@ export const verifyNonSecurity = async (req: Request, res: Response, next: NextF
   if (user && !user.isSecurity) {
     next()
   } else {
-    return res.status(401).json({ message: 'Unauthorized' })
+    return res.status(401).json({ message: 'Unauthorized security' })
   }
 }

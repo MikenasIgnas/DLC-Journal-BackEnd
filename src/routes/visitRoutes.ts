@@ -67,10 +67,10 @@ router.post('/end', verifyToken, endVisit)
 router.get('/pdf', verifyToken, getVisitPdf)
 router.get('/visit/report', verifyToken, generateVisitsReport)
 
-router.post('/guests', verifyToken, verifyAdmin, createGuest)
-router.put('/guests', verifyToken, verifyAdmin, editGuests)
-router.delete('/guests', verifyToken, verifyAdmin, deleteGuest)
-router.get('/guests', verifyToken, verifyAdmin, getGuests)
+router.post('/guests', verifyToken, createGuest)
+router.put('/guests', verifyToken, editGuests)
+router.delete('/guests', verifyToken, deleteGuest)
+router.get('/guests', verifyToken, getGuests)
 
 router.patch('/carplate', verifyToken, removeVisitCarplates)
 
